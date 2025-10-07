@@ -1,0 +1,313 @@
+/* Main container */
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+}
+
+/* Hero Section */
+.heroSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.heroHeadline {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  max-width: 800px;
+}
+
+.heroSubheadline {
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+  max-width: 650px;
+  opacity: 0.8;
+}
+
+.heroButton {
+  margin-top: 2.5rem;
+  padding: 1rem 2.5rem;
+  background-color: #00F5C8;
+  color: #1A1A2E;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.heroButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 245, 200, 0.2);
+}
+
+/* Universal Section Title */
+.sectionTitle {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+}
+
+/* Services Section */
+.servicesSection {
+  width: 100%;
+  max-width: 1200px;
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.servicesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  text-align: left;
+}
+
+.serviceCard {
+  background-color: #16213E;
+  padding: 2.5rem 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.serviceCard:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+}
+
+.serviceIcon {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.serviceCard h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.serviceCard p {
+  opacity: 0.8;
+  line-height: 1.6;
+}
+
+/* Portfolio Section */
+.portfolioSection {
+  width: 100%;
+  background-color: #16213E;
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.portfolioGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+  text-align: left;
+}
+
+.portfolioItem {
+  background-color: #1A1A2E;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.portfolioItem:hover {
+  transform: translateY(-10px);
+}
+
+.portfolioImagePlaceholder {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #2c3e50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.portfolioItem h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+}
+
+.portfolioItem p {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  opacity: 0.7;
+}
+
+/* Why Choose Us Section */
+.whyUsSection {
+  width: 100%;
+  max-width: 1200px;
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.whyUsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.whyUsItem {
+  background-color: #16213E;
+  padding: 2.5rem 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease;
+  text-align: center;
+}
+
+.whyUsItem:hover {
+  transform: translateY(-10px);
+}
+
+.whyUsIcon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  color: #00F5C8;
+}
+
+.whyUsItem h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.whyUsItem p {
+  opacity: 0.8;
+  line-height: 1.6;
+}
+
+/* Testimonials Section */
+.testimonialsSection {
+  width: 100%;
+  background-color: #16213E;
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.testimonialsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+  text-align: left;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.testimonialCard {
+  background-color: #1A1A2E;
+  padding: 2.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.testimonialCard::before {
+  content: '“';
+  position: absolute;
+  top: -1rem;
+  left: 1.5rem;
+  font-size: 6rem;
+  color: #00F5C8;
+  opacity: 0.1;
+  line-height: 1;
+}
+
+.quote {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  font-style: italic;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.author {
+  font-weight: 600;
+  color: #00F5C8;
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== NAYA: Blog Section ki Styling ===== */
+.blogSection {
+  width: 100%;
+  max-width: 1200px;
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.blogGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+  text-align: left;
+}
+
+.blogCard {
+  background-color: #16213E;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.blogCard:hover {
+  transform: translateY(-10px);
+}
+
+.blogImagePlaceholder {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #2c3e50;
+}
+
+.blogCardContent {
+  padding: 1.5rem;
+}
+
+.blogCategory {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #00F5C8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.blogCard h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.readMoreLink {
+  font-weight: 600;
+  color: #EFEFEF;
+  transition: color 0.2s ease;
+}
+
+.readMoreLink:hover {
+  color: #00F5C8;
+}

@@ -1,0 +1,106 @@
+.main {
+  width: 100%;
+  max-width: 1200px; /* Page content ki width set karna */
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+/* Hero Section ki styling */
+.hero {
+  text-align: center;
+  padding-bottom: 4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 3rem;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  opacity: 0.8;
+}
+
+/* Filter buttons ki styling */
+.filters {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.filters button {
+  background-color: transparent;
+  color: #EFEFEF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.75rem 1.5rem;
+  border-radius: 2rem; /* Rounded buttons */
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.filters button:hover {
+  background-color: #16213E;
+}
+
+.filters .activeFilter {
+  background-color: #00F5C8;
+  color: #1A1A2E;
+  border-color: #00F5C8;
+}
+
+/* Portfolio Grid ki styling */
+.portfolioGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.portfolioItem {
+  position: relative; /* Hover effect ke liye zaroori */
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+}
+
+.portfolioImagePlaceholder {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background-color: #2c3e50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  transition: transform 0.4s ease;
+}
+
+.portfolioItem:hover .portfolioImagePlaceholder {
+  transform: scale(1.05); /* Image par zoom effect */
+}
+
+/* Project Info jo hover par dikhega */
+.portfolioItemInfo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1.5rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.portfolioItemInfo h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.portfolioItemInfo p {
+  opacity: 0.8;
+  margin-top: 0.25rem;
+}

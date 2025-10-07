@@ -1,0 +1,131 @@
+.main {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+/* Hero Section ki styling */
+.hero {
+  text-align: center;
+  padding-bottom: 4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 4rem;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  opacity: 0.8;
+}
+
+/* Main Content Section (2-column layout) */
+.contactSection {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr; /* Form ko thodi zyada jagah */
+  gap: 4rem;
+}
+
+/* Left side: Contact Info ki styling */
+.contactInfo h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.contactInfo p {
+  opacity: 0.8;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.infoItem {
+  margin-bottom: 2rem;
+}
+
+.infoItem strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
+}
+
+.infoItem a {
+  color: #00F5C8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.socials {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.socials a {
+  color: #EFEFEF;
+  opacity: 0.7;
+  font-size: 1.75rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.socials a:hover {
+  opacity: 1;
+  color: #00F5C8;
+  transform: translateY(-2px);
+}
+
+/* Right side: Contact Form ki styling */
+.contactForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  padding: 1rem;
+  background-color: #16213E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #EFEFEF;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: #00F5C8;
+}
+
+.submitButton {
+  padding: 1rem 2.5rem;
+  background-color: #00F5C8;
+  color: #1A1A2E;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  align-self: flex-start; /* Button ko left mein align karna */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 245, 200, 0.2);
+}

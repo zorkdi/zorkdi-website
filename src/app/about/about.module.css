@@ -1,0 +1,119 @@
+.main {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+/* Hero Section ki styling */
+.hero {
+  text-align: center;
+  padding-bottom: 4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 4rem;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  opacity: 0.8;
+}
+
+/* Our Story Section ki styling (2-column layout) */
+.storySection {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Text ko zyada jagah */
+  gap: 3rem;
+  align-items: center;
+  margin-bottom: 6rem;
+}
+
+.storyContent h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #00F5C8;
+}
+
+.storyContent p {
+  line-height: 1.8;
+  opacity: 0.9;
+}
+
+.founderImagePlaceholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: #16213E;
+  border-radius: 50%; /* Gol image ke liye */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Mission & Vision Section ki styling */
+.missionVisionSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 6rem;
+}
+
+.missionCard, .visionCard {
+  background-color: #16213E;
+  padding: 2.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.missionCard h3, .visionCard h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.missionCard p, .visionCard p {
+  line-height: 1.7;
+  opacity: 0.8;
+}
+
+/* Core Values Section ki styling */
+.valuesSection {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.valueItem .valueIcon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #00F5C8;
+}
+
+.valueItem h4 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.valueItem p {
+  opacity: 0.8;
+  line-height: 1.6;
+}

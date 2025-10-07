@@ -1,0 +1,90 @@
+/* Main header bar ki styling */
+.header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: rgba(22, 33, 62, 0.8); /* #16213E with transparency */
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 0;
+}
+
+/* Header ke content ko manage karne wala container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* UPDATED: Logo "ZORK DI" ki styling */
+.logo a {
+  font-size: 1.7rem; /* Thoda bada kiya */
+  font-weight: 700;
+  color: #EFEFEF;
+  text-decoration: none;
+}
+
+/* Navigation links ki list ki styling */
+.navLinks {
+  list-style: none;
+  display: flex;
+  align-items: center; /* Button ke saath align karne ke liye */
+  gap: 2rem;
+}
+
+/* UPDATED: Har ek link ki styling */
+.navLinks a {
+  position: relative; /* Naye hover effect ke liye zaroori */
+  color: #EFEFEF;
+  opacity: 0.8;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.navLinks a:hover {
+  opacity: 1;
+}
+
+/* Naya Hover Effect: Link ke neeche line */
+.navLinks a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 100%;
+  height: 2px;
+  background-color: #00F5C8;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.navLinks a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* NAYA: Contact Button ki styling */
+.ctaButton {
+  padding: 0.6rem 1.5rem;
+  background-color: #00F5C8;
+  color: #1A1A2E !important; /* Text color ko force karne ke liye */
+  opacity: 1 !important; /* Opacity ko force karne ke liye */
+  border-radius: 6px;
+  transition: transform 0.2s ease;
+}
+
+.ctaButton:hover {
+  transform: translateY(-2px);
+}
+
+/* Hover effect ki line Contact button par na aaye */
+.ctaButton::after {
+  display: none;
+}

@@ -1,0 +1,39 @@
+/* Page ko readable banane ke liye container */
+.main {
+  width: 100%;
+  max-width: 800px; /* Blog post ke liye ideal width */
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+/* .postArticle class ko hata diya gaya hai kyunki woh khaali tha */
+
+/* Post ke title ki styling */
+.postTitle {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+/* Category tag ki styling */
+.postCategory {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #00F5C8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+  display: inline-block;
+}
+
+/* Post ke content area ki styling */
+.postContent {
+  font-size: 1.125rem; /* Padhne ke liye aacha font size */
+  line-height: 1.8; /* Lines ke beech mein aachi spacing */
+  opacity: 0.9;
+}
+
+.postContent p {
+  margin-bottom: 1.5rem;
+}

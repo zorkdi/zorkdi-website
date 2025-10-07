@@ -1,0 +1,82 @@
+.footer {
+  width: 100%;
+  background-color: #1A1A2E;
+  color: #EFEFEF;
+  padding: 4rem 0 2rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.footerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.footerBrand h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.footerBrand p {
+  opacity: 0.7;
+  max-width: 300px;
+}
+
+.footerSocial h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* NAYA: Social links ki list ko manage karne ke liye */
+.socialList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column; /* Vertical layout */
+  gap: 1rem; /* Links ke beech mein vertical space */
+}
+
+/* Har ek link (icon + text) ki styling */
+.socialList a {
+  display: flex;
+  align-items: center; /* Icon aur text ko align karna */
+  gap: 0.75rem; /* Icon aur text ke beech mein space */
+  color: #EFEFEF;
+  opacity: 0.8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.socialList a:hover {
+  opacity: 1;
+  color: #00F5C8; /* Accent color */
+}
+
+/* Icon ka size */
+.socialList a svg {
+  font-size: 1.5rem;
+}
+
+.footerBottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 2rem;
+  text-align: center;
+}
+
+.footerBottom p {
+  opacity: 0.6;
+  font-size: 0.9rem;
+}
