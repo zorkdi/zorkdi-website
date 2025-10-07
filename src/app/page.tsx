@@ -1,4 +1,3 @@
-import Image from "next/image";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -68,7 +67,7 @@ export default function Home() {
           <div className={styles.whyUsItem}>
             <div className={styles.whyUsIcon}>🏆</div>
             <h3>Premium Quality</h3>
-            <p>We don't just build, we craft. Our commitment is to deliver top-notch, reliable, and polished products.</p>
+            <p>We do not just build, we craft. Our commitment is to deliver top-notch, reliable, and polished products.</p>
           </div>
           <div className={styles.whyUsItem}>
             <div className={styles.whyUsIcon}>🚀</div>
@@ -89,7 +88,7 @@ export default function Home() {
         <div className={styles.testimonialsGrid}>
           <div className={styles.testimonialCard}>
             <p className={styles.quote}>
-              "Working with ZORK DI was a game-changer. Their attention to detail and commitment to quality is unmatched. Our app is not only functional but also incredibly fast."
+              &quot;Working with ZORK DI was a game-changer. Their attention to detail and commitment to quality is unmatched. Our app is not only functional but also incredibly fast.&quot;
             </p>
             <p className={styles.author}>
               - Client Name, CEO of ExampleCorp
@@ -97,7 +96,7 @@ export default function Home() {
           </div>
           <div className={styles.testimonialCard}>
             <p className={styles.quote}>
-              "The team at ZORK DI delivered beyond our expectations. They understood our vision and translated it into a robust software solution that has streamlined our operations."
+              &quot;The team at ZORK DI delivered beyond our expectations. They understood our vision and translated it into a robust software solution that has streamlined our operations.&quot;
             </p>
             <p className={styles.author}>
               - Another Client, CTO of Biz Inc.
@@ -106,7 +105,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== NAYA: Blog Snippet Section ===== */}
+      {/* ===== Blog Snippet Section ===== */}
       <section className={styles.blogSection}>
         <h2 className={styles.sectionTitle}>Latest Insights</h2>
         <div className={styles.blogGrid}>
@@ -115,7 +114,7 @@ export default function Home() {
             <div className={styles.blogCardContent}>
               <p className={styles.blogCategory}>TUTORIAL</p>
               <h3>How to Optimize Your Flutter App Performance</h3>
-              <a href="#" className={styles.readMoreLink}>Read More →</a>
+              <a href="/blog/flutter-performance" className={styles.readMoreLink}>Read More →</a>
             </div>
           </div>
           <div className={styles.blogCard}>
@@ -123,7 +122,7 @@ export default function Home() {
             <div className={styles.blogCardContent}>
               <p className={styles.blogCategory}>WEB SECURITY</p>
               <h3>Top 5 Security Practices for Next.js Apps</h3>
-              <a href="#" className={styles.readMoreLink}>Read More →</a>
+              <a href="/blog/nextjs-security" className={styles.readMoreLink}>Read More →</a>
             </div>
           </div>
           <div className={styles.blogCard}>
@@ -131,7 +130,7 @@ export default function Home() {
             <div className={styles.blogCardContent}>
               <p className={styles.blogCategory}>FIREBASE</p>
               <h3>Understanding Firestore: A Deep Dive</h3>
-              <a href="#" className={styles.readMoreLink}>Read More →</a>
+              <a href="/blog/firestore-deep-dive" className={styles.readMoreLink}>Read More →</a>
             </div>
           </div>
         </div>

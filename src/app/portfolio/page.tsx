@@ -1,7 +1,6 @@
 "use client"; // Hum is component ko interactive banane ke liye ise 'Client Component' bana rahe hain
 
 import { useState } from 'react'; // 'State' manage karne ke liye
-import Link from 'next/link';
 import styles from './portfolio.module.css';
 
 // Projects ka data
@@ -39,10 +38,8 @@ const allProjects = [
 ];
 
 const PortfolioPage = () => {
-  // Yahan hum 'state' bana rahe hain jo yaad rakhega ki kaun sa filter active hai
   const [activeFilter, setActiveFilter] = useState('All');
 
-  // Yeh projects ko active filter ke hisaab se filter karta hai
   const filteredProjects = activeFilter === 'All'
     ? allProjects
     : allProjects.filter(project => project.category === activeFilter);
@@ -52,7 +49,7 @@ const PortfolioPage = () => {
       {/* ===== Hero Section ===== */}
       <section className={styles.hero}>
         <h1>Our Work</h1>
-        <p>A showcase of our passion, dedication, and the problems we've solved.</p>
+        <p>A showcase of our passion, dedication, and the problems we have solved.</p>
       </section>
 
       {/* ===== Filter Buttons ===== */}
@@ -85,7 +82,6 @@ const PortfolioPage = () => {
 
       {/* ===== Portfolio Grid ===== */}
       <section className={styles.portfolioGrid}>
-        {/* Hum yahan 'allProjects' ki jagah 'filteredProjects' use kar rahe hain */}
         {filteredProjects.map((project, index) => (
           <div key={index} className={styles.portfolioItem}>
             <div className={styles.portfolioImagePlaceholder}>

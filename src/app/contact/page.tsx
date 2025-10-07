@@ -11,8 +11,6 @@ const ContactPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Abhi ke liye, hum form data ko console par print karenge.
-    // Future mein hum ise email par bhejenge.
     console.log({ name, email, message });
     alert('Thank you for your message!');
     setName('');
@@ -25,7 +23,7 @@ const ContactPage = () => {
       {/* ===== Hero Section ===== */}
       <section className={styles.hero}>
         <h1>Get in Touch</h1>
-        <p>Have a project in mind or just want to say hello? We'd love to hear from you.</p>
+        <p>Have a project in mind or just want to say hello? We would love to hear from you.</p>
       </section>
 
       {/* ===== Main Content Section ===== */}

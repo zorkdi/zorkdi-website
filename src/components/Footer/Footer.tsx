@@ -1,6 +1,4 @@
-import Link from 'next/link';
 import styles from './Footer.module.css';
-// NAYA: Humne Facebook ka icon bhi import kiya hai
 import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook } from "react-icons/fa";
 
 const Footer = () => {
@@ -14,7 +12,6 @@ const Footer = () => {
           </div>
           <div className={styles.footerSocial}>
             <h3>Social</h3>
-            {/* NAYA: Humne links ko vertical list mein daala hai */}
             <ul className={styles.socialList}>
               <li>
                 <a href="#" target="_blank" rel="noopener noreferrer">
