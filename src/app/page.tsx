@@ -1,3 +1,4 @@
+import Link from 'next/link'; // NAYA: Link component ko import kiya
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -11,9 +12,9 @@ export default function Home() {
         <p className={styles.heroSubheadline}>
           We transform your ideas into high-performance applications, websites, and software.
         </p>
-        <a href="/services" className={styles.heroButton}>
+        <Link href="/services" className={styles.heroButton}>
           Explore Our Services
-        </a>
+        </Link>
       </section>
 
       {/* ===== Services Overview Section ===== */}
@@ -114,7 +115,8 @@ export default function Home() {
             <div className={styles.blogCardContent}>
               <p className={styles.blogCategory}>TUTORIAL</p>
               <h3>How to Optimize Your Flutter App Performance</h3>
-              <a href="/blog/flutter-performance" className={styles.readMoreLink}>Read More →</a>
+              {/* NAYA: <a> ko <Link> se replace kiya */}
+              <Link href="/blog/flutter-performance" className={styles.readMoreLink}>Read More →</Link>
             </div>
           </div>
           <div className={styles.blogCard}>
@@ -122,7 +124,8 @@ export default function Home() {
             <div className={styles.blogCardContent}>
               <p className={styles.blogCategory}>WEB SECURITY</p>
               <h3>Top 5 Security Practices for Next.js Apps</h3>
-              <a href="/blog/nextjs-security" className={styles.readMoreLink}>Read More →</a>
+              {/* NAYA: <a> ko <Link> se replace kiya */}
+              <Link href="/blog/nextjs-security" className={styles.readMoreLink}>Read More →</Link>
             </div>
           </div>
           <div className={styles.blogCard}>
@@ -130,7 +133,8 @@ export default function Home() {
             <div className={styles.blogCardContent}>
               <p className={styles.blogCategory}>FIREBASE</p>
               <h3>Understanding Firestore: A Deep Dive</h3>
-              <a href="/blog/firestore-deep-dive" className={styles.readMoreLink}>Read More →</a>
+              {/* NAYA: <a> ko <Link> se replace kiya */}
+              <Link href="/blog/firestore-deep-dive" className={styles.readMoreLink}>Read More →</Link>
             </div>
           </div>
         </div>

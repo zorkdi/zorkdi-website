@@ -5,14 +5,14 @@ const AboutPage = () => {
     <main className={styles.main}>
       {/* ===== Hero Section ===== */}
       <section className={styles.hero}>
-        <h1>We Don't Just Build Software, We Build Trust.</h1>
+        <h1>We Do Not Just Build Software, We Build Trust.</h1>
         <p>Learn more about the vision, mission, and the people behind ZORK DI.</p>
       </section>
 
       {/* ===== Our Story Section ===== */}
       <section className={styles.storySection}>
         <div className={styles.storyContent}>
-          <h2>Our Story: The "Why" Behind ZORK DI</h2>
+          <h2>Our Story: The &quot;Why&quot; Behind ZORK DI</h2>
           <p>ZORK DI was founded by Gadadhar Bairagya with a simple idea: to make cutting-edge technology accessible and to empower businesses of all sizes to thrive in the digital world. We saw a gap between brilliant ideas and the complex technical execution required to bring them to life. Our mission is to bridge that gap with expertise, passion, and a commitment to quality.</p>
         </div>
         <div className={styles.founderImagePlaceholder}>
