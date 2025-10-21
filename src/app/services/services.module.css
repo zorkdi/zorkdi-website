@@ -82,3 +82,27 @@
   position: absolute;
   left: 0;
 }
+
+/* ===== NAYA: Mobile Responsive Styles ===== */
+@media (max-width: 768px) {
+  .main {
+    padding: 2rem 1.5rem; /* Mobile par thodi kam padding */
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .serviceItem {
+    padding: 2rem;
+  }
+
+  .serviceItem h2 {
+    font-size: 1.75rem;
+  }
+
+  /* "What we offer" list ko 1-column mein badalna */
+  .serviceItem ul {
+    grid-template-columns: 1fr;
+  }
+}

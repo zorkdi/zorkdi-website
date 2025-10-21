@@ -1,0 +1,99 @@
+/* src/app/admin/blog/new/new-post.module.css */
+
+.formGroup {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.formGroup label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background-color: #1A1A2E;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #EFEFEF;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+    outline: none;
+    border-color: #00F5C8;
+}
+
+.formGroup textarea {
+    min-height: 250px;
+    resize: vertical;
+}
+
+/* Image Upload Section */
+.imageUploadSection {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.imagePreview {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    border-radius: 6px;
+    margin: 0 auto 1.5rem auto;
+}
+
+.fileInput {
+    display: none;
+}
+
+.uploadButton {
+    padding: 0.6rem 1.5rem;
+    background-color: transparent;
+    color: #00F5C8;
+    border: 1px solid #00F5C8;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.uploadButton:hover {
+    background-color: rgba(0, 245, 200, 0.1);
+}
+
+.uploadProgress {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #EFEFEF;
+}
+
+.publishButton {
+    width: 100%;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.publishButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.errorMessage {
+    color: #ff4757;
+    margin-top: 1rem;
+    text-align: center;
+}

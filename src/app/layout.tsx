@@ -3,8 +3,9 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 
 import Header from "../components/Header/Header";
-// NAYA: Humne Footer component ko yahan import kiya hai
 import Footer from "../components/Footer/Footer";
+// NAYA: Humne apne naye AuthProvider ko import kiya hai
+import { AuthProvider } from "../context/AuthContext";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -24,10 +25,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Header />
-        {children}
-        {/* NAYA: Humne Footer component ko yahan use kiya hai */}
-        <Footer />
+        {/* NAYA: Humne poori app ko AuthProvider ke andar daal diya hai */}
+        <AuthProvider>
+          <Header />
+          {children}
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,14 +1,23 @@
-/* Page ko readable banane ke liye container */
+/* src/app/blog/[slug]/post.module.css */
+
 .main {
   width: 100%;
-  max-width: 800px; /* Blog post ke liye ideal width */
+  max-width: 800px;
   margin: 0 auto;
   padding: 4rem 2rem;
 }
 
-/* .postArticle class ko hata diya gaya hai kyunki woh khaali tha */
+/* NAYA: Cover image ke liye container */
+.postImageContainer {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  background-color: #16213E; /* Placeholder color */
+}
 
-/* Post ke title ki styling */
 .postTitle {
   font-size: 3rem;
   font-weight: 700;
@@ -16,7 +25,6 @@
   margin-bottom: 1rem;
 }
 
-/* Category tag ki styling */
 .postCategory {
   font-size: 0.875rem;
   font-weight: 700;
@@ -27,13 +35,22 @@
   display: inline-block;
 }
 
-/* Post ke content area ki styling */
 .postContent {
-  font-size: 1.125rem; /* Padhne ke liye aacha font size */
-  line-height: 1.8; /* Lines ke beech mein aachi spacing */
+  font-size: 1.125rem;
+  line-height: 1.8;
   opacity: 0.9;
 }
 
 .postContent p {
   margin-bottom: 1.5rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .main {
+        padding: 2rem 1.5rem;
+    }
+    .postTitle {
+        font-size: 2.25rem;
+    }
 }

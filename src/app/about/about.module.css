@@ -117,3 +117,28 @@
   opacity: 0.8;
   line-height: 1.6;
 }
+
+/* ===== NAYA: Mobile Responsive Styles ===== */
+@media (max-width: 768px) {
+  .main {
+    padding: 2rem 1.5rem;
+  }
+
+  .hero h1, .storyContent h2, .sectionTitle {
+    font-size: 2.25rem;
+  }
+  
+  /* Saare grids ko 1-column mein badalna */
+  .storySection, .missionVisionSection, .valuesGrid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  /* Mobile par image ko text ke upar dikhana */
+  .founderImagePlaceholder {
+    grid-row: 1; /* Image ko pehle row mein bhej dega */
+    width: 200px;
+    height: 200px;
+    margin: 0 auto; /* Image ko center mein karna */
+  }
+}

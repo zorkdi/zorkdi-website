@@ -1,52 +1,62 @@
+// src/app/blog/[slug]/page.tsx
+
 import styles from './post.module.css';
 import { notFound } from 'next/navigation';
+import Image from 'next/image'; // NAYA: Image component import kiya
 
-// Humne blog posts ka data yahan dobara copy kiya hai.
-// Isse hum baad mein ek common file mein move karenge.
-const blogPosts = [
-  {
-    title: 'How to Optimize Your Flutter App Performance',
-    category: 'TUTORIAL',
-    content: 'This is the full blog post content about Flutter performance...',
-    slug: 'flutter-performance',
-  },
-  {
-    title: 'Top 5 Security Practices for Next.js Apps',
-    category: 'WEB SECURITY',
-    content: 'This is the full blog post content about Next.js security...',
-    slug: 'nextjs-security',
-  },
-  {
-    title: 'Understanding Firestore: A Deep Dive for Beginners',
-    category: 'FIREBASE',
-    content: 'This is the full blog post content about Firestore...',
-    slug: 'firestore-deep-dive',
-  },
-  {
-    title: 'The Power of Component-Based Architecture',
-    category: 'SOFTWARE DESIGN',
-    content: 'This is the full blog post content about component architecture...',
-    slug: 'component-architecture',
-  },
-];
+// NAYA: Firebase se data laane ke liye functions import kiye
+import { db } from '@/firebase';
+import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 
-// Yeh function URL se 'slug' leta hai aur uske hisaab se data dhoondhta hai
-const BlogPostPage = ({ params }: { params: { slug: string } }) => {
-  const post = blogPosts.find(p => p.slug === params.slug);
+// NAYA: Blog post ke data ka structure define kiya
+interface Post {
+  title: string;
+  category: string;
+  content: string;
+  coverImageURL: string;
+  publishedAt: Timestamp;
+}
 
-  // Agar post nahi milta, toh 404 Not Found page dikhata hai
+// NAYA: Server Component mein data fetching
+async function getPost(slug: string) {
+  const postsCollection = collection(db, 'blogs');
+  const q = query(postsCollection, where("slug", "==", slug));
+  const querySnapshot = await getDocs(q);
+
+  if (querySnapshot.empty) {
+    return null; // Agar post nahi mila to null return karo
+  }
+
+  const postData = querySnapshot.docs[0].data() as Post;
+  return postData;
+}
+
+const BlogPostPage = async ({ params }: { params: { slug: string } }) => {
+  const post = await getPost(params.slug);
+
   if (!post) {
-    notFound();
+    notFound(); // Agar post null hai, to 404 page dikhao
   }
 
   return (
     <main className={styles.main}>
-      <article className={styles.postArticle}>
+      <article>
+        <div className={styles.postImageContainer}>
+          {post.coverImageURL && (
+            <Image
+              src={post.coverImageURL}
+              alt={post.title}
+              fill
+              style={{ objectFit: 'cover' }}
+              priority // Taaki image jaldi load ho
+            />
+          )}
+        </div>
         <h1 className={styles.postTitle}>{post.title}</h1>
         <p className={styles.postCategory}>{post.category}</p>
         <div className={styles.postContent}>
           <p>{post.content}</p>
-          {/* Yahan par future mein poora blog content aayega */}
+          {/* Yahan par future mein poora blog content (HTML/Markdown) aayega */}
         </div>
       </article>
     </main>

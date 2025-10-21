@@ -1,0 +1,141 @@
+/* app/new-project/new-project.module.css */
+
+.main {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+.formContainer {
+  background-color: #16213E;
+  padding: 3rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.formContainer h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.formContainer p {
+  text-align: center;
+  opacity: 0.8;
+  margin-bottom: 3rem;
+}
+
+.projectForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2-column layout */
+  gap: 1.5rem 2rem; /* row and column gap */
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make Project Description and other fields take full width */
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.formGroup label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Budget label ke liye alag style */
+.budgetLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Label aur currency ke beech space */
+}
+
+.currencySymbol {
+  font-weight: 700;
+  color: #00F5C8;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: 1rem;
+  background-color: #1A1A2E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #EFEFEF;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: #00F5C8;
+}
+
+.formGroup textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.submitButton {
+  grid-column: 1 / -1; /* Make button full width */
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #00F5C8;
+  color: #1A1A2E;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 245, 200, 0.2);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.successMessage {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-top: 1rem;
+  color: #00F5C8;
+  background-color: rgba(0, 245, 200, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .main {
+    padding: 2rem 1.5rem;
+  }
+  
+  .formContainer {
+    padding: 2rem;
+  }
+
+  .formContainer h1 {
+    font-size: 2rem;
+  }
+
+  /* Make form 1-column on mobile */
+  .projectForm {
+    grid-template-columns: 1fr;
+  }
+}

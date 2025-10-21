@@ -1,16 +1,17 @@
-/* Main header bar ki styling */
+/* components/Header/Header.module.css */
+
 .header {
   position: sticky;
   top: 0;
   width: 100%;
   z-index: 1000;
-  background-color: rgba(22, 33, 62, 0.8); /* #16213E with transparency */
+  background-color: rgba(22, 33, 62, 0.8);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1rem 0;
+  /* NAYA: Padding thodi badhayi taaki bada logo fit ho */
+  padding: 0.5rem 0; 
 }
 
-/* Header ke content ko manage karne wala container */
 .container {
   width: 100%;
   max-width: 1200px;
@@ -21,25 +22,50 @@
   align-items: center;
 }
 
-/* UPDATED: Logo "ZORK DI" ki styling */
 .logo a {
-  font-size: 1.7rem; /* Thoda bada kiya */
-  font-weight: 700;
-  color: #EFEFEF;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
   text-decoration: none;
+  color: #EFEFEF;
 }
 
-/* Navigation links ki list ki styling */
+.logoImage {
+  /* NAYA: Height 45px se badhakar 55px kar di */
+  height: 55px; 
+  width: auto;
+}
+
+.logoTextContainer {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brandName {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.brandTagline {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  font-weight: 300;
+}
+
+.desktopNav {
+  display: flex;
+}
+
 .navLinks {
   list-style: none;
   display: flex;
-  align-items: center; /* Button ke saath align karne ke liye */
   gap: 2rem;
+  margin: 0;
+  padding: 0;
 }
 
-/* UPDATED: Har ek link ki styling */
 .navLinks a {
-  position: relative; /* Naye hover effect ke liye zaroori */
   color: #EFEFEF;
   opacity: 0.8;
   text-decoration: none;
@@ -51,40 +77,151 @@
   opacity: 1;
 }
 
-/* Naya Hover Effect: Link ke neeche line */
-.navLinks a::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -5px;
-  width: 100%;
-  height: 2px;
-  background-color: #00F5C8;
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.3s ease;
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
-.navLinks a:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
-}
-
-/* NAYA: Contact Button ki styling */
-.ctaButton {
+.primaryCtaButton {
   padding: 0.6rem 1.5rem;
   background-color: #00F5C8;
-  color: #1A1A2E !important; /* Text color ko force karne ke liye */
-  opacity: 1 !important; /* Opacity ko force karne ke liye */
+  color: #1A1A2E !important; 
   border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
   transition: transform 0.2s ease;
 }
 
-.ctaButton:hover {
-  transform: translateY(-2px);
+.primaryCtaButton:hover {
+    transform: translateY(-2px);
 }
 
-/* Hover effect ki line Contact button par na aaye */
-.ctaButton::after {
+.secondaryCtaButton {
+    color: #EFEFEF;
+    text-decoration: none;
+    font-weight: 500;
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+}
+
+.secondaryCtaButton:hover {
+    opacity: 1;
+}
+
+.profileMenuContainer {
+  position: relative;
+}
+
+.profileIcon {
+  background: none;
+  border: none;
+  color: #EFEFEF;
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.profileImage {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #00F5C8;
+  cursor: pointer;
+}
+
+.profileDropdown {
+  position: absolute;
+  top: 150%;
+  right: 0;
+  background-color: #16213E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem;
+  width: 180px;
+  z-index: 1001;
+}
+
+.profileDropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.profileDropdown a, .profileDropdown button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  color: #EFEFEF;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: inherit;
+  border-radius: 4px;
+}
+
+.profileDropdown a:hover, .profileDropdown button:hover {
+  background-color: #1A1A2E;
+}
+
+.hamburgerButton {
   display: none;
+  background: none;
+  border: none;
+  color: #EFEFEF;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.mobileMenu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: #1A1A2E;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mobileNavLinks {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+}
+
+.mobileNavLinks li {
+  margin-bottom: 2rem;
+}
+
+.mobileNavLinks a {
+  color: #EFEFEF;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.mobileCta {
+    padding: 0.8rem 2rem;
+    background-color: #00F5C8;
+    color: #1A1A2E;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .desktopNav, .primaryCtaButton, .secondaryCtaButton {
+    display: none;
+  }
+  .hamburgerButton {
+    display: block;
+  }
+  .container {
+    padding: 0 1.5rem;
+  }
 }

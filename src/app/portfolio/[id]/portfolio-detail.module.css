@@ -1,0 +1,184 @@
+/* src/app/portfolio/[id]/portfolio-detail.module.css */
+
+.main {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+.coverImageContainer {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  background-color: #16213E;
+}
+
+.projectTitle {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.projectCategory {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #00F5C8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+  display: inline-block;
+}
+
+.projectContent {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  opacity: 0.9;
+}
+
+.projectContent p {
+  margin-bottom: 1.5rem;
+}
+
+.projectContent h1,
+.projectContent h2,
+.projectContent h3 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  font-weight: 600;
+}
+.projectContent h1 { font-size: 2em; }
+.projectContent h2 { font-size: 1.5em; }
+.projectContent h3 { font-size: 1.25em; }
+
+.projectContent ul,
+.projectContent ol {
+  padding-left: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.projectContent blockquote {
+  border-left: 3px solid #00F5C8;
+  margin-left: 0;
+  padding-left: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+/* Styles for single images within content */
+.projectContent > img, /* Image directly inside content */
+.projectContent p > img { /* Image inside a paragraph */
+    display: block !important;
+    max-width: 650px !important;
+    width: 100%;
+    max-height: 700px !important;
+    height: auto !important;
+    object-fit: contain;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 2.5rem !important;
+    margin-bottom: 2.5rem !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: transform 0.2s ease;
+}
+
+.projectContent img:hover {
+    transform: scale(1.02);
+}
+
+
+/* --- Styles for Image Row --- */
+.imageRow {
+    display: flex !important; /* Force flex display */
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 2.5rem 0;
+    justify-content: center;
+    /* NAYA: Ensure paragraphs inside don't add extra margin */
+    align-items: center; /* Vertically align items if they wrap */
+}
+
+/* NAYA: Target images INSIDE the row, even if wrapped in <p> */
+.imageRow img,
+.imageRow p img {
+    flex: 1;
+    min-width: 200px;
+    max-width: 100%;
+    height: auto;
+    max-height: 400px !important; /* Force max height */
+    object-fit: contain;
+    border-radius: 8px;
+    margin: 0 !important; /* Remove default image margins */
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+/* NAYA: Remove margin from paragraphs inside the row */
+.imageRow p {
+    margin: 0 !important;
+    flex: 1; /* Allow paragraph to take flex space */
+    min-width: 200px; /* Match image min-width */
+    display: flex; /* Ensure image inside paragraph behaves */
+    justify-content: center;
+}
+
+
+.imageRow img:hover {
+    transform: scale(1.03);
+}
+/* --- End of Image Row Styles --- */
+
+
+/* Styles for side-by-side layout (Text + Image) */
+.layoutBox {
+    display: flex;
+    gap: 1.5rem;
+    margin: 2.5rem 0;
+    align-items: center;
+}
+
+.layoutColumn {
+    flex: 1;
+}
+
+@media (max-width: 600px) {
+    .layoutBox {
+        flex-direction: column;
+    }
+    .projectContent > img,
+    .projectContent p > img {
+        max-width: 95% !important;
+        max-height: 500px !important;
+    }
+    .imageRow {
+        flex-direction: column;
+        align-items: center;
+    }
+    .imageRow img,
+    .imageRow p img {
+        min-width: unset;
+        max-width: 95%;
+    }
+     .imageRow p {
+        min-width: unset;
+        max-width: 95%;
+        width: 100%; /* Ensure paragraph takes width */
+    }
+}
+
+
+/* General Responsive */
+@media (max-width: 768px) {
+    .main {
+        padding: 2rem 1.5rem;
+    }
+    .projectTitle {
+        font-size: 2.25rem;
+    }
+}

@@ -1,0 +1,213 @@
+/* src/app/admin/admin.module.css */
+
+.adminLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #1A1A2E;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #16213E;
+  padding: 2rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+    color: #EFEFEF;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar nav li a {
+    display: block;
+    padding: 0.8rem 1rem;
+    color: #EFEFEF;
+    opacity: 0.8;
+    text-decoration: none;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.sidebar nav li a:hover {
+    background-color: #1A1A2E;
+    opacity: 1;
+}
+
+.mainContent {
+  flex-grow: 1;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+}
+
+.pageHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.pageHeader h1 {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.primaryButton {
+    background-color: #00F5C8;
+    color: #1A1A2E;
+    padding: 0.7rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.2s ease;
+}
+
+.primaryButton:hover {
+    transform: translateY(-2px);
+}
+
+.dataContainer {
+    background-color: #16213E;
+    padding: 2rem;
+    border-radius: 12px;
+}
+
+.dataTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.dataTable th, .dataTable td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dataTable th {
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.dataTable tr:last-child td {
+    border-bottom: none;
+}
+
+.actionLink {
+    color: #00F5C8;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.actionLink:hover {
+    text-decoration: underline;
+}
+
+.statusTag {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusPending {
+  background-color: rgba(255, 165, 0, 0.1);
+  color: #ffc966;
+}
+
+.statusAccepted {
+  background-color: rgba(0, 245, 200, 0.1);
+  color: #00F5C8;
+}
+
+.statusInProgress {
+  background-color: rgba(52, 152, 219, 0.1);
+  color: #3498db;
+}
+
+.statusCompleted {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+}
+
+.statusRejected {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+/* NAYA: Chat list ke liye styles */
+.chatList {
+    display: flex;
+    flex-direction: column;
+}
+
+.chatListItem {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    color: #EFEFEF;
+    transition: background-color 0.2s ease;
+}
+
+.chatListItem:hover {
+    background-color: #1A1A2E;
+}
+
+.chatListItem:last-child {
+    border-bottom: none;
+}
+
+.chatUserInfo h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.chatUserInfo p {
+    margin: 0;
+    opacity: 0.7;
+    font-size: 0.9rem;
+}
+
+
+.accessDeniedContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  text-align: center;
+}
+
+.accessDeniedContainer h1 {
+    font-size: 3rem;
+    color: #e74c3c;
+    margin-bottom: 1rem;
+}
+
+.accessDeniedContainer p {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+.accessDeniedContainer a {
+    margin-top: 2rem;
+    padding: 0.8rem 2rem;
+    background-color: #00F5C8;
+    color: #1A1A2E;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+}

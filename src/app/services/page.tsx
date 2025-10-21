@@ -1,58 +1,83 @@
+// src/app/services/page.tsx
+
+"use client"; // NAYA: Animation component ke liye "use client" zaroori hai
+
 import styles from './services.module.css';
+// NAYA: AnimationWrapper component ko import kiya
+import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
+
+// Dummy icons (replace with actual icons if you have them)
+const ServiceIcon = () => <span>⚙️</span>;
 
 const ServicesPage = () => {
   return (
     <main className={styles.main}>
-      {/* ===== Hero Section ===== */}
       <section className={styles.hero}>
-        <h1>Our Services</h1>
-        <p>Custom-built solutions to elevate your business.</p>
+        <h1>Our Expertise</h1>
+        <p>We offer a wide range of services to bring your digital ideas to life, ensuring quality, scalability, and performance.</p>
       </section>
 
-      {/* ===== Detailed Services List ===== */}
-      <section className={styles.detailedServices}>
-        {/* Service 1 */}
+      {/* NAYA: Har service item ko AnimationWrapper se wrap kiya with delay */}
+      <AnimationWrapper delay={0.1}>
         <div className={styles.serviceItem}>
-          <div className={styles.serviceIcon}>📱</div>
-          <h2>Mobile App Development</h2>
-          <p>We build high-quality, cross-platform mobile applications for Android & iOS that are fast, intuitive, and scalable, ensuring a seamless user experience.</p>
+          <div className={styles.serviceIcon}><ServiceIcon /></div>
+          <h2>Custom Web Application Development</h2>
+          <p>Building robust, scalable, and secure web applications tailored precisely to your business requirements using modern technologies like Next.js, Node.js, and Firebase.</p>
           <h4>What we offer:</h4>
           <ul>
-            <li>Native iOS & Android Apps</li>
-            <li>Cross-Platform (Flutter) Apps</li>
-            <li>UI/UX Design & Prototyping</li>
-            <li>Backend & API Integration</li>
+            <li>Full-Stack Development</li>
+            <li>API Integration</li>
+            <li>Real-time Features</li>
+            <li>Cloud Deployment</li>
           </ul>
         </div>
+      </AnimationWrapper>
 
-        {/* Service 2 */}
+      <AnimationWrapper delay={0.2}>
         <div className={styles.serviceItem}>
-          <div className={styles.serviceIcon}>💻</div>
-          <h2>Web Platforms & Websites</h2>
-          <p>From modern marketing websites to complex, data-driven web applications, we deliver solutions that are secure, responsive, and optimized for performance.</p>
+          <div className={styles.serviceIcon}><ServiceIcon /></div>
+          <h2>Mobile App Development (iOS & Android)</h2>
+          <p>Creating engaging and high-performance native or cross-platform mobile applications that provide seamless user experiences on both iOS and Android devices.</p>
           <h4>What we offer:</h4>
           <ul>
-            <li>Corporate & E-commerce Websites</li>
-            <li>Single Page Applications (SPAs)</li>
-            <li>Content Management Systems (CMS)</li>
-            <li>Progressive Web Apps (PWAs)</li>
+            <li>Native iOS (Swift)</li>
+            <li>Native Android (Kotlin)</li>
+            <li>Cross-Platform (Flutter/React Native)</li>
+            <li>App Store Deployment</li>
           </ul>
         </div>
-        
-        {/* Service 3 */}
+      </AnimationWrapper>
+
+      <AnimationWrapper delay={0.3}>
         <div className={styles.serviceItem}>
-          <div className={styles.serviceIcon}>⚙️</div>
+          <div className={styles.serviceIcon}><ServiceIcon /></div>
+          <h2>UI/UX Design & Prototyping</h2>
+          <p>Designing intuitive, user-friendly, and visually stunning interfaces that enhance user engagement and align perfectly with your brand identity.</p>
+          <h4>What we offer:</h4>
+          <ul>
+            <li>User Research & Persona</li>
+            <li>Wireframing & Prototyping</li>
+            <li>Interface Design</li>
+            <li>Usability Testing</li>
+          </ul>
+        </div>
+      </AnimationWrapper>
+
+       <AnimationWrapper delay={0.4}>
+        <div className={styles.serviceItem}>
+          <div className={styles.serviceIcon}><ServiceIcon /></div>
           <h2>Custom Software Solutions</h2>
-          <p>We engineer bespoke software tailored to your specific business needs, including desktop applications, ERP systems, and internal business tools.</p>
+          <p>Developing specialized software tailored to automate processes, improve efficiency, and solve unique business challenges that off-the-shelf software cannot.</p>
           <h4>What we offer:</h4>
           <ul>
-            <li>Desktop Apps (Windows/Mac)</li>
-            <li>Enterprise Resource Planning (ERP)</li>
-            <li>Business Automation Tools</li>
-            <li>Third-Party API Integrations</li>
+            <li>Desktop Applications</li>
+            <li>Business Process Automation</li>
+            <li>System Integration</li>
+            <li>Maintenance & Support</li>
           </ul>
         </div>
-      </section>
+      </AnimationWrapper>
+
     </main>
   );
 };

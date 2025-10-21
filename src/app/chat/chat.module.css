@@ -1,0 +1,133 @@
+/* app/chat/chat.module.css */
+
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px); /* Adjust based on your header/footer height */
+  padding: 2rem;
+}
+
+.chatContainer {
+  width: 100%;
+  max-width: 800px;
+  height: 70vh;
+  background-color: #16213E;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Ensures content stays within rounded corners */
+}
+
+.chatHeader {
+  padding: 1rem 1.5rem;
+  background-color: #1A1A2E;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chatHeader h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.messagesContainer {
+  flex-grow: 1;
+  padding: 1.5rem;
+  overflow-y: auto; /* Enables scrolling for messages */
+  display: flex;
+  flex-direction: column-reverse; /* New messages appear at the bottom */
+}
+
+.messageList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.message {
+  padding: 0.75rem 1rem;
+  border-radius: 18px;
+  max-width: 75%;
+  line-height: 1.5;
+}
+
+.user {
+  background-color: #00F5C8;
+  color: #1A1A2E;
+  align-self: flex-end; /* User's messages on the right */
+  border-bottom-right-radius: 4px; /* Bubble tail effect */
+}
+
+.admin {
+  background-color: #2c3e50;
+  color: #EFEFEF;
+  align-self: flex-start; /* Admin's messages on the left */
+  border-bottom-left-radius: 4px; /* Bubble tail effect */
+}
+
+.inputArea {
+  display: flex;
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #1A1A2E;
+}
+
+.inputArea input {
+  flex-grow: 1;
+  padding: 0.75rem 1rem;
+  background-color: #16213E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  color: #EFEFEF;
+  font-size: 1rem;
+  font-family: inherit;
+  margin-right: 1rem;
+}
+
+.inputArea input:focus {
+  outline: none;
+  border-color: #00F5C8;
+}
+
+.sendButton {
+  padding: 0.75rem 1.5rem;
+  background-color: #00F5C8;
+  color: #1A1A2E;
+  font-weight: 600;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.sendButton:hover {
+  transform: scale(1.05);
+}
+
+.loading, .loginPrompt {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  font-size: 1.2rem;
+}
+
+.loginPrompt a {
+    color: #00F5C8;
+    text-decoration: underline;
+    margin-left: 0.5rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .main {
+    padding: 1rem;
+    min-height: calc(100vh - 60px);
+  }
+
+  .chatContainer {
+    height: 80vh;
+  }
+}

@@ -126,6 +126,23 @@
 }
 
 .submitButton:hover {
-  transform: translateY(-3px);
+  transform: translateY(-3px); /* YAHAN PAR BRACKET ')' THEEK KAR DIYA HAI */
   box-shadow: 0 10px 20px rgba(0, 245, 200, 0.2);
+}
+
+/* ===== Mobile Responsive Styles ===== */
+@media (max-width: 768px) {
+  .main {
+    padding: 2rem 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+  
+  /* 2-column layout ko 1-column mein badalna */
+  .contactSection {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
 }

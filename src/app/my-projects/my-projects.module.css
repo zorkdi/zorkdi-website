@@ -1,0 +1,170 @@
+/* src/app/my-projects/my-projects.module.css */
+
+.main {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.header h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  font-size: 1.1rem;
+  opacity: 0.8;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.projectsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.projectCard {
+  background-color: #16213E;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.projectCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.projectInfo h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.projectInfo p {
+  opacity: 0.7;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.projectId {
+    font-family: monospace;
+    font-size: 0.85rem;
+    background-color: #1A1A2E;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    opacity: 0.9;
+}
+
+.projectActions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; /* Space between status and button */
+}
+
+.projectStatus {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* NAYA: Updated Discuss Button style */
+.discussButton {
+    background-color: #00F5C8; /* Same as primary buttons */
+    color: #1A1A2E; /* Dark text */
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap; /* Prevent button text wrapping */
+    transition: transform 0.2s ease;
+}
+
+.discussButton:hover {
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+
+.statusPending {
+  background-color: rgba(255, 165, 0, 0.1);
+  color: #ffc966;
+}
+
+.statusAccepted {
+  background-color: rgba(0, 245, 200, 0.1);
+  color: #00F5C8;
+}
+
+.statusInProgress {
+  background-color: rgba(52, 152, 219, 0.1);
+  color: #3498db;
+}
+
+.statusCompleted {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+}
+
+.statusRejected {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+.loading, .noProjects {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 4rem 0;
+  opacity: 0.8;
+}
+
+.noProjects a {
+    color: #00F5C8;
+    text-decoration: underline;
+    margin-left: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: 2rem 1.5rem;
+  }
+  .header h1 {
+    font-size: 2.2rem;
+  }
+  .projectCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .projectActions {
+    width: 100%; /* Make actions take full width on mobile */
+    margin-top: 1rem;
+    /* Changed flex-direction for better alignment */
+    display: flex;
+    flex-direction: row; /* Keep status and button side-by-side */
+    justify-content: space-between; /* Space them out */
+    align-items: center; /* Vertically align */
+  }
+  /* Ensure button doesn't stretch excessively */
+  .discussButton {
+      flex-shrink: 0; /* Prevent button from shrinking */
+  }
+}

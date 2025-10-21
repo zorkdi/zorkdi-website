@@ -1,0 +1,89 @@
+/* src/components/RichTextEditor/Editor.module.css */
+
+.editorContainer {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #1A1A2E;
+}
+
+.toolbar {
+    padding: 0.5rem;
+    background-color: #16213E;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.toolbarButton {
+    background: none;
+    border: none;
+    color: #EFEFEF;
+    opacity: 0.7;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.toolbarButton:hover {
+    background-color: #1A1A2E;
+    opacity: 1;
+}
+
+.toolbarButton.isActive {
+    background-color: #00F5C8;
+    color: #1A1A2E;
+    opacity: 1;
+}
+
+.editorContent {
+    padding: 1rem;
+    min-height: 300px;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.editorContent:focus {
+    outline: none;
+}
+
+/* TipTap default styles ko override karna */
+.editorContent p {
+    margin: 0 0 1rem 0;
+}
+
+.editorContent h1,
+.editorContent h2,
+.editorContent h3 {
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.editorContent h1 {
+    font-size: 2em;
+}
+
+.editorContent h2 {
+    font-size: 1.5em;
+}
+
+.editorContent h3 {
+    font-size: 1.25em;
+}
+
+.editorContent ul,
+.editorContent ol {
+    padding-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.editorContent blockquote {
+    border-left: 3px solid #00F5C8;
+    margin-left: 0;
+    padding-left: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+}

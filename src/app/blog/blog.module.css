@@ -1,11 +1,12 @@
+/* src/app/blog/blog.module.css */
+
 .main {
   width: 100%;
-  max-width: 1200px; /* Page content ki width set karna */
+  max-width: 1200px;
   margin: 0 auto;
   padding: 4rem 2rem;
 }
 
-/* Hero Section ki styling */
 .hero {
   text-align: center;
   padding-bottom: 4rem;
@@ -24,14 +25,12 @@
   opacity: 0.8;
 }
 
-/* Blog Grid ki styling */
 .blogGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
 }
 
-/* Har ek blog card ki styling */
 .blogCard {
   display: flex;
   flex-direction: column;
@@ -49,17 +48,29 @@
   box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
 }
 
-.cardImagePlaceholder {
+/* NAYA: Image container ke liye style */
+.cardImageContainer {
   width: 100%;
   aspect-ratio: 16 / 9;
-  background-color: #2c3e50;
+  position: relative; /* Image ko iske andar aache se fit karne ke liye */
+  background-color: #2c3e50; /* Placeholder color */
+}
+
+/* NAYA: Agar image na ho to yeh text dikhega */
+.imagePlaceholderText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
 }
 
 .cardContent {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  flex-grow: 1; /* Taaki content poori height le */
+  flex-grow: 1;
 }
 
 .cardCategory {
@@ -79,8 +90,31 @@
   flex-grow: 1;
 }
 
-.cardExcerpt {
-  font-size: 0.9rem;
-  opacity: 0.7;
-  line-height: 1.6;
+/* NAYA: Published date ke liye style */
+.cardDate {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+/* NAYA: Agar koi post na ho to message dikhane ke liye */
+.noPosts {
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 4rem 0;
+    opacity: 0.8;
+    grid-column: 1 / -1; /* Taaki yeh poori grid ki jagah le */
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: 2rem 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .blogGrid {
+    grid-template-columns: 1fr;
+  }
 }

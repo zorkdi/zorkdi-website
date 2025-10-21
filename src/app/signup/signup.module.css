@@ -1,0 +1,103 @@
+/* Main container to center the form */
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh; /* Takes up most of the screen height */
+  padding: 4rem 2rem;
+}
+
+/* The box containing the form */
+.formContainer {
+  width: 100%;
+  max-width: 450px;
+  background-color: #16213E;
+  padding: 3rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.formContainer h1 {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.formContainer p {
+  opacity: 0.8;
+  margin-bottom: 2.5rem;
+}
+
+/* The form itself */
+.signupForm {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 1rem;
+  background-color: #1A1A2E; /* Darker background for input */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #EFEFEF;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: #00F5C8;
+}
+
+/* Error message styling */
+.errorText {
+  color: #ff4757;
+  background-color: rgba(255, 71, 87, 0.1);
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Submit button styling */
+.submitButton {
+  padding: 1rem;
+  background-color: #00F5C8;
+  color: #1A1A2E;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 245, 200, 0.2);
+}
+
+/* "Already have an account?" link */
+.loginLink {
+  margin-top: 2rem;
+  opacity: 0.8;
+}
+
+.loginLink a {
+  color: #00F5C8;
+  font-weight: 600;
+  text-decoration: none;
+}
