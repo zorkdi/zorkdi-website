@@ -4,113 +4,88 @@
 
 import { useState, useEffect, ChangeEvent } from 'react';
 import Image from 'next/image';
-import { doc, getDoc, setDoc } from 'firebase/firestore'; 
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import dynamic from 'next/dynamic';
+
+// Firebase services
 import { db, storage } from '@/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 
+// Dynamically import the editor (assuming you have this path)
+const RichTextEditor = dynamic(() => import('@/components/RichTextEditor/RichTextEditor'), {
+  ssr: false,
+  loading: () => <p>Loading editor...</p>,
+});
+
+// Styles
 import adminStyles from '@/app/admin/admin.module.css';
-import formStyles from './forms.module.css';
+import formStyles from '../AdminForms/forms.module.css'; 
+import newPostStyles from '@/app/admin/blog/new/new-post.module.css'; // Image upload styles reuse kiya
 
-// Type for Firestore data structure
+// Type definitions (About Page se liye gaye)
 interface AboutContent {
-  heroHeadline: string;
-  heroSubheadline: string;
-  storyHeadline: string;
-  storyContent: string;
-  missionHeadline: string;
-  missionContent: string;
-  visionHeadline: string;
-  visionContent: string;
-  values: string[]; // Array of strings for core values
-  founderPhotoURL: string;
+    heroTitle: string;
+    heroSubtitle: string;
+    storyTitle: string;
+    storyParagraph1: string;
+    storyParagraph2: string;
+    missionTitle: string;
+    missionText: string;
+    visionTitle: string;
+    visionText: string;
+    valuesTitle: string;
+    founderImageUrl: string;
 }
 
 // Default/Initial values
-const initialData: AboutContent = {
-  heroHeadline: "Our journey to building digital excellence.",
-  heroSubheadline: "We are more than just developers; we are partners in your digital evolution.",
-  storyHeadline: "The ZORK DI Story: Built on Passion",
-  storyContent: "ZORK DI was founded with a single mission: to cut through complexity and deliver clean, high-performance software. Over the years, we have grown into a team of dedicated experts...",
-  missionHeadline: "Our Mission",
-  missionContent: "To empower businesses globally by delivering cutting-edge, secure, and scalable technology solutions.",
-  visionHeadline: "Our Vision",
-  visionContent: "To be the leading digital engineering firm, recognized for innovation and uncompromising quality.",
-  values: ["Integrity", "Innovation", "Excellence", "Client Success"],
-  founderPhotoURL: "/placeholder/founder.jpg",
+const defaultContent: AboutContent = {
+    heroTitle: "Redefining Digital Experiences.",
+    heroSubtitle: "We are ZorkDI: The force accelerating the next generation of web development.",
+    storyTitle: "Our Story: Built on Passion and Precision",
+    storyParagraph1: "ZorkDI was founded with a simple, yet ambitious goal: to bridge the gap between complex technology and compelling user experience.",
+    storyParagraph2: "Today, we've grown into a full-service digital agency. Every line of code and every pixel matters.",
+    missionTitle: "Our Mission",
+    missionText: "To empower businesses globally with cutting-edge, scalable, and secure digital platforms.",
+    visionTitle: "Our Vision",
+    visionText: "To be the recognized leader in bespoke digital innovation, setting the benchmark for quality, speed, and client satisfaction.",
+    valuesTitle: "Core Values",
+    founderImageUrl: "/images/founder_placeholder.jpg",
 };
-
-
-// Component to handle the array of core values
-const ValuesArrayEditor = ({ values, onChange }: { values: string[], onChange: (newValues: string[]) => void }) => {
-    const handleValueChange = (index: number, value: string) => {
-        const newValues = [...values];
-        newValues[index] = value;
-        onChange(newValues);
-    };
-
-    const handleAddValue = () => {
-        onChange([...values, 'New Value']);
-    };
-
-    const handleRemoveValue = (index: number) => {
-        const newValues = values.filter((_, i) => i !== index);
-        onChange(newValues);
-    };
-
-    return (
-        <div className={formStyles.formGroup}>
-            <label>Core Values</label>
-            {values.map((value, index) => (
-                <div key={index} style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                    <input
-                        type="text"
-                        value={value}
-                        onChange={(e) => handleValueChange(index, e.target.value)}
-                        placeholder={`Value ${index + 1}`}
-                        style={{ flexGrow: 1 }}
-                    />
-                    <button type="button" onClick={() => handleRemoveValue(index)} className={adminStyles.dangerButton} style={{ width: 'auto', padding: '0.5rem 1rem' }}>
-                        Remove
-                    </button>
-                </div>
-            ))}
-            <button type="button" onClick={handleAddValue} className={formStyles.uploadButton} style={{ width: 'auto', marginTop: '10px' }}>
-                + Add New Value
-            </button>
-        </div>
-    );
-};
-
 
 const AboutCMS = () => {
-  const [content, setContent] = useState<AboutContent>(initialData);
+  const [content, setContent] = useState<AboutContent>(defaultContent);
+  
+  // State for image handling
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  
+  const DOC_REF = doc(db, 'cms', 'about_page');
 
   // --- Data Fetching ---
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Fetch content from the single CMS document
-        const docRef = doc(db, 'cms', 'about_page');
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDoc(DOC_REF);
 
         if (docSnap.exists()) {
-          setContent(docSnap.data() as AboutContent);
+          const fetchedData = docSnap.data() as AboutContent;
+          setContent({ ...defaultContent, ...fetchedData }); 
+          setImagePreview(fetchedData.founderImageUrl);
         } else {
-          // Agar document nahi mila, toh default data ke saath create kar do
-          await setDoc(docRef, initialData);
-          setContent(initialData);
+          await setDoc(DOC_REF, defaultContent);
+          setContent(defaultContent);
+          setImagePreview(defaultContent.founderImageUrl);
         }
-      } catch (error: unknown) { // FIX: _err replaced with error, aur console.error mein use kiya
-        console.error("Error fetching About CMS:", error);
-        setError('Failed to load CMS content.');
+      } catch (_err: unknown) {
+        console.error("Error fetching About CMS:", _err);
+        setError('Failed to load About page content.');
       } finally {
         setIsLoading(false);
       }
@@ -125,16 +100,21 @@ const AboutCMS = () => {
     setSuccess('');
     setError('');
   };
-
-  const handleValuesChange = (newValues: string[]) => {
-    setContent(prev => ({ ...prev, values: newValues.filter(v => v.trim() !== '') })); // Remove empty values
+  
+  // Handle Rich Text Editor change for paragraphs
+  const handleRichTextChange = (name: keyof AboutContent, htmlContent: string) => {
+    setContent(prev => ({ ...prev, [name]: htmlContent }));
     setSuccess('');
     setError('');
   };
-
+  
+  // Handle image file selection
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImageFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
     }
   };
 
@@ -145,13 +125,12 @@ const AboutCMS = () => {
     setSuccess('');
 
     try {
-      let finalPhotoURL = content.founderPhotoURL;
+      let finalImageURL = content.founderImageUrl;
 
-      // 1. Image Upload
       if (imageFile) {
         setUploadProgress(0);
-        const fileExtension = imageFile.name.split('.').pop();
-        const storageRef = ref(storage, `cms/founder/founder_photo_${Date.now()}.${fileExtension}`);
+        // Image Upload Logic
+        const storageRef = ref(storage, `cms_images/founder_image_${Date.now()}`);
         const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
         await new Promise<void>((resolve, reject) => {
@@ -162,160 +141,171 @@ const AboutCMS = () => {
             },
             (uploadError) => {
               console.error("Image upload failed:", uploadError);
-              setError("Founder photo upload failed.");
+              setError("Image upload failed. Please try again.");
               reject(uploadError);
             },
             async () => {
-              finalPhotoURL = await getDownloadURL(uploadTask.snapshot.ref);
+              finalImageURL = await getDownloadURL(uploadTask.snapshot.ref);
+              // Agar koi purani image ho toh usko delete karne ki logic yahan aayegi
               resolve();
             }
           );
         });
       }
 
-      // 2. Text Content Update
-      const docRef = doc(db, 'cms', 'about_page');
-      await setDoc(docRef, { // Use setDoc to overwrite/merge
-        ...content,
-        founderPhotoURL: finalPhotoURL,
-        values: content.values.filter(v => v.trim() !== ''), // Ensure only non-empty values are saved
-      }, { merge: true });
+      // 2. Update Document in Firestore
+      await setDoc(DOC_REF, { ...content, founderImageUrl: finalImageURL }, { merge: true }); 
 
-      // Update local state with the new URL and reset file state
-      setContent(prev => ({ ...prev, founderPhotoURL: finalPhotoURL, values: prev.values.filter(v => v.trim() !== '') }));
-      setImageFile(null);
-      setUploadProgress(null);
-      
       setSuccess('About Page content updated successfully!');
 
-    } catch (error: unknown) { // FIX: _err replaced with error, aur console.error mein use kiya
-      if (!error) { // Agar image upload se error nahi aaya toh generic error dikhao
-        console.error('Error during form submission:', error); 
-        setError('Failed to save CMS content. Please check the console.');
-      }
+    } catch (err: unknown) {
+      console.error('Failed to save About CMS content. Check console.', err); 
+      setError('Failed to save About CMS content. Check console.');
     } finally {
       setIsSubmitting(false);
+      setUploadProgress(null);
+      setImageFile(null); // Clear file state after successful upload
     }
   };
 
   if (isLoading) {
-    return <div className={adminStyles.loading}>Loading About Page CMS...</div>;
+    return <div className={adminStyles.loading}>Loading About CMS...</div>;
   }
   
-  const currentPhotoURL = imageFile ? URL.createObjectURL(imageFile) : content.founderPhotoURL;
-
   return (
     <form className={formStyles.formSection} onSubmit={handleSubmit}>
       <h2>About Page Content Management</h2>
-
-      {/* --- Founder Photo Upload --- */}
-      <div className={formStyles.formGroup} style={{ maxWidth: '300px', margin: '0 auto 3rem auto' }}>
-        <label style={{ textAlign: 'center' }}>Founder Photo (1:1 Aspect Ratio)</label>
-        <div className={formStyles.imageUpload}>
-          {/* NAYA: Placeholder Image agar URL available na ho */}
-          {currentPhotoURL && currentPhotoURL !== "/placeholder/founder.jpg" ? (
-            <Image
-              src={currentPhotoURL}
-              alt="Founder Photo Preview"
-              width={100} height={100}
-              className={formStyles.imagePreview}
-            />
-          ) : (
-             <div className={formStyles.imagePreview} style={{backgroundColor: '#34495e', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                 <span style={{opacity: 0.7}}>No Photo</span>
-             </div>
-          )}
-          <input
-            type="file" id="founderPhoto" className={formStyles.fileInput}
-            onChange={handleFileChange} accept="image/png, image/jpeg, image/webp"
-          />
-          <label htmlFor="founderPhoto" className={formStyles.uploadButton}>
-            {currentPhotoURL && currentPhotoURL !== "/placeholder/founder.jpg" ? 'Change Photo' : 'Upload Photo'}
-          </label>
-          {uploadProgress !== null && uploadProgress < 100 && (
-            <p className={formStyles.uploadProgress}>Uploading: {uploadProgress}%</p>
-          )}
-        </div>
-      </div>
-      
       <div className={formStyles.formGrid}>
-        {/* Hero Section */}
+        
+        {/* --- HERO SECTION --- */}
         <div className={formStyles.fullWidth}>
-            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1.5rem', color: 'var(--color-neon-light)' }}>Hero Section</h3>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1rem', color: 'var(--color-neon-green)' }}>Hero Section</h3>
         </div>
         <div className={formStyles.fullWidth}>
-          <div className={formStyles.formGroup}>
-            <label htmlFor="heroHeadline">Hero Headline</label>
-            <input type="text" id="heroHeadline" name="heroHeadline" value={content.heroHeadline} onChange={handleTextChange} required />
+          <div className={newPostStyles.formGroup}>
+            <label htmlFor="heroTitle">Hero Title</label>
+            <input type="text" id="heroTitle" name="heroTitle" value={content.heroTitle} onChange={handleTextChange} required />
           </div>
         </div>
         <div className={formStyles.fullWidth}>
-          <div className={formStyles.formGroup}>
-            <label htmlFor="heroSubheadline">Hero Subheadline</label>
-            <textarea id="heroSubheadline" name="heroSubheadline" value={content.heroSubheadline} onChange={handleTextChange} required />
+          <div className={newPostStyles.formGroup}>
+            <label htmlFor="heroSubtitle">Hero Subtitle</label>
+            <textarea id="heroSubtitle" name="heroSubtitle" value={content.heroSubtitle} onChange={handleTextChange} required />
           </div>
         </div>
 
-        {/* Our Story */}
+        {/* --- STORY SECTION --- */}
         <div className={formStyles.fullWidth}>
-            <h3 style={{ marginTop: '1.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1.5rem', color: 'var(--color-neon-light)' }}>Our Story</h3>
-        </div>
-        <div className={formStyles.formGroup}>
-            <label htmlFor="storyHeadline">Story Headline</label>
-            <input type="text" id="storyHeadline" name="storyHeadline" value={content.storyHeadline} onChange={handleTextChange} required />
-        </div>
-        {/* Empty column for alignment */}
-        <div></div> 
-        <div className={formStyles.fullWidth}>
-          <div className={formStyles.formGroup}>
-            <label htmlFor="storyContent">Story Content</label>
-            <textarea id="storyContent" name="storyContent" value={content.storyContent} onChange={handleTextChange} required />
-          </div>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-green)' }}>Our Story Section</h3>
         </div>
         
-        {/* Mission & Vision */}
         <div className={formStyles.fullWidth}>
-            <h3 style={{ marginTop: '1.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1.5rem', color: 'var(--color-neon-light)' }}>Mission & Vision</h3>
+            <div className={newPostStyles.formGroup}>
+                <label>Story Title</label>
+                <input type="text" name="storyTitle" value={content.storyTitle} onChange={handleTextChange} required />
+            </div>
+        </div>
+
+        {/* Story Paragraph 1 (Rich Text) */}
+        <div className={formStyles.fullWidth}>
+            <div className={newPostStyles.formGroup}>
+                <label>Story Paragraph 1 (Content)</label>
+                <RichTextEditor
+                    content={content.storyParagraph1}
+                    onChange={(html) => handleRichTextChange('storyParagraph1', html)}
+                />
+            </div>
+        </div>
+
+        {/* Story Paragraph 2 (Rich Text) */}
+        <div className={formStyles.fullWidth}>
+            <div className={newPostStyles.formGroup}>
+                <label>Story Paragraph 2 (Content)</label>
+                <RichTextEditor
+                    content={content.storyParagraph2}
+                    onChange={(html) => handleRichTextChange('storyParagraph2', html)}
+                />
+            </div>
+        </div>
+
+
+        {/* --- FOUNDER IMAGE --- */}
+        <div className={formStyles.fullWidth}>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-green)' }}>Founder Image (Story Section)</h3>
+        </div>
+        <div className={formStyles.fullWidth}>
+             <div className={newPostStyles.imageUploadSection}>
+                {imagePreview && imagePreview !== defaultContent.founderImageUrl ? (
+                    <Image
+                      src={imagePreview}
+                      alt="Founder preview"
+                      width={150} height={150} 
+                      className={newPostStyles.imagePreview}
+                      style={{borderRadius: '50%', aspectRatio: '1/1', objectFit: 'cover', maxWidth: '150px', maxHeight: '150px'}}
+                    />
+                ) : (
+                    <span style={{opacity: 0.7}}>Founder Image Placeholder</span>
+                )}
+                <input
+                    type="file" id="founderImage" className={newPostStyles.fileInput}
+                    onChange={handleFileChange} accept="image/png, image/jpeg"
+                />
+                <label htmlFor="founderImage" className={newPostStyles.uploadButton} style={{marginTop: '1.5rem'}}>
+                    {imagePreview && imagePreview !== defaultContent.founderImageUrl ? 'Change Image' : 'Upload Founder Image'}
+                </label>
+                {uploadProgress !== null && uploadProgress < 100 && ( 
+                    <p className={newPostStyles.uploadProgress}>Uploading: {uploadProgress}%</p>
+                )}
+            </div>
+        </div>
+
+        {/* --- MISSION & VISION --- */}
+        <div className={formStyles.fullWidth}>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-green)' }}>Mission & Vision</h3>
         </div>
         <div className={formStyles.formGroup}>
-            <label htmlFor="missionHeadline">Mission Headline</label>
-            <input type="text" id="missionHeadline" name="missionHeadline" value={content.missionHeadline} onChange={handleTextChange} required />
+            <label>Mission Title</label>
+            <input type="text" name="missionTitle" value={content.missionTitle} onChange={handleTextChange} required />
         </div>
         <div className={formStyles.formGroup}>
-            <label htmlFor="visionHeadline">Vision Headline</label>
-            <input type="text" id="visionHeadline" name="visionHeadline" value={content.visionHeadline} onChange={handleTextChange} required />
+            <label>Vision Title</label>
+            <input type="text" name="visionTitle" value={content.visionTitle} onChange={handleTextChange} required />
         </div>
-        <div className={formStyles.formGroup}>
-            <label htmlFor="missionContent">Mission Content</label>
-            <textarea id="missionContent" name="missionContent" value={content.missionContent} onChange={handleTextChange} required />
+        <div className={formStyles.fullWidth}>
+            <div className={formStyles.formGroup}>
+                <label>Mission Text</label>
+                <textarea name="missionText" value={content.missionText} onChange={handleTextChange} required rows={4} />
+            </div>
         </div>
-        <div className={formStyles.formGroup}>
-            <label htmlFor="visionContent">Vision Content</label>
-            <textarea id="visionContent" name="visionContent" value={content.visionContent} onChange={handleTextChange} required />
+        <div className={formStyles.fullWidth}>
+            <div className={formStyles.formGroup}>
+                <label>Vision Text</label>
+                <textarea name="visionText" value={content.visionText} onChange={handleTextChange} required rows={4} />
+            </div>
         </div>
         
-        {/* Core Values (Uses custom array editor) */}
+        {/* --- CORE VALUES TITLE --- */}
         <div className={formStyles.fullWidth}>
-            <h3 style={{ marginTop: '1.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1.5rem', color: 'var(--color-neon-light)' }}>Core Values (Max 4)</h3>
-            <ValuesArrayEditor 
-                values={content.values} 
-                onChange={handleValuesChange} 
-            />
+            <div className={formStyles.formGroup} style={{marginTop: '1.5rem'}}>
+                <label>Core Values Title</label>
+                <input type="text" name="valuesTitle" value={content.valuesTitle} onChange={handleTextChange} required />
+            </div>
         </div>
         
       </div>
       
       {/* Response Messages */}
-      {error && <p className={formStyles.errorMessage}>{error}</p>}
+      {error && <p className={newPostStyles.errorMessage}>{error}</p>}
       {success && <p className={formStyles.successMessage}>{success}</p>}
 
       {/* Save Button */}
       <button
         type="submit"
-        className={formStyles.saveButton}
+        className={newPostStyles.publishButton}
         disabled={isSubmitting || isLoading}
+        style={{ width: '100%' }}
       >
-        {isSubmitting ? 'Saving Changes...' : 'Save All Changes'}
+        {isSubmitting ? 'Saving About Page...' : 'Save About Page Content'}
       </button>
     </form>
   );
