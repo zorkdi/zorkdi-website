@@ -7,15 +7,18 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 
 import adminStyles from '@/app/admin/admin.module.css';
-import formStyles from './forms.module.css'; // Assuming this file exists and contains styling
-import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from "react-icons/fa"; // NAYE ICONS IMPORT KIYE
+import formStyles from './forms.module.css';
+import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaChartLine, FaSearch } from "react-icons/fa"; // NAYE ICONS IMPORT KIYE
 
 // Type for Firestore data structure
 interface GlobalSettings {
-  websiteTitle: string;
-  websiteTagline: string;
+  websiteTitle: string; 
+  websiteTagline: string; 
   
-  // NAYE FIELDS FOR CONTACT INFORMATION
+  // NAYE FIELDS FOR DIGITAL MARKETING
+  googleAnalyticsId: string;
+  googleSearchConsoleId: string; // Verification ID for meta tag
+
   contactEmail: string;
   contactPhone: string;
   contactAddress: string;
@@ -27,12 +30,15 @@ interface GlobalSettings {
   adminUID: string;
 }
 
-// Default/Initial values (for first-time setup)
+// Default/Initial values
 const initialData: GlobalSettings = {
   websiteTitle: "ZORK DI - Custom Tech Solutions",
   websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
   
-  // NAYE DEFAULT VALUES
+  // NAYE DEFAULT VALUES FOR MARKETING
+  googleAnalyticsId: "G-XXXXXXXXXX", 
+  googleSearchConsoleId: "",
+
   contactEmail: "info@zorkdi.com", 
   contactPhone: "+1 (555) 555-5555",
   contactAddress: "123 Digital Blvd, Suite 100, Tech City, USA",
@@ -61,7 +67,7 @@ const GlobalCMS = () => {
 
         if (docSnap.exists()) {
           const fetchedData = docSnap.data();
-          // NAYA: Default values ko use kiya taaki naye fields bhi set ho jayein agar Firestore mein nahi hain
+          // Default values ko use kiya taaki naye fields bhi set ho jayein agar Firestore mein nahi hain
           setContent({ ...initialData, ...fetchedData } as GlobalSettings); 
         } else {
           // Agar document nahi mila, toh default data ke saath create kar do
@@ -94,7 +100,6 @@ const GlobalCMS = () => {
 
     try {
       const docRef = doc(db, 'cms', 'global_settings');
-      // setDoc use kiya with merge: true for reliable save/create
       await setDoc(docRef, content, { merge: true }); 
 
       setSuccess('Global Settings updated successfully!');
@@ -117,25 +122,41 @@ const GlobalCMS = () => {
 
       <div className={formStyles.formGrid}>
         
-        {/* Website Title */}
+        {/* Website Title & Tagline */}
+        <div className={formStyles.fullWidth}>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--color-neon-light)' }}>Branding & Core Info</h3>
+        </div>
         <div className={formStyles.fullWidth}>
           <div className={formStyles.formGroup}>
-            <label htmlFor="websiteTitle">Website Title (Used in Metadata/Header)</label>
+            <label htmlFor="websiteTitle">Website Title (Metadata)</label>
             <input type="text" id="websiteTitle" name="websiteTitle" value={content.websiteTitle} onChange={handleTextChange} required />
           </div>
         </div>
-        
-        {/* Website Tagline */}
         <div className={formStyles.fullWidth}>
           <div className={formStyles.formGroup}>
-            <label htmlFor="websiteTagline">Website Tagline</label>
+            <label htmlFor="websiteTagline">Website Tagline / Description (Metadata)</label>
             <textarea id="websiteTagline" name="websiteTagline" value={content.websiteTagline} onChange={handleTextChange} required />
           </div>
         </div>
+        
+        {/* --- DIGITAL MARKETING / SEO --- */}
+        <div className={formStyles.fullWidth}>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-light)' }}>Digital Marketing & Tracking</h3>
+        </div>
+
+        <div className={formStyles.formGroup}>
+            <label><FaChartLine /> Google Analytics 4 (GA4) ID</label>
+            <input type="text" name="googleAnalyticsId" value={content.googleAnalyticsId} onChange={handleTextChange} placeholder="e.g., G-XXXXXXXXXX" />
+        </div>
+        <div className={formStyles.formGroup}>
+            <label><FaSearch /> Google Search Console Verification</label>
+            <input type="text" name="googleSearchConsoleId" value={content.googleSearchConsoleId} onChange={handleTextChange} placeholder="Meta Tag Content ID only" />
+        </div>
+
 
         {/* --- CONTACT INFORMATION --- */}
         <div className={formStyles.fullWidth}>
-            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-light)' }}>Contact Information (Contact Page & Footer)</h3>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-light)' }}>Contact Information</h3>
         </div>
 
         <div className={formStyles.formGroup}>
@@ -155,7 +176,7 @@ const GlobalCMS = () => {
         
         {/* --- Social Media Links --- */}
         <div className={formStyles.fullWidth}>
-            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-light)' }}>Social Media Links (Footer & Contact Page)</h3>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-light)' }}>Social Media Links</h3>
         </div>
         
         <div className={formStyles.formGroup}>
