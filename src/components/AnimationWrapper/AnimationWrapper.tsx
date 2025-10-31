@@ -2,11 +2,12 @@
 
 "use client";
 
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react'; // FIX: React ko explicitly import kiya
 import { motion, useInView, useAnimation } from 'framer-motion';
 
 interface Props {
-  children: JSX.Element;
+  // FIX: Type ko theek kiya, taaki TypeScript compiler use recognize kar sake
+  children: React.ReactNode; 
   delay?: number; // Optional delay for staggered animations
 }
 

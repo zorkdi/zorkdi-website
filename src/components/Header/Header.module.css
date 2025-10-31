@@ -5,11 +5,14 @@
   top: 0;
   width: 100%;
   z-index: 1000;
-  background-color: rgba(22, 33, 62, 0.8);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  /* NAYA: Padding thodi badhayi taaki bada logo fit ho */
+  /* NAYA: Glassmorphism effect */
+  background-color: var(--color-glass-dark);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-glass-light);
   padding: 0.5rem 0; 
+  /* NAYA: Neon shadow effect for depth */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 .container {
@@ -27,13 +30,16 @@
   align-items: center;
   gap: 0.8rem;
   text-decoration: none;
-  color: #EFEFEF;
+  color: var(--color-off-white);
+  /* NAYA: Logo par thoda neon glow */
+  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
 .logoImage {
-  /* NAYA: Height 45px se badhakar 55px kar di */
   height: 55px; 
   width: auto;
+  /* NAYA: Logo image ko thoda futuristic look */
+  filter: drop-shadow(0 0 5px var(--color-neon-light));
 }
 
 .logoTextContainer {
@@ -45,6 +51,7 @@
 .brandName {
   font-size: 1.6rem;
   font-weight: 700;
+  color: var(--color-neon-green);
 }
 
 .brandTagline {
@@ -66,18 +73,39 @@
 }
 
 .navLinks a {
-  color: #EFEFEF;
+  position: relative;
+  color: var(--color-off-white);
   opacity: 0.8;
   text-decoration: none;
   font-weight: 500;
-  transition: opacity 0.2s ease;
+  padding: 0.2rem 0;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+/* NAYA: Futuristic active/hover indicator */
+.navLinks a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-neon-green);
+    transition: width 0.3s ease-out;
 }
 
 .navLinks a:hover {
   opacity: 1;
+  color: var(--color-neon-light);
+}
+
+.navLinks a:hover::after {
+    width: 100%;
 }
 
 .rightControls {
+  /* NAYA: Flex-end alignment for better spacing in general */
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -85,42 +113,51 @@
 
 .primaryCtaButton {
   padding: 0.6rem 1.5rem;
-  background-color: #00F5C8;
-  color: #1A1A2E !important; 
+  background-color: var(--color-neon-green);
+  color: var(--color-dark-navy) !important; 
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  transition: transform 0.2s ease;
+  /* NAYA: Neon Glow on CTA */
+  box-shadow: 0 0 10px rgba(0, 245, 200, 0.6);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .primaryCtaButton:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-neon);
 }
 
 .secondaryCtaButton {
-    color: #EFEFEF;
+    color: var(--color-off-white);
     text-decoration: none;
     font-weight: 500;
-    opacity: 0.9;
+    opacity: 0.8;
     transition: opacity 0.2s ease;
 }
 
 .secondaryCtaButton:hover {
     opacity: 1;
+    color: var(--color-neon-light);
 }
 
 .profileMenuContainer {
   position: relative;
+  /* NAYA: Profile menu ko mobile par bhi display rakhne ke liye */
+  display: flex;
+  align-items: center;
 }
 
 .profileIcon {
   background: none;
   border: none;
-  color: #EFEFEF;
+  color: var(--color-neon-green);
   font-size: 2rem;
   cursor: pointer;
   display: flex;
   align-items: center;
+  /* NAYA: Subtle neon glow on icon */
+  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
 .profileImage {
@@ -128,20 +165,32 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #00F5C8;
+  border: 2px solid var(--color-neon-green);
   cursor: pointer;
+  transition: transform 0.2s ease;
+}
+/* NAYA: Image par hover effect */
+.profileImage:hover {
+  transform: scale(1.05);
 }
 
 .profileDropdown {
   position: absolute;
   top: 150%;
   right: 0;
-  background-color: #16213E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* FIX: Background ko thoda zyaada solid banaya (less transparent) */
+  background-color: var(--color-deep-blue); /* #16213E */
+  backdrop-filter: blur(5px); /* FIX: Blur ko kam kiya */
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid var(--color-glass-light);
   border-radius: 8px;
   padding: 0.5rem;
   width: 180px;
   z-index: 1001;
+  /* NAYA: Depth effect */
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  /* FIX: Opacity issue solve karne ke liye, humne background solid kar diya hai */
+  opacity: 1; 
 }
 
 .profileDropdown ul {
@@ -155,7 +204,7 @@
   width: 100%;
   text-align: left;
   padding: 0.75rem 1rem;
-  color: #EFEFEF;
+  color: var(--color-off-white);
   text-decoration: none;
   background: none;
   border: none;
@@ -166,16 +215,19 @@
 }
 
 .profileDropdown a:hover, .profileDropdown button:hover {
-  background-color: #1A1A2E;
+  background-color: var(--color-dark-navy); /* Hover par thoda aur dark */
+  color: var(--color-neon-light);
 }
 
 .hamburgerButton {
   display: none;
   background: none;
   border: none;
-  color: #EFEFEF;
+  color: var(--color-neon-green);
   font-size: 2rem;
   cursor: pointer;
+  /* NAYA: Hamburger icon ko thoda neon glow */
+  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
 .mobileMenu {
@@ -184,10 +236,11 @@
   left: 0;
   width: 100%;
   height: 100vh;
-  background-color: #1A1A2E;
+  background-color: var(--color-dark-navy);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
 
 .mobileNavLinks {
@@ -201,27 +254,64 @@
 }
 
 .mobileNavLinks a {
-  color: #EFEFEF;
+  color: var(--color-off-white);
   text-decoration: none;
   font-size: 1.5rem;
   font-weight: 600;
+  transition: color 0.2s ease;
+}
+.mobileNavLinks a:hover {
+    color: var(--color-neon-green);
 }
 
 .mobileCta {
     padding: 0.8rem 2rem;
-    background-color: #00F5C8;
-    color: #1A1A2E;
+    background-color: var(--color-neon-green);
+    color: var(--color-dark-navy) !important;
     border-radius: 8px;
 }
 
 @media (max-width: 768px) {
+  /* Hide all desktop links/buttons */
   .desktopNav, .primaryCtaButton, .secondaryCtaButton {
     display: none;
   }
-  .hamburgerButton {
-    display: block;
-  }
+  
   .container {
     padding: 0 1.5rem;
+  }
+  
+  .rightControls {
+    /* FIX: Mobile par gap kam kiya aur alignment theek kiya */
+    gap: 1rem; 
+    /* NAYA: Profile menu mobile par dikhana hai */
+    display: flex; 
+    align-items: center;
+    /* FIX: Hamburger button aur profile icon ko right mein rakhne ke liye */
+    margin-left: auto;
+  }
+
+  /* Hamburger button hamesha dikhega */
+  .hamburgerButton {
+    display: block;
+    /* FIX: Hamburger aur profile icon ke beech ki spacing */
+    margin-left: 0.5rem;
+  }
+  
+  /* Profile Icon ka size theek kiya */
+  .profileIcon {
+    font-size: 1.75rem;
+  }
+  .profileImage {
+      width: 35px;
+      height: 35px;
+  }
+
+  /* Profile Dropdown position fix (Hamburger ke paas) */
+  .profileDropdown {
+      right: 50px; /* Hamburger button se thoda andar */
+      left: unset;
+      top: 100%; /* Header ke bilkul neeche */
+      transform: translateY(10px); /* Thoda gap diya header se */
   }
 }

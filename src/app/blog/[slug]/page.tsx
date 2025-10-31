@@ -2,22 +2,22 @@
 
 import styles from './post.module.css';
 import { notFound } from 'next/navigation';
-import Image from 'next/image'; // NAYA: Image component import kiya
+import Image from 'next/image'; 
 
-// NAYA: Firebase se data laane ke liye functions import kiye
+// Firebase se data laane ke liye functions import kiye
 import { db } from '@/firebase';
 import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
 
-// NAYA: Blog post ke data ka structure define kiya
+// Blog post ke data ka structure define kiya
 interface Post {
   title: string;
   category: string;
-  content: string;
+  content: string; // Rich Text (HTML)
   coverImageURL: string;
   publishedAt: Timestamp;
 }
 
-// NAYA: Server Component mein data fetching
+// Server Component mein data fetching
 async function getPost(slug: string) {
   const postsCollection = collection(db, 'blogs');
   const q = query(postsCollection, where("slug", "==", slug));
@@ -41,6 +41,7 @@ const BlogPostPage = async ({ params }: { params: { slug: string } }) => {
   return (
     <main className={styles.main}>
       <article>
+        {/* Cover Image */}
         <div className={styles.postImageContainer}>
           {post.coverImageURL && (
             <Image
@@ -48,16 +49,25 @@ const BlogPostPage = async ({ params }: { params: { slug: string } }) => {
               alt={post.title}
               fill
               style={{ objectFit: 'cover' }}
-              priority // Taaki image jaldi load ho
+              priority 
             />
           )}
         </div>
+        
+        {/* Title and Category */}
         <h1 className={styles.postTitle}>{post.title}</h1>
         <p className={styles.postCategory}>{post.category}</p>
-        <div className={styles.postContent}>
-          <p>{post.content}</p>
-          {/* Yahan par future mein poora blog content (HTML/Markdown) aayega */}
-        </div>
+        
+        {/* FIX: Content ko dangerouslySetInnerHTML se render karna */}
+        <div 
+          className={styles.postContent}
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
+        
+        {/* Published Date Display */}
+        <p style={{ opacity: 0.6, fontSize: '0.9rem', marginTop: '3rem', textAlign: 'center' }}>
+          Published on: {post.publishedAt ? new Date(post.publishedAt.seconds * 1000).toLocaleDateString() : 'N/A'}
+        </p>
       </article>
     </main>
   );

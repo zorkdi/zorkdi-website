@@ -4,119 +4,159 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 4rem 2rem;
+  padding: 5rem 2rem;
 }
 
 .hero {
   text-align: center;
   padding-bottom: 4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--color-glass-light);
   margin-bottom: 3rem;
 }
 
 .hero h1 {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  color: var(--color-neon-green);
+  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
 .hero p {
-  font-size: 1.25rem;
-  opacity: 0.8;
+  font-size: 1.5rem;
+  opacity: 0.85;
 }
 
+/* NAYA: Filters ko Futuristic look */
 .filters {
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
   flex-wrap: wrap;
 }
 
 .filters button {
-  background-color: transparent;
-  color: #EFEFEF;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 0.75rem 1.5rem;
+  background-color: var(--color-deep-blue);
+  color: var(--color-off-white);
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Clearer border */
+  padding: 0.75rem 1.75rem;
   border-radius: 2rem;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  font-weight: 600;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
 }
 
 .filters button:hover {
-  background-color: #16213E;
+  background-color: var(--color-dark-navy);
+  border-color: var(--color-neon-light);
+  transform: translateY(-3px);
 }
 
 .filters .activeFilter {
-  background-color: #00F5C8;
-  color: #1A1A2E;
-  border-color: #00F5C8;
+  background-color: var(--color-neon-green);
+  color: var(--color-dark-navy);
+  border-color: var(--color-neon-green);
+  /* NAYA: Neon glow on active filter */
+  box-shadow: 0 0 10px rgba(0, 245, 200, 0.5);
+  font-weight: 700;
 }
 
 .portfolioGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); /* Thoda zyaada size */
+  gap: 3rem; /* Zyaada space */
 }
 
-/* NAYA: Updated Portfolio Item styles */
+/* NAYA: Advanced Portfolio Item Card */
 .portfolioItem {
-  display: flex; /* Use flexbox for layout */
-  flex-direction: column; /* Stack image and text vertically */
-  background-color: #16213E; /* Card background */
-  border-radius: 12px;
+  display: flex;
+  flex-direction: column; 
+  /* NAYA: Glassmorphism Card Effect */
+  background-color: var(--color-glass-dark); 
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  text-decoration: none; /* Remove underline from Link */
-  color: #EFEFEF;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid var(--color-glass-light);
+  text-decoration: none;
+  color: var(--color-off-white);
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+
+  /* NAYA: Prepare for 3D tilt effect */
+  transform-style: preserve-3d;
 }
 
 .portfolioItem:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+  /* Subtle 3D tilt + strong lift */
+  transform: translateY(-15px) rotateX(1deg) rotateY(1deg);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6), 0 0 15px var(--color-secondary-accent); /* Purple neon glow */
 }
 
 /* Image container */
 .portfolioImagePlaceholder {
   width: 100%;
-  aspect-ratio: 16 / 10; /* Keep aspect ratio */
-  position: relative; /* Needed for Next/Image fill */
-  background-color: #2c3e50; /* Fallback color */
+  aspect-ratio: 16 / 10; 
+  position: relative; 
+  background-color: var(--color-deep-blue);
+}
+.portfolioImagePlaceholder img {
+    object-fit: cover;
+    transition: transform 0.4s ease;
 }
 
-/* NAYA: Text Info Container (no longer absolute) */
+.portfolioItem:hover .portfolioImagePlaceholder img {
+    transform: scale(1.05); /* Image par subtle zoom on card hover */
+}
+
+/* NAYA: Text Info Container */
 .portfolioItemInfo {
-  padding: 1.5rem; /* Add padding around text */
-  flex-grow: 1; /* Allow text area to grow if needed */
+  padding: 1.5rem; 
+  flex-grow: 1; 
   display: flex;
   flex-direction: column;
 }
 
 .portfolioItemInfo h3 {
-  font-size: 1.25rem; /* Slightly smaller title */
-  font-weight: 600;
-  margin: 0 0 0.5rem 0; /* Adjust margin */
+  font-size: 1.5rem; 
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
 }
 
 .portfolioItemInfo p {
-  font-size: 0.9rem; /* Smaller category text */
-  opacity: 0.7;
+  font-size: 0.95rem; 
+  color: var(--color-neon-green); /* Category ko highlight kiya */
+  opacity: 1;
   margin: 0;
-  margin-top: auto; /* Push category to the bottom if description is long later */
+  margin-top: 0.5rem; 
+  font-weight: 600;
 }
 
 
 /* General Loading/Error/No Projects styles (can be shared) */
 .loading, .errorMessage, .noProjects {
-    grid-column: 1 / -1; /* Span full grid width */
+    grid-column: 1 / -1; 
     text-align: center;
     padding: 3rem 1rem;
     font-size: 1.2rem;
     opacity: 0.8;
 }
-.errorMessage { color: #ff4757; }
+
+.errorMessage { 
+    color: #ff4757; 
+    background-color: rgba(255, 71, 87, 0.15);
+    border-radius: 8px;
+    border: 1px solid #e74c3c;
+}
+.loading {
+    color: var(--color-neon-green);
+}
+.noProjects {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid var(--color-glass-light);
+}
 
 
 @media (max-width: 768px) {
@@ -125,5 +165,10 @@
   }
   .hero h1 { font-size: 2.5rem; }
   .filters button { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
-  .portfolioGrid { grid-template-columns: 1fr; } /* Stack cards on mobile */
+  .portfolioGrid { grid-template-columns: 1fr; } 
+  
+  .portfolioItem:hover {
+    transform: translateY(-8px); /* Mobile par kam lift */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5); 
+  }
 }

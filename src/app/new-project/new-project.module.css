@@ -2,35 +2,43 @@
 
 .main {
   width: 100%;
-  max-width: 800px;
+  max-width: 900px; /* Thoda aur zyada spacious feel ke liye */
   margin: 0 auto;
   padding: 4rem 2rem;
 }
 
 .formContainer {
-  background-color: #16213E;
-  padding: 3rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* NAYA: Refined Glassmorphism - Thoda light background aur zyada border highlight */
+  background-color: var(--color-glass-dark);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 3.5rem; /* Zyaada padding */
+  border-radius: 20px; /* Aur zyaada rounded */
+  border: 1px solid var(--color-glass-light);
+  /* NAYA: Stronger depth shadow */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
 }
 
 .formContainer h1 {
-  font-size: 2.5rem;
+  font-size: 2.8rem; /* Thoda bada heading */
   font-weight: 700;
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-neon-green);
+  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
 .formContainer p {
   text-align: center;
-  opacity: 0.8;
+  opacity: 0.9;
   margin-bottom: 3rem;
+  font-size: 1.1rem;
 }
 
 .projectForm {
   display: grid;
   grid-template-columns: 1fr 1fr; /* 2-column layout */
-  gap: 1.5rem 2rem; /* row and column gap */
+  gap: 2rem 3rem; /* Spacing increased */
 }
 
 .formGroup {
@@ -38,87 +46,139 @@
   flex-direction: column;
 }
 
-/* Make Project Description and other fields take full width */
 .fullWidth {
   grid-column: 1 / -1;
 }
 
 .formGroup label {
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  opacity: 0.8;
+  margin-bottom: 0.75rem; /* Increased margin */
+  font-weight: 600; /* Bolder label */
+  opacity: 0.9;
+  font-size: 1.05rem;
+  transition: color 0.2s ease;
 }
 
 /* Budget label ke liye alag style */
 .budgetLabel {
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* Label aur currency ke beech space */
+  gap: 0.5rem; 
 }
 
 .currencySymbol {
   font-weight: 700;
-  color: #00F5C8;
+  color: var(--color-neon-light); 
+  font-size: 1.1rem;
 }
 
 .formGroup input,
 .formGroup select,
 .formGroup textarea {
   width: 100%;
-  padding: 1rem;
-  background-color: #1A1A2E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #EFEFEF;
+  padding: 1.1rem; /* Increased padding for better field height */
+  /* NAYA: Cleaner deep-blue input background */
+  background-color: var(--color-deep-blue);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px; /* Slightly more rounded inputs */
+  color: var(--color-off-white);
   font-size: 1rem;
   font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .formGroup input:focus,
 .formGroup select:focus,
 .formGroup textarea:focus {
   outline: none;
-  border-color: #00F5C8;
+  /* NAYA: Stronger Neon focus border aur glow */
+  border-color: var(--color-neon-green);
+  box-shadow: 0 0 10px var(--color-neon-light);
 }
 
 .formGroup textarea {
-  min-height: 150px;
+  min-height: 180px; /* Thodi zyaada height */
   resize: vertical;
 }
 
 .submitButton {
-  grid-column: 1 / -1; /* Make button full width */
-  margin-top: 1rem;
-  padding: 1rem;
-  background-color: #00F5C8;
-  color: #1A1A2E;
-  font-weight: 600;
-  border-radius: 8px;
+  grid-column: 1 / -1; 
+  margin-top: 1.5rem; /* Zyaada space button ke upar */
+  padding: 1.2rem;
+  background-color: var(--color-neon-green);
+  color: var(--color-dark-navy);
+  font-weight: 700;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  /* NAYA: Strong Neon Glow and lift */
+  box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .submitButton:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 245, 200, 0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 245, 200, 0.8);
 }
 
 .submitButton:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .successMessage {
   grid-column: 1 / -1;
   text-align: center;
   margin-top: 1rem;
-  color: #00F5C8;
-  background-color: rgba(0, 245, 200, 0.1);
-  padding: 1rem;
-  border-radius: 8px;
+  color: var(--color-neon-green);
+  background-color: rgba(0, 245, 200, 0.15); /* Thoda dark background */
+  padding: 1.2rem;
+  border-radius: 10px;
+  border: 1px solid var(--color-neon-green);
+  font-weight: 600;
+  font-size: 1.1rem;
 }
+
+.errorMessage { /* Error message style update for consistency */
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-top: 1rem;
+    color: #ff4757;
+    background-color: rgba(255, 71, 87, 0.15);
+    padding: 1.2rem;
+    border-radius: 10px;
+    border: 1px solid #e74c3c;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* NAYA: Login/Signup Prompt box styling */
+.authPrompt {
+    grid-column: 1 / -1;
+    margin-bottom: 2rem;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.08); /* Thoda brighter background */
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-subtle);
+}
+.authPrompt p {
+    margin: 0;
+    opacity: 1; /* Text zyaada visible */
+}
+.authPrompt a {
+    color: var(--color-neon-light);
+    font-weight: 700;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+.authPrompt a:hover {
+    color: var(--color-neon-green);
+}
+
 
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
@@ -131,11 +191,22 @@
   }
 
   .formContainer h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
+  }
+  
+  .formContainer p {
+    font-size: 1rem;
+    margin-bottom: 2rem;
   }
 
   /* Make form 1-column on mobile */
   .projectForm {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .formGroup label {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
   }
 }

@@ -1,0 +1,162 @@
+/* src/components/AdminForms/forms.module.css */
+
+.formSection {
+    background-color: var(--color-deep-blue);
+    padding: 2.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 3rem;
+}
+
+.formSection h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: var(--color-neon-green);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.fullWidth {
+    grid-column: 1 / -1;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.formGroup label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    opacity: 0.8;
+}
+
+.formGroup input,
+.formGroup textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background-color: var(--color-dark-navy);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: var(--color-off-white);
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+    outline: none;
+    border-color: var(--color-neon-green);
+    box-shadow: 0 0 5px rgba(0, 245, 200, 0.5);
+}
+
+.formGroup textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.imageUpload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    text-align: center;
+    background-color: var(--color-dark-navy);
+}
+
+.imagePreview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    border: 3px solid var(--color-neon-green);
+}
+
+.uploadButton {
+    padding: 0.6rem 1.5rem;
+    background-color: transparent;
+    color: var(--color-neon-green);
+    border: 1px solid var(--color-neon-green);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.uploadButton:hover {
+    background-color: rgba(0, 245, 200, 0.1);
+    box-shadow: 0 0 8px rgba(0, 245, 200, 0.3);
+}
+
+.uploadProgress {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: var(--color-off-white);
+    opacity: 0.9;
+}
+
+.saveButton {
+    width: 100%;
+    padding: 1rem;
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    background-color: var(--color-neon-green);
+    color: var(--color-dark-navy);
+    font-weight: 700;
+    border-radius: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.saveButton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(0, 245, 200, 0.7);
+}
+
+.saveButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Response Messages */
+.successMessage {
+    color: var(--color-neon-green);
+    background-color: rgba(0, 245, 200, 0.15);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.errorMessage {
+    color: #ff4757;
+    background-color: rgba(255, 71, 87, 0.15);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+    .formSection {
+        padding: 1.5rem;
+    }
+}

@@ -4,56 +4,73 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 4rem 2rem;
+  padding: 5rem 2rem;
 }
 
 .hero {
   text-align: center;
   padding-bottom: 4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--color-glass-light);
   margin-bottom: 4rem;
 }
 
 .hero h1 {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  color: var(--color-neon-green);
+  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
 .hero p {
-  font-size: 1.25rem;
-  opacity: 0.8;
+  font-size: 1.5rem;
+  opacity: 0.85;
 }
 
 .blogGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2rem;
+  gap: 3rem; /* Zyaada space */
 }
 
+/* NAYA: Advanced Blog Card (Same aesthetic as Portfolio) */
 .blogCard {
   display: flex;
   flex-direction: column;
-  background-color: #16213E;
-  border-radius: 12px;
+  /* Glassmorphism Card Effect */
+  background-color: var(--color-glass-dark); 
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid var(--color-glass-light);
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
   text-decoration: none;
-  color: #EFEFEF;
+  color: var(--color-off-white);
+  transform-style: preserve-3d;
 }
 
 .blogCard:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+  /* Subtle 3D tilt + strong lift */
+  transform: translateY(-15px) rotateX(1deg) rotateY(1deg);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6), var(--shadow-neon); /* Neon glow */
 }
 
 /* NAYA: Image container ke liye style */
 .cardImageContainer {
   width: 100%;
   aspect-ratio: 16 / 9;
-  position: relative; /* Image ko iske andar aache se fit karne ke liye */
-  background-color: #2c3e50; /* Placeholder color */
+  position: relative; 
+  background-color: var(--color-deep-blue);
+}
+.cardImageContainer img {
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.blogCard:hover .cardImageContainer img {
+    transform: scale(1.05); /* Image par subtle zoom on card hover */
 }
 
 /* NAYA: Agar image na ho to yeh text dikhega */
@@ -67,24 +84,24 @@
 }
 
 .cardContent {
-  padding: 1.5rem;
+  padding: 2rem; /* Zyaada padding */
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
 
 .cardCategory {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: #00F5C8;
-  letter-spacing: 1px;
+  color: var(--color-secondary-accent); /* Purple accent */
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   margin-bottom: 0.75rem;
 }
 
 .cardContent h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.6rem;
+  font-weight: 700;
   margin-bottom: 1rem;
   line-height: 1.4;
   flex-grow: 1;
@@ -92,17 +109,22 @@
 
 /* NAYA: Published date ke liye style */
 .cardDate {
-  font-size: 0.8rem;
-  opacity: 0.6;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-top: 1rem;
 }
 
 /* NAYA: Agar koi post na ho to message dikhane ke liye */
 .noPosts {
     text-align: center;
     font-size: 1.2rem;
-    padding: 4rem 0;
-    opacity: 0.8;
-    grid-column: 1 / -1; /* Taaki yeh poori grid ki jagah le */
+    padding: 3rem;
+    opacity: 0.9;
+    grid-column: 1 / -1; 
+    /* NAYA: Clean card look */
+    background-color: var(--color-deep-blue);
+    border-radius: 12px;
+    border: 1px solid var(--color-glass-light);
 }
 
 @media (max-width: 768px) {
@@ -116,5 +138,10 @@
 
   .blogGrid {
     grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .blogCard:hover {
+      transform: translateY(-8px); /* Mobile par kam lift */
   }
 }

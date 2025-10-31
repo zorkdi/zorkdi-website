@@ -3,23 +3,29 @@
 .adminLayout {
   display: flex;
   min-height: 100vh;
-  background-color: #1A1A2E;
+  /* Base dark navy color */
+  background-color: var(--color-dark-navy);
 }
 
 .sidebar {
-  width: 250px;
-  background-color: #16213E;
-  padding: 2rem;
+  width: 280px; /* Thodi zyada width */
+  /* NAYA: Darker deep blue color */
+  background-color: var(--color-deep-blue);
+  padding: 2rem 1.5rem;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+  /* NAYA: Mobile properties */
+  transition: transform 0.3s ease-in-out;
 }
 
 .sidebar h2 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 2.5rem;
-    color: #EFEFEF;
+    color: var(--color-neon-green);
+    text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
 .sidebar nav ul {
@@ -29,19 +35,22 @@
 }
 
 .sidebar nav li a {
-    display: block;
-    padding: 0.8rem 1rem;
-    color: #EFEFEF;
+    display: flex; /* NAYA: Icon alignment ke liye */
+    align-items: center;
+    padding: 1rem 1rem;
+    color: var(--color-off-white);
     opacity: 0.8;
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 8px; /* Zyaada rounded */
     margin-bottom: 0.5rem;
-    transition: background-color 0.2s ease, opacity 0.2s ease;
+    transition: background-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
 }
 
-.sidebar nav li a:hover {
-    background-color: #1A1A2E;
+.sidebar nav li a:hover,
+.sidebar nav li a.activeLink { /* NAYA: Active link style */
+    background-color: var(--color-dark-navy);
     opacity: 1;
+    color: var(--color-neon-light);
 }
 
 .mainContent {
@@ -55,31 +64,40 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
 }
 
 .pageHeader h1 {
-    font-size: 2rem;
-    font-weight: 600;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-off-white);
 }
 
 .primaryButton {
-    background-color: #00F5C8;
-    color: #1A1A2E;
+    background-color: var(--color-neon-green);
+    color: var(--color-dark-navy);
     padding: 0.7rem 1.5rem;
-    border-radius: 6px;
+    border-radius: 8px;
     text-decoration: none;
-    font-weight: 600;
-    transition: transform 0.2s ease;
+    font-weight: 700;
+    /* NAYA: Neon glow effect */
+    box-shadow: 0 0 10px rgba(0, 245, 200, 0.5);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .primaryButton:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 245, 200, 0.7);
 }
 
 .dataContainer {
-    background-color: #16213E;
-    padding: 2rem;
+    /* NAYA: Glassmorphism/Dark Card Effect */
+    background-color: var(--color-deep-blue);
+    padding: 2.5rem;
     border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .dataTable {
@@ -88,7 +106,7 @@
 }
 
 .dataTable th, .dataTable td {
-    padding: 1rem;
+    padding: 1.2rem;
     text-align: left;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -96,6 +114,20 @@
 .dataTable th {
     font-weight: 600;
     opacity: 0.8;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    color: var(--color-neon-green); /* Header text color */
+}
+
+.dataTable td {
+    font-size: 1rem;
+    color: var(--color-off-white);
+    transition: background-color 0.2s ease;
+}
+
+/* NAYA: Hover effect for table rows */
+.dataTable tr:hover td {
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .dataTable tr:last-child td {
@@ -103,49 +135,56 @@
 }
 
 .actionLink {
-    color: #00F5C8;
+    color: var(--color-neon-green);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
 }
 
 .actionLink:hover {
     text-decoration: underline;
+    color: var(--color-neon-light);
 }
 
+/* Status Tags (More pronounced) */
 .statusTag {
-  padding: 0.4rem 0.8rem;
+  padding: 0.4rem 1rem;
   border-radius: 20px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  min-width: 100px;
+  text-align: center;
 }
 
+/* Status colors (using color variables) */
 .statusPending {
-  background-color: rgba(255, 165, 0, 0.1);
+  background-color: rgba(255, 165, 0, 0.2); /* Orange/Amber */
   color: #ffc966;
 }
 
 .statusAccepted {
-  background-color: rgba(0, 245, 200, 0.1);
-  color: #00F5C8;
+  background-color: rgba(0, 245, 200, 0.2); /* Neon Green */
+  color: var(--color-neon-green);
 }
 
 .statusInProgress {
-  background-color: rgba(52, 152, 219, 0.1);
+  background-color: rgba(52, 152, 219, 0.2); /* Blue */
   color: #3498db;
 }
 
 .statusCompleted {
-    background-color: rgba(46, 204, 113, 0.1);
+    background-color: rgba(46, 204, 113, 0.2); /* Green */
     color: #2ecc71;
 }
 
 .statusRejected {
-  background-color: rgba(231, 76, 60, 0.1);
+  background-color: rgba(231, 76, 60, 0.2); /* Red */
   color: #e74c3c;
 }
 
+/* Chat List Styles - Minimal Changes, relying on primary colors */
 .chatList {
     display: flex;
     flex-direction: column;
@@ -155,12 +194,12 @@
     padding: 1.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     text-decoration: none;
-    color: #EFEFEF;
+    color: var(--color-off-white);
     transition: background-color 0.2s ease;
 }
 
 .chatListItem:hover {
-    background-color: #1A1A2E;
+    background-color: var(--color-dark-navy);
 }
 
 .chatListItem:last-child {
@@ -181,70 +220,105 @@
     transition: opacity 0.2s ease;
 }
 
+/* NAYA: Unread message highlight */
+.chatListItem.unread {
+    background-color: rgba(0, 245, 200, 0.08); /* Subtle highlight */
+    border-left: 5px solid var(--color-neon-green);
+}
+
 .chatListItem.unread .chatUserInfo h3 {
     font-weight: 700;
-    color: #ffffff;
+    color: var(--color-neon-light);
 }
 
 .chatListItem.unread .chatUserInfo p {
     opacity: 0.9;
 }
 
-.chatListItem.unread .chatUserInfo h3::after {
-    content: '•';
-    color: #00F5C8;
-    font-size: 1.5em;
-    margin-left: 0.5rem;
-    vertical-align: middle;
-    line-height: 1;
+/* NAYA: Logout Button Style (Sidebar ke andar) */
+.logoutButton {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 1rem 1rem;
+    color: #e74c3c; /* Red color for warning/logout */
+    opacity: 0.8;
+    background-color: transparent;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: 2rem;
+    transition: background-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+}
+
+.logoutButton:hover {
+    background-color: rgba(231, 76, 60, 0.15);
+    color: #ff4757;
+    opacity: 1;
 }
 
 /* Dashboard Stats Styles */
 .statsGrid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Thoda bada size */
+    gap: 2rem;
+    margin-bottom: 3rem;
     width: 100%;
 }
 
 .statCard {
-    background-color: #16213E;
-    padding: 1.5rem;
+    /* NAYA: Neon Stat Card */
+    background-color: var(--color-deep-blue);
+    padding: 2rem;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
+    transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
-/* NOTE: Removed the empty .unreadCard rule */
+/* NAYA: Unread/Critical card highlight */
+.statCard.unreadCard {
+    border-color: var(--color-neon-green);
+    box-shadow: 0 0 15px rgba(0, 245, 200, 0.4);
+    transform: translateY(-5px);
+}
+
 
 .statCard h2 {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 500;
     opacity: 0.8;
     margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .statCard p {
-    font-size: 2.5rem;
+    font-size: 3rem; /* Bigger number */
     font-weight: 700;
-    color: #00F5C8;
+    color: var(--color-neon-green);
     margin: 0;
 }
 
 .welcomeMessage {
-    background-color: #16213E;
-    padding: 2rem;
+    /* NAYA: Glassmorphism Card Style */
+    background-color: var(--color-deep-blue);
+    padding: 2.5rem;
     border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .welcomeMessage h2 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     margin-bottom: 0.5rem;
+    color: var(--color-neon-light);
 }
 
 .welcomeMessage p {
-    opacity: 0.8;
+    opacity: 0.85;
 }
 
 .actionButtonsContainer {
@@ -257,7 +331,7 @@
     background-color: #e74c3c;
     color: #ffffff;
     padding: 0.7rem 1.5rem;
-    border-radius: 6px;
+    border-radius: 8px;
     border: none;
     text-decoration: none;
     font-weight: 600;
@@ -267,12 +341,13 @@
 
 .dangerButton:hover {
     background-color: #c0392b;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
 .dangerButton:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
 }
 
 .accessDeniedContainer {
@@ -280,7 +355,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh; /* FIX: Min-height set kiya */
   width: 100%;
   text-align: center;
 }
@@ -299,20 +374,22 @@
 .accessDeniedContainer a {
     margin-top: 2rem;
     padding: 0.8rem 2rem;
-    background-color: #00F5C8;
-    color: #1A1A2E;
+    background-color: var(--color-neon-green);
+    color: var(--color-dark-navy);
     font-weight: 600;
     border-radius: 8px;
     text-decoration: none;
+    box-shadow: 0 0 10px rgba(0, 245, 200, 0.5);
 }
 
 .errorMessage {
     color: #ff4757;
-    background-color: rgba(255, 71, 87, 0.1);
+    background-color: rgba(255, 71, 87, 0.15);
     padding: 1rem;
     border-radius: 8px;
     margin: 1.5rem 0;
     text-align: center;
+    font-weight: 600;
 }
 
 .loading {
@@ -320,10 +397,29 @@
     padding: 3rem;
     font-size: 1.2rem;
     opacity: 0.8;
+    color: var(--color-neon-green);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* NAYA: Mobile Sidebar Open/Close Logic */
+.sidebarOpen {
+    transform: translateX(0) !important;
+    position: fixed; /* Jab open ho to fixed rahe */
+    height: 100vh;
+    z-index: 1000;
 }
 
 
-@media (max-width: 600px) {
+@media (max-width: 992px) {
+    .mainContent {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
     .actionButtonsContainer {
         flex-direction: column;
     }
@@ -333,5 +429,46 @@
     }
     .statsGrid {
         grid-template-columns: 1fr;
+    }
+    
+    /* FIX: Mobile par sidebar default hide rahega */
+    .sidebar {
+        position: fixed;
+        width: 300px; /* Thoda zyada width mobile par */
+        height: 100vh;
+        left: 0;
+        top: 0;
+        z-index: 1000;
+        transform: translateX(-100%); /* Default hidden */
+        padding-top: 4rem;
+        /* Box-shadow ko right side par rakha */
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5); 
+    }
+    
+    /* FIX: Hamburger button sirf mobile par dikhega, aur right corner mein rahega */
+    .hamburgerButton {
+        display: flex; /* Display kiya mobile par */
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 1.5rem;
+        left: 1.5rem; /* FIX: Left side se open button */
+        z-index: 999;
+        font-size: 1.5rem;
+    }
+
+    .adminLayout {
+        /* Flex direction ko column karne ki zaroorat nahi hai, main content adjust ho jayega */
+        flex-direction: row; 
+    }
+    
+    /* Main Content ko full width denge taki woh sidebar ke neeche na chhipe */
+    .mainContent {
+        width: 100%;
+        padding: 4rem 1.5rem 2rem 1.5rem; /* Top padding diya open button ke liye */
+    }
+    
+    .dataTable th, .dataTable td {
+        padding: 0.8rem;
     }
 }

@@ -10,47 +10,50 @@
 .formGroup label {
     font-weight: 500;
     margin-bottom: 0.5rem;
-    opacity: 0.9;
+    opacity: 0.85; /* Thodi zyada opacity */
 }
 
 .formGroup input,
 .formGroup select,
-.formGroup textarea { /* Textarea might not be used if RichTextEditor is used */
+.formGroup textarea { 
     width: 100%;
-    padding: 0.8rem 1rem;
-    background-color: #1A1A2E;
+    padding: 0.9rem 1rem; /* Thodi zyada padding */
+    background-color: var(--color-deep-blue); /* Deep Blue input background */
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    color: #EFEFEF;
+    border-radius: 8px; /* Zyaada rounded */
+    color: var(--color-off-white);
     font-size: 1rem;
     font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .formGroup input:focus,
 .formGroup select:focus,
 .formGroup textarea:focus {
     outline: none;
-    border-color: #00F5C8;
+    /* NAYA: Neon Focus */
+    border-color: var(--color-neon-green);
+    box-shadow: 0 0 5px var(--color-neon-light);
 }
 
 /* Image Upload Section */
 .imageUploadSection {
-    border: 2px dashed rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    padding: 1.5rem;
+    border: 2px dashed var(--color-neon-green); /* Neon dashed border */
+    border-radius: 12px;
+    padding: 2rem; /* Zyaada padding */
     text-align: center;
-    background-color: #1A1A2E; /* Slightly different background */
+    background-color: var(--color-deep-blue);
 }
 
 .imagePreview {
     width: 100%;
-    max-width: 300px; /* Adjust as needed */
+    max-width: 350px; /* Thodi zyada width */
     height: auto;
     aspect-ratio: 16 / 10; /* Portfolio image ratio */
     object-fit: cover;
-    border-radius: 6px;
+    border-radius: 8px;
     margin: 0 auto 1.5rem auto;
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Add subtle border to preview */
+    border: 1px solid var(--color-neon-green); /* Neon border to preview */
 }
 
 .fileInput {
@@ -60,38 +63,55 @@
 .uploadButton {
     padding: 0.6rem 1.5rem;
     background-color: transparent;
-    color: #00F5C8;
-    border: 1px solid #00F5C8;
+    color: var(--color-neon-green);
+    border: 1px solid var(--color-neon-green);
     border-radius: 6px;
     cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
+    font-weight: 600;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .uploadButton:hover {
-    background-color: rgba(0, 245, 200, 0.1);
+    background-color: rgba(0, 245, 200, 0.15);
+    box-shadow: 0 0 8px rgba(0, 245, 200, 0.3);
 }
 
 .uploadProgress {
     margin-top: 1rem;
     font-size: 0.9rem;
-    color: #EFEFEF;
+    color: var(--color-off-white);
+    opacity: 0.9;
 }
 
-.submitButton { /* Renamed from publishButton for clarity */
+.submitButton { 
     width: 100%;
-    padding: 1rem;
-    margin-top: 1.5rem;
-    font-size: 1.1rem;
+    padding: 1.1rem; /* Zyaada padding */
+    margin-top: 2rem; /* Zyaada margin */
+    font-size: 1.2rem;
+    font-weight: 700;
+    /* NAYA: Neon Glow */
+    box-shadow: 0 0 15px rgba(0, 245, 200, 0.5);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submitButton:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 5px 20px rgba(0, 245, 200, 0.7);
 }
 
 .submitButton:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .errorMessage {
     color: #ff4757;
-    margin-top: 1rem;
+    background-color: rgba(255, 71, 87, 0.15);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
     text-align: center;
+    font-weight: 600;
 }

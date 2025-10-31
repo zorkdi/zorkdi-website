@@ -1,6 +1,6 @@
 .main {
   width: 100%;
-  max-width: 1000px; /* Page content ki width set karna */
+  max-width: 1100px; /* Thodi zyada width */
   margin: 0 auto;
   padding: 4rem 2rem;
 }
@@ -9,7 +9,7 @@
 .hero {
   text-align: center;
   padding-bottom: 4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--color-glass-light);
   margin-bottom: 4rem;
 }
 
@@ -17,47 +17,64 @@
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  color: var(--color-neon-green);
+  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
 .hero p {
   font-size: 1.25rem;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
-/* Har ek service item ki styling */
+/* Har ek service item ki styling - NAYA: Advanced Neo-Tech Card */
 .serviceItem {
-  margin-bottom: 4rem; /* Har service ke beech mein space */
-  background-color: #16213E;
-  padding: 3rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 5rem; /* Zyaada space */
+  /* Glassmorphism/Neo-Tech Card Base */
+  background-color: var(--color-deep-blue); 
+  padding: 3.5rem; /* Zyaada padding */
+  border-radius: 20px;
+  border: 1px solid var(--color-glass-light);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+
+  /* NAYA: 3D Perspective (Zaroori agar hum 3D transforms use kar rahe hain) */
+  transform-style: preserve-3d;
 }
+
+.serviceItem:hover {
+  /* Subtle 3D tilt + lift effect */
+  transform: translateY(-15px) rotateX(2deg) rotateY(-2deg);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6), var(--shadow-neon); /* Stronger glow */
+}
+
 
 .serviceIcon {
-  font-size: 2.5rem;
+  font-size: 3rem; /* Bigger icon */
   margin-bottom: 1rem;
-  color: #00F5C8;
+  color: var(--color-neon-green);
+  text-shadow: 0 0 5px rgba(0, 245, 200, 0.6);
 }
 
 .serviceItem h2 {
-  font-size: 2rem;
-  font-weight: 600;
+  font-size: 2.5rem; /* Bigger heading */
+  font-weight: 700;
   margin-bottom: 1rem;
+  color: var(--color-off-white);
 }
 
 .serviceItem p {
   line-height: 1.7;
-  opacity: 0.8;
-  margin-bottom: 2rem;
+  opacity: 0.9;
+  margin-bottom: 2.5rem; /* Zyaada space */
 }
 
 .serviceItem h4 {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.7;
+  letter-spacing: 1.5px;
+  color: var(--color-secondary-accent); /* Highlighted sub-heading */
 }
 
 /* "What we offer" list ki styling */
@@ -66,27 +83,30 @@
   padding: 0;
   display: grid;
   grid-template-columns: 1fr 1fr; /* 2 column layout */
-  gap: 1rem;
+  gap: 1.2rem 2rem; /* Zyaada space */
 }
 
 .serviceItem li {
-  padding-left: 1.5rem;
+  padding-left: 2rem;
   position: relative;
-  opacity: 0.9;
+  opacity: 0.95;
+  font-size: 1.05rem;
 }
 
 /* List ke items ke aage checkmark jaisa design */
 .serviceItem li::before {
   content: '✓';
-  color: #00F5C8;
+  color: var(--color-neon-light); /* Neon checkmark */
   position: absolute;
   left: 0;
+  font-weight: 700;
+  font-size: 1.2rem;
 }
 
 /* ===== NAYA: Mobile Responsive Styles ===== */
 @media (max-width: 768px) {
   .main {
-    padding: 2rem 1.5rem; /* Mobile par thodi kam padding */
+    padding: 2rem 1.5rem;
   }
 
   .hero h1 {
@@ -95,14 +115,21 @@
 
   .serviceItem {
     padding: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .serviceItem:hover {
+    transform: translateY(-8px); /* Mobile par kam lift */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5); 
   }
 
   .serviceItem h2 {
-    font-size: 1.75rem;
+    font-size: 2rem;
   }
 
   /* "What we offer" list ko 1-column mein badalna */
   .serviceItem ul {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }

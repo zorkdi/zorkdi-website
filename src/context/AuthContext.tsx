@@ -5,20 +5,22 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth, db } from '../firebase'; // Hamari firebase.ts file se
-import { doc, getDoc, onSnapshot } from 'firebase/firestore'; // NAYA: Firestore se functions import kiye
+import { doc, onSnapshot } from 'firebase/firestore'; // FIX: getDoc removed
 
-// NAYA: User data ka type define kiya, jismein photoURL bhi hai
+// NAYA: User data ka type define kiya, jismein photoURL aur naye fields bhi hain
 interface UserProfile {
   fullName: string;
   email: string;
   photoURL: string;
-  // Yahan aap future mein aur bhi cheezein add kar sakte hain
+  // FIX: Added missing fields to resolve TypeScript error
+  mobile: string; 
+  country: string;
 }
 
 // Context ke type ko update kiya
 interface AuthContextType {
   currentUser: User | null;
-  userProfile: UserProfile | null; // NAYA: userProfile ko add kiya
+  userProfile: UserProfile | null;
   loading: boolean;
 }
 
@@ -26,23 +28,31 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null); // NAYA
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
 
-      // NAYA: Agar user logged in hai, to uska profile data lao
+      // Agar user logged in hai, to uska profile data lao
       if (user) {
         const userDocRef = doc(db, 'users', user.uid);
         
         // onSnapshot ka use kar rahe hain taaki data real-time mein update ho
         const unsubscribeProfile = onSnapshot(userDocRef, (docSnap) => {
           if (docSnap.exists()) {
-            setUserProfile(docSnap.data() as UserProfile);
+            const data = docSnap.data();
+            setUserProfile({
+                fullName: data.fullName || '',
+                email: data.email || '',
+                photoURL: data.photoURL || '',
+                // FIX: Setting default values for mobile and country
+                mobile: data.mobile || '',
+                country: data.country || 'USA',
+            } as UserProfile);
           } else {
-            setUserProfile(null); // Agar profile nahi hai to null set karo
+            setUserProfile(null); 
           }
           setLoading(false);
         });
@@ -63,13 +73,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const value = {
     currentUser,
-    userProfile, // NAYA
+    userProfile,
     loading,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {/* Auth loading ke dauran children ko render hone se roko */}
+      {!loading && children} 
+      {loading && <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'var(--color-neon-green)' }}>Loading application...</div>}
     </AuthContext.Provider>
   );
 };

@@ -1,80 +1,139 @@
 // src/app/about/page.tsx
 
-"use client"; // NAYA: Animation component ke liye "use client" zaroori hai
+"use client";
 
+import { useState, useEffect } from 'react';
+import Image from 'next/image'; // NAYA: Image component import kiya
+import { doc, getDoc } from 'firebase/firestore'; 
+import { db } from '@/firebase'; 
 import styles from './about.module.css';
-// NAYA: AnimationWrapper component ko import kiya
-import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
+import { FaHeart, FaRocket, FaLightbulb, FaHandsHelping } from 'react-icons/fa'; // Icons for core values
 
-// Dummy icons (replace with actual icons)
-const ValueIcon = () => <span>⭐</span>;
+// Interface for CMS Data
+interface AboutContent {
+    heroTitle: string;
+    heroSubtitle: string;
+    storyTitle: string;
+    storyParagraph1: string;
+    storyParagraph2: string;
+    missionTitle: string;
+    missionText: string;
+    visionTitle: string;
+    visionText: string;
+    valuesTitle: string;
+    founderImageUrl: string; // URL for the founder's image
+}
+
+const defaultContent: AboutContent = {
+    heroTitle: "Redefining Digital Experiences.",
+    heroSubtitle: "We are ZorkDI: The force accelerating the next generation of web development.",
+    storyTitle: "Our Story: Built on Passion and Precision",
+    storyParagraph1: "ZorkDI was founded with a simple, yet ambitious goal: to bridge the gap between complex technology and compelling user experience. We started as a small team of innovators, fuelled by coffee and a shared passion for clean code and flawless design.",
+    storyParagraph2: "Today, we've grown into a full-service digital agency, but our core philosophy remains the same—every line of code and every pixel matters. We believe that the best digital solutions are built not just with tools, but with dedication and a deep understanding of our clients' visions.",
+    missionTitle: "Our Mission",
+    missionText: "To empower businesses globally with cutting-edge, scalable, and secure digital platforms that drive measurable growth and transform the way they interact with their customers.",
+    visionTitle: "Our Vision",
+    visionText: "To be the recognized leader in bespoke digital innovation, setting the benchmark for quality, speed, and client satisfaction in the tech industry worldwide.",
+    valuesTitle: "Core Values",
+    founderImageUrl: "/images/founder.jpg", // Default placeholder image
+};
 
 const AboutPage = () => {
-  return (
-    <main className={styles.main}>
-      {/* Hero Section */}
-      <section className={styles.hero}>
-        <h1>About ZORK DI</h1>
-        <p>Empowering Ideas With Technology - We are a passionate team dedicated to crafting exceptional digital experiences.</p>
-      </section>
+    const [content, setContent] = useState<AboutContent>(defaultContent);
 
-      {/* Story Section */}
-      <AnimationWrapper delay={0.1}>
-        <section className={styles.storySection}>
-          <div className={styles.storyContent}>
-            <h2>Our Story</h2>
-            <p>Founded with a vision to bridge the gap between innovative ideas and cutting-edge technology, ZORK DI started as a small team with big ambitions. We believe in the transformative power of technology and strive to create solutions that not only meet but exceed expectations, driving growth and success for our clients.</p>
-            <p>Our journey has been fueled by a commitment to quality, collaboration, and continuous learning.</p>
-          </div>
-          <div className={styles.founderImagePlaceholder}>Founder Image</div>
-        </section>
-      </AnimationWrapper>
+    useEffect(() => {
+        const fetchContent = async () => {
+            try {
+                const docRef = doc(db, 'cms', 'about_page');
+                const docSnap = await getDoc(docRef);
 
-      {/* Mission & Vision Section */}
-      <section className={styles.missionVisionSection}>
-        <AnimationWrapper delay={0.2}>
-          <div className={styles.missionCard}>
-            <h3>Our Mission</h3>
-            <p>To empower businesses and individuals by transforming their ideas into high-performance, scalable, and user-centric digital solutions.</p>
-          </div>
-        </AnimationWrapper>
-        <AnimationWrapper delay={0.3}>
-          <div className={styles.visionCard}>
-            <h3>Our Vision</h3>
-            <p>To be a globally recognized tech brand known for innovation, quality, and delivering tangible results through custom technology solutions.</p>
-          </div>
-        </AnimationWrapper>
-      </section>
+                if (docSnap.exists()) {
+                    const data = docSnap.data() as AboutContent;
+                    setContent({
+                        ...defaultContent, // Keep defaults for fields not in CMS
+                        ...data,
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching about page content:", error);
+            }
+        };
+        fetchContent();
+    }, []);
 
-      {/* Core Values Section */}
-      <section className={styles.valuesSection}>
-        <h2 className={styles.sectionTitle}>Our Core Values</h2>
-        <div className={styles.valuesGrid}>
-          <AnimationWrapper delay={0.4}>
-            <div className={styles.valueItem}>
-              <div className={styles.valueIcon}><ValueIcon /></div>
-              <h4>Innovation</h4>
-              <p>Constantly exploring new technologies and approaches.</p>
-            </div>
-          </AnimationWrapper>
-          <AnimationWrapper delay={0.5}>
-            <div className={styles.valueItem}>
-              <div className={styles.valueIcon}><ValueIcon /></div>
-              <h4>Quality</h4>
-              <p>Delivering robust, reliable, and polished solutions.</p>
-            </div>
-          </AnimationWrapper>
-          <AnimationWrapper delay={0.6}>
-            <div className={styles.valueItem}>
-              <div className={styles.valueIcon}><ValueIcon /></div>
-              <h4>Collaboration</h4>
-              <p>Working closely with clients as true partners.</p>
-            </div>
-          </AnimationWrapper>
-        </div>
-      </section>
-    </main>
-  );
+    const coreValues = [
+        { icon: FaRocket, title: "Innovation", description: "Continuously exploring new technologies to keep our clients ahead of the curve." },
+        { icon: FaLightbulb, title: "Clarity", description: "Providing clear communication and transparent processes from concept to launch." },
+        { icon: FaHeart, title: "Dedication", description: "Committing our full effort and passion to every project we undertake." },
+        { icon: FaHandsHelping, title: "Integrity", description: "Building relationships based on honesty, trust, and mutual respect." },
+    ];
+
+
+    return (
+        <main className={styles.main}>
+            {/* Hero Section */}
+            <section className={styles.hero}>
+                <h1>{content.heroTitle}</h1>
+                <p>{content.heroSubtitle}</p>
+            </section>
+
+            {/* Our Story Section */}
+            <section className={styles.storySection}>
+                <div className={styles.storyContent}>
+                    <h2>{content.storyTitle}</h2>
+                    <p style={{ marginBottom: '1.5rem' }}>
+                        {content.storyParagraph1}
+                    </p>
+                    <p>
+                        {content.storyParagraph2}
+                    </p>
+                </div>
+                <div className={styles.founderImageContainer}>
+                    {/* Yahan par Founder ki Image aayegi, abhi placeholder use kiya hai */}
+                    {content.founderImageUrl && content.founderImageUrl !== defaultContent.founderImageUrl ? (
+                        // <Image /> component use kiya for optimization
+                        <Image 
+                            src={content.founderImageUrl} 
+                            alt="Founder of ZorkDI" 
+                            fill 
+                            sizes="(max-width: 768px) 200px, 450px" // Responsive size for performance
+                            className={styles.founderImage}
+                        />
+                    ) : (
+                        <div className={styles.founderImagePlaceholder}>
+                            Founder Image
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* Mission & Vision Section */}
+            <section className={styles.missionVisionSection}>
+                <div className={styles.missionCard}>
+                    <h3>{content.missionTitle}</h3>
+                    <p>{content.missionText}</p>
+                </div>
+                <div className={styles.visionCard}>
+                    <h3>{content.visionTitle}</h3>
+                    <p>{content.visionText}</p>
+                </div>
+            </section>
+
+            {/* Core Values Section */}
+            <section className={styles.valuesSection}>
+                <h2 className={styles.sectionTitle}>{content.valuesTitle}</h2>
+                <div className={styles.valuesGrid}>
+                    {coreValues.map((value, index) => (
+                        <div key={index} className={styles.valueItem}>
+                            <value.icon className={styles.valueIcon} />
+                            <h4>{value.title}</h4>
+                            <p>{value.description}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+        </main>
+    );
 };
 
 export default AboutPage;

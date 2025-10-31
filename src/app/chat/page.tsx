@@ -1,133 +1,171 @@
-// app/chat/page.tsx
+// src/app/chat/page.tsx
 
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react'; // FIX: ChangeEvent ko hata diya
 import Link from 'next/link';
-import { useAuth } from '../../context/AuthContext';
+// FIX: Image, FaUserCircle, FaRobot ko hata diya
+import { FaPaperPlane } from 'react-icons/fa';
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/firebase';
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, limit } from 'firebase/firestore';
+
 import styles from './chat.module.css';
 
-// Firebase functions (doc and setDoc already imported)
-import { db } from '../../firebase';
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, Timestamp, doc, setDoc } from 'firebase/firestore';
-
+// Type definitions
 interface Message {
   id: string;
+  senderId: string; // User ID (currentUser.uid)
+  senderType: 'user' | 'admin'; // For styling
   text: string;
-  sender: 'user' | 'admin';
-  createdAt: Timestamp;
-  isRead?: boolean; // NAYA: Added isRead flag
+  timestamp: Date;
 }
 
 const ChatPage = () => {
   const { currentUser, loading } = useAuth();
-  const router = useRouter();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
+  // Auto-scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
+  // 1. Fetch Messages (Real-time)
   useEffect(() => {
     if (currentUser) {
-      const messagesRef = collection(db, 'chats', currentUser.uid, 'messages');
-      const q = query(messagesRef, orderBy('createdAt', 'asc'));
+      setChatLoading(true);
+      const messagesCollectionRef = collection(db, 'chats', currentUser.uid, 'messages');
+      const messagesQuery = query(
+        messagesCollectionRef,
+        orderBy('timestamp', 'desc'), // Latest messages first (for reverse display)
+        limit(50) // Limit to 50 messages
+      );
 
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const fetchedMessages: Message[] = [];
-        querySnapshot.forEach((doc) => {
-          fetchedMessages.push({ id: doc.id, ...doc.data() } as Message);
-        });
-        setMessages(fetchedMessages);
+      const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+        const fetchedMessages = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          timestamp: doc.data().timestamp?.toDate() || new Date(),
+        })) as Message[];
+        
+        // Reverse array back to chronological order for correct display
+        setMessages(fetchedMessages.reverse());
+        setChatLoading(false);
+      }, (error) => {
+        console.error("Error fetching chat messages:", error);
+        setChatLoading(false);
       });
 
       return () => unsubscribe();
+    } else if (!loading) {
+      setChatLoading(false);
+      setMessages([]);
     }
-  }, [currentUser]);
+  }, [currentUser, loading]);
 
   useEffect(() => {
-    if (!loading && !currentUser) {
-      router.push('/login');
-    }
-  }, [currentUser, loading, router]);
+    scrollToBottom();
+  }, [messages]);
 
-  const handleSendMessage = async (e: React.FormEvent) => {
+  // 2. Send Message Handler
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newMessage.trim() === '' || !currentUser) return;
+    const trimmedInput = input.trim();
+
+    if (!trimmedInput || !currentUser) return;
+
+    setInput(''); // Clear input immediately
 
     try {
-      // Step 1: Add message with isRead: false
-      const messagesRef = collection(db, 'chats', currentUser.uid, 'messages');
-      await addDoc(messagesRef, {
-        text: newMessage,
-        sender: 'user',
-        createdAt: serverTimestamp(),
-        isRead: false, // NAYA: Mark message as unread initially
+      const messagesCollectionRef = collection(db, 'chats', currentUser.uid, 'messages');
+      
+      await addDoc(messagesCollectionRef, {
+        senderId: currentUser.uid,
+        senderType: 'user', // Always 'user' for client side chat input
+        text: trimmedInput,
+        timestamp: serverTimestamp(),
       });
-
-      // Step 2: Update parent document with hasUnread: true
-      const chatDocRef = doc(db, 'chats', currentUser.uid);
-      await setDoc(chatDocRef, {
-        lastMessageAt: serverTimestamp(),
-        userEmail: currentUser.email,
-        hasUnread: true, // NAYA: Set flag indicating unread message
-      }, { merge: true });
-
-      setNewMessage('');
-    } catch (error) {
-      console.error("Error sending message: ", error);
+      
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred during submission.';
+      console.error("Error sending message:", error);
+      alert(`Failed to send message: ${errorMessage}`);
+      setInput(trimmedInput); // Restore input on failure
     }
   };
 
-  if (loading) {
-    return <div className={styles.loading}>Loading...</div>;
-  }
+  // --- Render Logic ---
 
-  if (!currentUser) {
+  // Show Loading while Auth is checking or Chat is fetching
+  if (loading || chatLoading) {
     return (
-      <div className={styles.loginPrompt}>
-        Please <Link href="/login">log in</Link> to access the chat.
+      <div className={styles.main}>
+        <div className={styles.loading}>
+            <p>Connecting to Chat...</p>
+        </div>
       </div>
     );
   }
 
-  // Rest of the component remains the same...
+  // Show Prompt if user is not logged in
+  if (!currentUser) {
+    return (
+      <div className={styles.main}>
+        <div className={styles.loginPrompt}>
+          <h1>Chat Access Restricted</h1>
+          <p>Please login or sign up to start a conversation with our support team.</p>
+          <Link href="/login">Login / Sign Up</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Show Main Chat Interface
   return (
-    <main className={styles.main}>
+    <div className={styles.main}>
       <div className={styles.chatContainer}>
+        {/* Chat Header (Static for Client Chat) */}
         <div className={styles.chatHeader}>
           <h1>Chat with Support</h1>
         </div>
-        
+
+        {/* Messages Container */}
         <div className={styles.messagesContainer}>
           <div className={styles.messageList}>
-            <div ref={messagesEndRef} />
             {messages.map((msg) => (
               <div 
                 key={msg.id} 
-                className={`${styles.message} ${msg.sender === 'user' ? styles.user : styles.admin}`}
+                className={`${styles.message} ${msg.senderType === 'user' ? styles.user : styles.admin}`}
               >
+                {/* NAYA: Admin messages par thoda indication */}
+                {msg.senderType === 'admin' && (
+                    <span className={styles.messageSource} style={{color: 'var(--color-neon-green)'}}>Support: </span>
+                )}
                 {msg.text}
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
         </div>
-        
-        <form onSubmit={handleSendMessage} className={styles.inputArea}>
+
+        {/* Input Area */}
+        <form className={styles.inputArea} onSubmit={handleSend}>
           <input
             type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
+            disabled={!currentUser}
           />
-          <button type="submit" className={styles.sendButton}>Send</button>
+          <button type="submit" className={styles.sendButton} disabled={!input.trim() || !currentUser}>
+            <FaPaperPlane />
+          </button>
         </form>
       </div>
-    </main>
+    </div>
   );
 };
 

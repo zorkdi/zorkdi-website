@@ -1,96 +1,151 @@
-"use client"; // Form ko interactive banane ke liye
+// src/app/signup/page.tsx
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // User ko redirect karne ke liye
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../../firebase'; // Hamari firebase.ts file se auth import kiya
-import styles from './signup.module.css';
+"use client";
+
+import { useState, ChangeEvent } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '@/firebase';
+
+import styles from './signup.module.css';
+
+interface SignupForm {
+    fullName: string;
+    email: string;
+    password: string;
+}
+
+const initialFormState: SignupForm = {
+    fullName: '',
+    email: '',
+    password: '',
+};
 
 const SignupPage = () => {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+    const router = useRouter();
+    const [formData, setFormData] = useState<SignupForm>(initialFormState);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(''); // Har baar shuru mein error ko reset karein
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        setError('');
+    };
 
-    // Check karein ki password match ho rahe hain ya nahi
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    try {
-      // Firebase ka function use karke naya user banayein
-      await createUserWithEmailAndPassword(auth, email, password);
-      // Safal hone par user ko homepage par bhej dein
-      router.push('/');
-    } catch (firebaseError: any) {
-      // Firebase se aaye error ko aasan bhasha mein dikhayein
-      if (firebaseError.code === 'auth/email-already-in-use') {
-        setError('This email is already registered.');
-      } else if (firebaseError.code === 'auth/weak-password') {
-        setError('Password should be at least 6 characters long.');
-      } else {
-        setError('Failed to create an account. Please try again.');
-      }
-      console.error("Firebase signup error:", firebaseError);
-    }
-  };
-
-  return (
-    <main className={styles.main}>
-      <div className={styles.formContainer}>
-        <h1>Create an Account</h1>
-        <p>Join ZORK DI to manage your projects.</p>
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
         
-        <form onSubmit={handleSignup} className={styles.signupForm}>
-          <div className={styles.formGroup}>
-            <label htmlFor="email">Email</label>
-            <input 
-              type="email" 
-              id="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required 
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="password">Password</label>
-            <input 
-              type="password" 
-              id="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required 
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input 
-              type="password" 
-              id="confirmPassword" 
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required 
-            />
-          </div>
+        if (formData.password.length < 6) {
+            setError("Password should be at least 6 characters long.");
+            return;
+        }
 
-          {error && <p className={styles.errorText}>{error}</p>}
-          
-          <button type="submit" className={styles.submitButton}>Sign Up</button>
-        </form>
+        setIsSubmitting(true);
+        setError('');
 
-        <p className={styles.loginLink}>
-          Already have an account? <Link href="/login">Log In</Link>
-        </p>
-      </div>
-    </main>
-  );
+        try {
+            // 1. Create User in Firebase Authentication
+            const userCredential = await createUserWithEmailAndPassword(
+                auth,
+                formData.email,
+                formData.password
+            );
+            
+            const user = userCredential.user;
+            
+            // 2. Save User Profile to Firestore /users collection
+            const userDocRef = doc(db, 'users', user.uid);
+            await setDoc(userDocRef, {
+                uid: user.uid,
+                fullName: formData.fullName,
+                email: formData.email,
+                photoURL: user.photoURL || '', // Empty photo URL initially
+                mobile: '',
+                country: 'USA', // Default country
+                createdAt: new Date().toISOString(),
+            });
+
+            // 3. Redirect to profile or home page
+            router.push('/profile');
+            
+        } catch (authError: unknown) { 
+            console.error("Signup Error:", authError);
+            
+            // FIX: Error code access ke liye type guard use kiya
+            const errorMsg = String(authError);
+            if (errorMsg.includes('auth/email-already-in-use')) {
+                setError('This email is already in use. Please Login.');
+            } else if (errorMsg.includes('auth/invalid-email')) {
+                setError('The email address is invalid.');
+            } else {
+                setError('Signup failed. Please check your details and try again.');
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <main className={styles.main}>
+            <div className={styles.formContainer}>
+                <h1>Create Account</h1>
+                <p>Join the ZORK DI platform to start your projects.</p>
+
+                <form className={styles.signupForm} onSubmit={handleSubmit}>
+                    
+                    {error && <p className={styles.errorText}>{error}</p>}
+                    
+                    <div className={styles.formGroup}>
+                        <label htmlFor="fullName">Full Name *</label>
+                        <input 
+                            type="text" id="fullName" name="fullName" 
+                            value={formData.fullName} 
+                            onChange={handleInputChange} 
+                            required 
+                            disabled={isSubmitting}
+                        />
+                    </div>
+                    
+                    <div className={styles.formGroup}>
+                        <label htmlFor="email">Email Address *</label>
+                        <input 
+                            type="email" id="email" name="email" 
+                            value={formData.email} 
+                            onChange={handleInputChange} 
+                            required 
+                            disabled={isSubmitting}
+                        />
+                    </div>
+                    
+                    <div className={styles.formGroup}>
+                        <label htmlFor="password">Password (min 6 chars) *</label>
+                        <input 
+                            type="password" id="password" name="password" 
+                            value={formData.password} 
+                            onChange={handleInputChange} 
+                            required 
+                            disabled={isSubmitting}
+                        />
+                    </div>
+                    
+                    <button
+                        type="submit"
+                        className={styles.submitButton}
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? 'Signing Up...' : 'Sign Up'}
+                    </button>
+                </form>
+                
+                <p className={styles.loginLink}>
+                    Already have an account? <Link href="/login">Login</Link>
+                </p>
+            </div>
+        </main>
+    );
 };
 
 export default SignupPage;

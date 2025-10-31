@@ -2,169 +2,228 @@
 
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useAuth } from '../../../context/AuthContext'; // Adjusted path
-import styles from './project-chat.module.css';
-import adminStyles from '../../admin/admin.module.css'; // NAYA: Import adminStyles
-
-// Firebase functions
-import { db } from '../../../firebase'; // Adjusted path
-import {
-  doc, getDoc, collection, query, orderBy, onSnapshot, addDoc,
-  serverTimestamp, Timestamp, setDoc
+import { useState, useEffect, useRef } from 'react'; // FIX: ChangeEvent removed
+import { useRouter } from 'next/navigation';
+import { FaPaperPlane } from 'react-icons/fa';
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/firebase';
+import { 
+  collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, limit, doc, getDoc 
 } from 'firebase/firestore';
+import Link from 'next/link'; // FIX: Link component import kiya
 
-// Data types define kiye
-interface ProjectDetails {
-  projectType: string;
-  projectId?: string;
-  userId: string;
-}
+import styles from './project-chat.module.css';
 
+// Type definitions
 interface Message {
   id: string;
+  senderId: string;
+  senderType: 'user' | 'admin'; // 'user' for client, 'admin' for your company support
   text: string;
-  sender: 'user' | 'admin';
-  createdAt: Timestamp;
-  isRead?: boolean;
+  timestamp: Date;
 }
 
-const ProjectChatPage = () => {
-  const { currentUser, loading: authLoading } = useAuth();
+interface ProjectData {
+    title: string;
+    status: string;
+    clientId: string; // To check if current user is the owner
+}
+
+const ProjectChatPage = ({ params }: { params: { projectId: string } }) => {
+  const { projectId } = params;
+  const { currentUser, loading } = useAuth();
   const router = useRouter();
-  const params = useParams();
-  const projectId = params.projectId as string;
-
-  const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
+  
+  const [project, setProject] = useState<ProjectData | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
+  const [input, setInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // Auto-scroll
+  // Auto-scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // 1. Fetch Project Details & Check Authorization
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  // Fetch project details and chat messages
-  useEffect(() => {
-    if (currentUser && projectId) {
-      const projectDocRef = doc(db, 'project_requests', projectId);
-
-      // 1. Fetch Project details
-      getDoc(projectDocRef).then(docSnap => {
-        if (docSnap.exists()) {
-          const projectData = docSnap.data() as ProjectDetails;
-          if (projectData.userId === currentUser.uid) {
-            setProjectDetails(projectData);
-          } else {
-            setError("Access Denied: You are not authorized to view this chat."); setLoading(false);
-          }
-        } else {
-          setError("Project not found."); setLoading(false);
-        }
-      }).catch(err => {
-          console.error("Error fetching project details:", err); setError("Failed to load project details."); setLoading(false);
-      });
-
-      // 2. Fetch Messages
-      const messagesRef = collection(db, 'project_requests', projectId, 'messages');
-      const q = query(messagesRef, orderBy('createdAt', 'asc'));
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const fetchedMessages: Message[] = [];
-        querySnapshot.forEach((doc) => {
-          fetchedMessages.push({ id: doc.id, ...doc.data() } as Message);
-        });
-        setMessages(fetchedMessages);
-        // Only stop loading if project details haven't already set an error
-        if (!error) setLoading(false);
-      }, (err) => {
-        console.error("Error fetching messages:", err); setError("Could not load messages."); setLoading(false);
-      });
-      return () => unsubscribe();
-    } else if (!authLoading && !currentUser) {
+    if (!currentUser && !loading) {
+        // If not logged in, redirect to login
         router.push('/login');
-    } else if (!projectId) {
-        setError("Project ID is missing."); setLoading(false);
+        return;
     }
-  }, [currentUser, projectId, authLoading, router, error]); // Added error to dependencies
 
+    if (currentUser) {
+        setChatLoading(true);
+        const fetchProject = async () => {
+            try {
+                const docRef = doc(db, 'projects', projectId);
+                const docSnap = await getDoc(docRef);
 
-  // Handle sending a message
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newMessage.trim() === '' || !currentUser || !projectId) return;
-    try {
-      const messagesRef = collection(db, 'project_requests', projectId, 'messages');
-      await addDoc(messagesRef, {
-        text: newMessage, sender: 'user', createdAt: serverTimestamp(), isRead: false,
+                if (!docSnap.exists()) {
+                    setError("Project not found or invalid ID.");
+                    setChatLoading(false);
+                    return;
+                }
+
+                const data = docSnap.data() as ProjectData;
+                
+                // CRITICAL: Check if current user is the owner
+                if (data.clientId !== currentUser.uid) {
+                    setError("You do not have permission to access this chat.");
+                    setChatLoading(false);
+                    return;
+                }
+                
+                setProject(data);
+                setError(null); // Clear any previous error
+                
+            } catch (err) {
+                console.error("Error fetching project:", err);
+                setError("Failed to load project details.");
+                setChatLoading(false);
+            }
+        };
+        fetchProject();
+    }
+  }, [currentUser, loading, projectId, router]);
+  
+  // 2. Fetch Messages (Real-time)
+  useEffect(() => {
+    if (project && currentUser) {
+      const messagesCollectionRef = collection(db, 'projects', projectId, 'chat');
+      const messagesQuery = query(
+        messagesCollectionRef,
+        orderBy('timestamp', 'desc'), 
+        limit(50) 
+      );
+
+      const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+        const fetchedMessages = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          timestamp: doc.data().timestamp?.toDate() || new Date(),
+        })) as Message[];
+        
+        setMessages(fetchedMessages.reverse());
+        setChatLoading(false);
+      }, (err) => {
+        console.error("Error fetching project chat messages:", err);
+        setError("Failed to load chat history.");
+        setChatLoading(false);
       });
-      const projectDocRef = doc(db, 'project_requests', projectId);
-      await setDoc(projectDocRef, {
-        lastMessageAt: serverTimestamp(), hasUnread: true,
-      }, { merge: true });
-      setNewMessage('');
-    } catch (error) {
-      console.error("Error sending message: ", error); alert("Failed to send message.");
+
+      return () => unsubscribe();
+    } else if (!loading) {
+      setChatLoading(false);
+    }
+  }, [currentUser, project, projectId, loading]);
+
+  useEffect(() => {
+    // Only scroll if there are messages and chat is not loading
+    if (!chatLoading && messages.length > 0) {
+        scrollToBottom();
+    }
+  }, [messages, chatLoading]);
+
+
+  // 3. Send Message Handler
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedInput = input.trim();
+
+    if (!trimmedInput || !currentUser || !project) return;
+
+    setInput(''); 
+
+    try {
+      const messagesCollectionRef = collection(db, 'projects', projectId, 'chat');
+      
+      await addDoc(messagesCollectionRef, {
+        senderId: currentUser.uid,
+        senderType: 'user', // Always 'user' for client
+        text: trimmedInput,
+        timestamp: serverTimestamp(),
+      });
+      
+    } catch (sendError) {
+      console.error("Error sending message:", sendError);
+      alert("Failed to send message. Please try again.");
+      setInput(trimmedInput); 
     }
   };
 
-  if (authLoading || (loading && !error)) {
-    return <div className={styles.loading}>Loading Chat...</div>;
+  // --- Render Logic ---
+
+  // Show Loading or Error states
+  if (loading || chatLoading) {
+    return (
+      <div className={styles.main}>
+        <div className={styles.loading}>
+            <p>Loading project chat...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Show Prompt if user is not authorized or project not found
+  if (error || !project) {
+    return (
+      <div className={styles.main}>
+        <div className={styles.error} style={{display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center'}}> {/* FIX: Error box styling ke liye inline styles add kiye */}
+          <h1>Error</h1>
+          <p>{error || "Project details could not be loaded."}</p>
+          <Link href="/my-projects" style={{color: 'var(--color-neon-green)', marginTop: '1rem', textDecoration: 'underline'}}>Go to My Projects</Link>
+        </div>
+      </div>
+    );
   }
 
-  if (error) {
-    // Now adminStyles is available
-    return <div className={adminStyles.errorMessage}>{error}</div>;
-  }
-
-   if (!currentUser) { return <div>Please log in to view this chat.</div>; }
-   if (!projectDetails && !error) { return <div className={styles.loading}>Verifying access...</div>; }
-   // Added a check specifically for the access denied case after details load attempt
-   if (!projectDetails && error.startsWith("Access Denied")) {
-       return <div className={adminStyles.errorMessage}>{error}</div>;
-   }
-
-
-  // Rest of the component...
+  // Show Main Chat Interface
   return (
-    <main className={styles.main}>
+    <div className={styles.main}>
       <div className={styles.chatContainer}>
+        {/* Chat Header (Project Title) */}
         <div className={styles.chatHeader}>
-          <h1>{projectDetails?.projectType || 'Project'} Chat</h1>
-          {projectDetails?.projectId && <p>Project ID: {projectDetails.projectId}</p>}
+          <h1>Project Discussion: {project.title}</h1>
+          <p>ID: {projectId}</p>
         </div>
 
+        {/* Messages Container */}
         <div className={styles.messagesContainer}>
           <div className={styles.messageList}>
-            <div ref={messagesEndRef} />
             {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`${styles.message} ${msg.sender === 'user' ? styles.user : styles.admin}`}
+              <div 
+                key={msg.id} 
+                className={`${styles.message} ${msg.senderType === 'user' ? styles.user : styles.admin}`}
               >
+                {/* Admin/Support messages par indication */}
+                {msg.senderType === 'admin' && (
+                    <span className={styles.messageSource} style={{color: 'var(--color-secondary-accent)'}}>Support: </span>
+                )}
                 {msg.text}
               </div>
             ))}
-             {!loading && messages.length === 0 && <p style={{textAlign: 'center', opacity: 0.7}}>No messages yet for this project.</p>}
+            <div ref={messagesEndRef} />
           </div>
         </div>
 
-        <form onSubmit={handleSendMessage} className={styles.inputArea}>
+        {/* Input Area */}
+        <form className={styles.inputArea} onSubmit={handleSend}>
           <input
             type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
-            disabled={!projectDetails}
+            disabled={!currentUser}
           />
-          <button type="submit" className={styles.sendButton} disabled={!projectDetails}>Send</button>
+          <button type="submit" className={styles.sendButton} disabled={!input.trim() || !currentUser}>
+            <FaPaperPlane />
+          </button>
         </form>
       </div>
-    </main>
+    </div>
   );
 };
 

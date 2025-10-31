@@ -9,7 +9,7 @@
 .hero {
   text-align: center;
   padding-bottom: 4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--color-glass-light);
   margin-bottom: 4rem;
 }
 
@@ -17,6 +17,7 @@
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  color: var(--color-neon-green);
 }
 
 .hero p {
@@ -32,6 +33,15 @@
 }
 
 /* Left side: Contact Info ki styling */
+.contactInfo {
+    /* NAYA: Background Card effect for Contact Info */
+    background-color: var(--color-deep-blue);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--color-glass-light);
+    height: fit-content;
+}
+
 .contactInfo h2 {
   font-size: 2rem;
   margin-bottom: 1rem;
@@ -51,12 +61,18 @@
   display: block;
   margin-bottom: 0.5rem;
   opacity: 0.7;
+  font-weight: 600;
 }
 
 .infoItem a {
-  color: #00F5C8;
+  color: var(--color-neon-green);
   text-decoration: none;
   font-weight: 500;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+.infoItem a:hover {
+    text-decoration: underline;
+    color: var(--color-neon-light);
 }
 
 .socials {
@@ -66,22 +82,32 @@
 }
 
 .socials a {
-  color: #EFEFEF;
+  color: var(--color-off-white);
   opacity: 0.7;
   font-size: 1.75rem;
-  transition: color 0.2s ease, transform 0.2s ease;
+  /* NAYA: Neon Glow on icons */
+  filter: drop-shadow(0 0 4px rgba(0, 245, 200, 0.4));
+  transition: color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
 }
 
 .socials a:hover {
   opacity: 1;
-  color: #00F5C8;
-  transform: translateY(-2px);
+  color: var(--color-neon-light);
+  transform: translateY(-5px); /* Lift effect */
 }
 
 /* Right side: Contact Form ki styling */
 .contactForm {
   display: flex;
   flex-direction: column;
+  /* NAYA: Glassmorphism effect for form container */
+  background-color: var(--color-glass-dark);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  padding: 2.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--color-glass-light);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .formGroup {
@@ -99,35 +125,41 @@
 .formGroup textarea {
   width: 100%;
   padding: 1rem;
-  background-color: #16213E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* NAYA: Deep-blue input background */
+  background-color: var(--color-deep-blue);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  color: #EFEFEF;
+  color: var(--color-off-white);
   font-size: 1rem;
   font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .formGroup input:focus,
 .formGroup textarea:focus {
   outline: none;
-  border-color: #00F5C8;
+  /* NAYA: Neon focus border aur glow */
+  border-color: var(--color-neon-green);
+  box-shadow: 0 0 5px var(--color-neon-light);
 }
 
 .submitButton {
   padding: 1rem 2.5rem;
-  background-color: #00F5C8;
-  color: #1A1A2E;
-  font-weight: 600;
+  background-color: var(--color-neon-green);
+  color: var(--color-dark-navy);
+  font-weight: 700;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  align-self: flex-start; /* Button ko left mein align karna */
+  align-self: flex-start;
+  /* NAYA: Neon Glow on CTA */
+  box-shadow: 0 0 15px rgba(0, 245, 200, 0.5);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .submitButton:hover {
-  transform: translateY(-3px); /* YAHAN PAR BRACKET ')' THEEK KAR DIYA HAI */
-  box-shadow: 0 10px 20px rgba(0, 245, 200, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 5px 20px rgba(0, 245, 200, 0.7);
 }
 
 /* ===== Mobile Responsive Styles ===== */

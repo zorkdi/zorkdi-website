@@ -10,9 +10,9 @@ import dynamic from 'next/dynamic';
 // Firebase services
 import { db, storage } from '@/firebase';
 import {
-  collection, addDoc, serverTimestamp, doc, getDoc, updateDoc, Timestamp
+  collection, addDoc, serverTimestamp, doc, getDoc, updateDoc, Timestamp, deleteDoc
 } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'; // NAYA: deleteObject imported
 
 // Dynamically import the editor
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor/RichTextEditor'), {
@@ -21,8 +21,9 @@ const RichTextEditor = dynamic(() => import('@/components/RichTextEditor/RichTex
 });
 
 // Styles
-import adminStyles from '@/app/admin/admin.module.css'; // Use alias
-import formStyles from '@/app/admin/portfolio/new/portfolio-form.module.css'; // Use alias
+import adminStyles from '@/app/admin/admin.module.css'; 
+import formStyles from '@/app/admin/portfolio/new/portfolio-form.module.css'; 
+import formCommonStyles from './forms.module.css'; // NAYA: Common form styles import kiye
 
 // Define the structure for portfolio data from Firestore
 interface PortfolioData {
@@ -57,6 +58,7 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
 
   const [isLoading, setIsLoading] = useState(isEditMode);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false); // NAYA: Deleting state
   const [error, setError] = useState('');
 
   // Fetch data if in edit mode
@@ -86,6 +88,51 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
     }
   }, [postId, isEditMode]);
 
+  // --- DELETE LOGIC (NAYA) ---
+  const handleDelete = async () => {
+    if (!postId || !formData.coverImageURL) return;
+
+    // NAYA: Use custom alert/confirm UI instead of window.confirm
+    if (!confirm(`Are you sure you want to delete the project: "${formData.title}"? This action cannot be undone.`)) {
+        return;
+    }
+
+    setIsDeleting(true);
+    setError('');
+
+    try {
+        // 1. Delete Image from Storage
+        if (formData.coverImageURL.includes('firebasestorage.googleapis.com')) {
+             try {
+                // Get the path from the URL (simplified: assumes path starts after /o/)
+                const urlPath = formData.coverImageURL.split('/o/')[1];
+                const filePath = urlPath.split('?')[0];
+                const decodedPath = decodeURIComponent(filePath);
+                
+                const imageRef = ref(storage, decodedPath);
+                await deleteObject(imageRef);
+             } catch (storageError) {
+                 // Log storage error but continue to delete the document
+                 console.error("Warning: Failed to delete image from storage. Continuing with document deletion.", storageError);
+             }
+        }
+
+        // 2. Delete Document from Firestore
+        const docRef = doc(db, 'portfolio', postId);
+        await deleteDoc(docRef);
+        
+        alert('Portfolio project deleted successfully!');
+        router.push('/admin/portfolio'); // Redirect to list page
+
+    } catch (err) {
+        console.error("Error deleting portfolio item:", err);
+        setError('Failed to delete project. Check console.');
+    } finally {
+        setIsDeleting(false);
+    }
+  };
+
+
   // Handle standard input/select changes
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -110,7 +157,7 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
   // Handle form submission (Save or Update)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.content || formData.content === '<p></p>' || (!imageFile && !isEditMode)) {
+    if (!formData.title || !formData.content || formData.content === '<p></p>' || (!imageFile && !isEditMode && !formData.coverImageURL)) {
       setError('Please fill in title, content, and select a cover image.');
       return;
     }
@@ -144,7 +191,7 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
             }
           );
         });
-      } else if (!isEditMode) {
+      } else if (!isEditMode && !finalImageURL) {
          setError('Cover image is required.');
          setIsSubmitting(false);
          return;
@@ -172,8 +219,9 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
 
       router.push('/admin/portfolio');
 
-    } catch (err) {
+    } catch (error: unknown) { // FIX: _err replaced with error, aur console.error mein use kiya
       if (error !== "Image upload failed. Please try again.") {
+         console.error("Failed to save project data. Check console.", error);
          setError("Failed to save project data. Check console.");
       }
     } finally {
@@ -186,7 +234,7 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
     return <div className={adminStyles.loading}>Loading form...</div>;
   }
    // Render Error state
-  if (error && !isSubmitting) {
+  if (error && !isSubmitting && !isDeleting) {
     return <div className={adminStyles.errorMessage}>{error}</div>;
   }
 
@@ -201,21 +249,21 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
             <Image
               src={imagePreview}
               alt="Cover preview"
-              width={300} height={188}
+              width={350} height={219} // NAYA: Size updated to match CSS aspect ratio
               className={formStyles.imagePreview}
             />
           ) : (
-             <span>{isEditMode ? 'Click Choose Image to change' : 'No Image Selected'}</span>
+             <span>{isEditMode ? 'Click Change Image to upload' : 'No Image Selected'}</span>
           )}
           <input
             type="file" id="coverImage" className={formStyles.fileInput}
             onChange={handleFileChange} accept="image/png, image/jpeg"
-            required={!isEditMode}
+            required={!isEditMode && !formData.coverImageURL} // NAYA: required attribute theek kiya
           />
           <label htmlFor="coverImage" className={formStyles.uploadButton}>
             {isEditMode ? 'Change Image' : 'Choose Image'}
           </label>
-          {uploadProgress !== null && (
+          {uploadProgress !== null && uploadProgress < 100 && ( // NAYA: Upload progress dikhana
             <p className={formStyles.uploadProgress}>Uploading: {uploadProgress}%</p>
           )}
         </div>
@@ -233,7 +281,6 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
         <select id="category" name="category" value={formData.category} onChange={handleInputChange} required >
           <option>Web App</option>
           <option>Mobile App</option>
-          {/* NAYA: Finance Solution category added */}
           <option>Finance Solution</option>
           <option>Custom Software</option>
           <option>UI/UX Design</option>
@@ -242,31 +289,46 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
       </div>
 
       {/* Description (Rich Text Editor) */}
-      <div className={formStyles.formGroup}>
-        <label htmlFor="content">Description *</label>
-        {(formData.content !== undefined || !isEditMode) && (
-             <RichTextEditor
-               content={formData.content}
-               onChange={handleEditorChange}
-             />
-        )}
+      <div className={formCommonStyles.fullWidth} style={{ marginTop: '1.5rem' }}>
+        <div className={formStyles.formGroup}>
+          <label htmlFor="content">Description *</label>
+          {(formData.content !== undefined || !isEditMode) && (
+               <RichTextEditor
+                 content={formData.content}
+                 onChange={handleEditorChange}
+               />
+          )}
+        </div>
       </div>
+
 
       {/* Error Message Display */}
       {error && !isLoading && <p className={formStyles.errorMessage}>{error}</p>}
 
-      {/* Submit/Update Button */}
-      <button
-        type="submit"
-        className={`${adminStyles.primaryButton} ${formStyles.submitButton}`}
-        disabled={isSubmitting || isLoading}
-      >
-        {isSubmitting ? (isEditMode ? 'Updating...' : 'Saving...') : (isEditMode ? 'Update Project' : 'Save Project')}
-      </button>
-
-        {/* Delete button can be added here for edit mode */}
-        {/* {isEditMode && postId && (<button type="button" onClick={() => handleDelete(postId)} ... >Delete</button>)} */}
-
+      {/* Action Buttons Container */}
+      <div className={adminStyles.actionButtonsContainer}>
+          {/* Submit/Update Button */}
+          <button
+            type="submit"
+            className={adminStyles.primaryButton}
+            disabled={isSubmitting || isLoading || isDeleting}
+          >
+            {isSubmitting ? (isEditMode ? 'Updating...' : 'Saving...') : (isEditMode ? 'Update Project' : 'Save Project')}
+          </button>
+          
+          {/* NAYA: Delete Button (Edit Mode only) */}
+          {isEditMode && postId && (
+              <button 
+                  type="button" 
+                  onClick={handleDelete} 
+                  className={adminStyles.dangerButton}
+                  disabled={isDeleting || isSubmitting}
+              >
+                  {isDeleting ? 'Deleting...' : 'Delete Project'}
+              </button>
+          )}
+      </div>
+      
     </form>
   );
 };

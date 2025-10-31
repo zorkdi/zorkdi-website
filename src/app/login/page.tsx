@@ -1,73 +1,123 @@
-"use client"; // Form ko interactive banane ke liye
+// src/app/login/page.tsx
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // User ko redirect karne ke liye
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../../firebase'; // Hamari firebase.ts file se auth import kiya
-import styles from './login.module.css';
+"use client";
+
+import { useState, ChangeEvent } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/firebase';
+
+import styles from './login.module.css';
+
+interface LoginForm {
+    email: string;
+    password: string;
+}
+
+const initialFormState: LoginForm = {
+    email: '',
+    password: '',
+};
 
 const LoginPage = () => {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+    const router = useRouter();
+    const [formData, setFormData] = useState<LoginForm>(initialFormState);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        setError('');
+    };
 
-    try {
-      // Firebase ka function use karke user ko login karein
-      await signInWithEmailAndPassword(auth, email, password);
-      // Safal hone par user ko homepage par bhej dein
-      router.push('/');
-    } catch (firebaseError: any) {
-      // Firebase se aaye error ko aasan bhasha mein dikhayein
-      setError('Invalid email or password. Please try again.');
-      console.error("Firebase login error:", firebaseError);
-    }
-  };
-
-  return (
-    <main className={styles.main}>
-      <div className={styles.formContainer}>
-        <h1>Welcome Back!</h1>
-        <p>Log in to your ZORK DI account.</p>
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
         
-        <form onSubmit={handleLogin} className={styles.loginForm}>
-          <div className={styles.formGroup}>
-            <label htmlFor="email">Email</label>
-            <input 
-              type="email" 
-              id="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required 
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="password">Password</label>
-            <input 
-              type="password" 
-              id="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required 
-            />
-          </div>
+        if (!formData.email || !formData.password) {
+            setError("Please enter both email and password.");
+            return;
+        }
 
-          {error && <p className={styles.errorText}>{error}</p>}
-          
-          <button type="submit" className={styles.submitButton}>Log In</button>
-        </form>
+        setIsSubmitting(true);
+        setError('');
 
-        <p className={styles.signupLink}>
-          Don&apos;t have an account? <Link href="/signup">Sign Up</Link>
-        </p>
-      </div>
-    </main>
-  );
+        try {
+            // 1. Sign in user with Firebase Authentication
+            await signInWithEmailAndPassword(
+                auth,
+                formData.email,
+                formData.password
+            );
+            
+            // 2. Redirect to dashboard or home page (AuthContext handles profile fetch)
+            router.push('/my-projects'); // Project tracking page par redirect kiya
+            
+        } catch (authError: unknown) { 
+            console.error("Login Error:", authError);
+            
+            // FIX: Errors theek karne ke liye direct message check ya type assertion ko minimize kiya.
+            const errorMsg = String(authError);
+            if (errorMsg.includes('auth/invalid-email') || errorMsg.includes('auth/user-not-found') || errorMsg.includes('auth/wrong-password')) {
+                setError('Invalid email or password.');
+            } else if (errorMsg.includes('auth/too-many-requests')) {
+                setError('Access blocked due to too many failed login attempts. Try again later.');
+            } else {
+                setError('Login failed. Please check your credentials.');
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <main className={styles.main}>
+            <div className={styles.formContainer}>
+                <h1>Welcome Back</h1>
+                <p>Log in to manage your projects and chat with support.</p>
+
+                <form className={styles.loginForm} onSubmit={handleSubmit}>
+                    
+                    {error && <p className={styles.errorText}>{error}</p>}
+                    
+                    <div className={styles.formGroup}>
+                        <label htmlFor="email">Email Address *</label>
+                        <input 
+                            type="email" id="email" name="email" 
+                            value={formData.email} 
+                            onChange={handleInputChange} 
+                            required 
+                            disabled={isSubmitting}
+                        />
+                    </div>
+                    
+                    <div className={styles.formGroup}>
+                        <label htmlFor="password">Password *</label>
+                        <input 
+                            type="password" id="password" name="password" 
+                            value={formData.password} 
+                            onChange={handleInputChange} 
+                            required 
+                            disabled={isSubmitting}
+                        />
+                    </div>
+                    
+                    <button
+                        type="submit"
+                        className={styles.submitButton}
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? 'Logging In...' : 'Login'}
+                    </button>
+                </form>
+                
+                <p className={styles.signupLink}>
+                    Don&apos;t have an account? <Link href="/signup">Sign Up</Link>
+                </p>
+            </div>
+        </main>
+    );
 };
 
 export default LoginPage;

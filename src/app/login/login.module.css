@@ -3,7 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 80vh; /* Takes up most of the screen height */
+  min-height: 80vh; 
   padding: 4rem 2rem;
 }
 
@@ -11,16 +11,22 @@
 .formContainer {
   width: 100%;
   max-width: 450px;
-  background-color: #16213E;
+  /* NAYA: Glassmorphism Effect */
+  background-color: var(--color-glass-dark);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   padding: 3rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px; /* Thoda zyada rounded */
+  border: 1px solid var(--color-glass-light);
   text-align: center;
+  /* NAYA: Subtle depth shadow */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .formContainer h1 {
   font-size: 2rem;
   margin-bottom: 0.75rem;
+  color: var(--color-neon-green);
 }
 
 .formContainer p {
@@ -49,17 +55,21 @@
 .formGroup input {
   width: 100%;
   padding: 1rem;
-  background-color: #1A1A2E; /* Darker background for input */
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* NAYA: Deep-blue input background */
+  background-color: var(--color-deep-blue); 
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  color: #EFEFEF;
+  color: var(--color-off-white);
   font-size: 1rem;
   font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .formGroup input:focus {
   outline: none;
-  border-color: #00F5C8;
+  /* NAYA: Neon focus border aur glow */
+  border-color: var(--color-neon-green);
+  box-shadow: 0 0 5px var(--color-neon-light);
 }
 
 /* Error message styling */
@@ -75,19 +85,27 @@
 /* Submit button styling */
 .submitButton {
   padding: 1rem;
-  background-color: #00F5C8;
-  color: #1A1A2E;
-  font-weight: 600;
+  background-color: var(--color-neon-green);
+  color: var(--color-dark-navy);
+  font-weight: 700;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  /* NAYA: Neon Glow */
+  box-shadow: 0 0 15px rgba(0, 245, 200, 0.5);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .submitButton:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 245, 200, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 5px 20px rgba(0, 245, 200, 0.7);
+}
+.submitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 /* "Don't have an account?" link */
@@ -97,7 +115,10 @@
 }
 
 .signupLink a {
-  color: #00F5C8;
+  color: var(--color-neon-green);
   font-weight: 600;
   text-decoration: none;
+}
+.signupLink a:hover {
+    text-decoration: underline;
 }

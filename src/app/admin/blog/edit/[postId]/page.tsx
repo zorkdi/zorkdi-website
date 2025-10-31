@@ -3,18 +3,17 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 
 // Firebase services
 import { db, storage } from '@/firebase';
-import { doc, getDoc, updateDoc, Timestamp, deleteDoc } from 'firebase/firestore'; // deleteDoc added
+import {
+  doc, getDoc, updateDoc, Timestamp, deleteDoc
+  // FIX: Unused imports (collection, addDoc, serverTimestamp) ko hata diya
+} from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-
-// Styles
-import adminStyles from '../../../admin.module.css'; // Correct path to admin styles
-import newPostStyles from '../../new/new-post.module.css'; // Reuse styles from new post page
 
 // Dynamically import the editor
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor/RichTextEditor'), {
@@ -22,251 +21,327 @@ const RichTextEditor = dynamic(() => import('@/components/RichTextEditor/RichTex
   loading: () => <p>Loading editor...</p>,
 });
 
-// Define the structure for post data
-interface PostData {
+// Styles
+import adminStyles from '@/app/admin/admin.module.css'; 
+import formStyles from '@/app/admin/portfolio/new/portfolio-form.module.css'; // Reusing Portfolio form styles
+import formCommonStyles from '@/components/AdminForms/forms.module.css'; // Common form styles
+
+// Define the structure for blog post data from Firestore
+interface BlogPostData {
   title: string;
-  slug: string;
   category: string;
+  status: 'Draft' | 'Published' | 'Archived';
   content: string;
   coverImageURL: string;
-  publishedAt?: Timestamp; // Make optional for initial state
+  createdAt?: Timestamp; // Optional existing timestamp
 }
 
-const EditPostPage = () => {
+// Props for the component
+interface EditPostPageProps {
+  params: {
+      postId: string; // ID for edit mode
+  }
+}
+
+// Dummy Categories for options
+const categories = [
+    'Web Development', 'Mobile App', 'UI/UX Design', 'Backend & Cloud', 'Miscellaneous'
+];
+const statuses = ['Draft', 'Published', 'Archived'];
+
+
+const AdminEditPostPage = ({ params }: EditPostPageProps) => {
+  const { postId } = params;
   const router = useRouter();
-  const params = useParams();
-  const postId = params.postId as string;
 
   // State for form data
-  const [postData, setPostData] = useState<PostData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState<BlogPostData>({
+    title: '',
+    category: 'Web Development', 
+    status: 'Draft',
+    content: '',
+    coverImageURL: '',
+  });
 
-  // States for image handling
+  // State for image handling
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false); // State for delete loading
 
-  // Fetch existing post data
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState('');
+
+  // Fetch data if in edit mode
   useEffect(() => {
     if (postId) {
       const fetchPost = async () => {
-        setLoading(true); // Start loading
-        setError(''); // Reset error
+        setIsLoading(true);
+        setError('');
         try {
-          const postDocRef = doc(db, 'blogs', postId);
-          const docSnap = await getDoc(postDocRef);
-
+          const docRef = doc(db, 'blog', postId);
+          const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
-            const data = docSnap.data() as PostData;
-            setPostData(data);
-            setImagePreview(data.coverImageURL); // Set initial image preview
+            const data = docSnap.data();
+            setFormData({
+                title: data.title,
+                category: data.category,
+                status: data.status,
+                content: data.content,
+                coverImageURL: data.coverImageURL,
+                createdAt: data.createdAt,
+            });
+            setImagePreview(data.coverImageURL);
           } else {
             setError('Blog post not found.');
           }
         } catch (err) {
-          console.error("Error fetching post:", err);
+          console.error("Error fetching blog post:", err);
           setError('Failed to load blog post.');
         } finally {
-          setLoading(false); // Stop loading
+          setIsLoading(false);
         }
       };
       fetchPost();
     }
   }, [postId]);
 
-  // Handle input changes
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setPostData(prev => {
-        if (!prev) return null; // Should not happen if loading is false
-        const newData = { ...prev, [name]: value };
-        // Update slug automatically based on title
-        if (name === 'title') {
-            newData.slug = value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 50);
+  // --- DELETE LOGIC ---
+  const handleDelete = async () => {
+    if (!postId) return;
+
+    if (!confirm(`Are you sure you want to delete the post: "${formData.title}"? This action cannot be undone.`)) {
+        return;
+    }
+
+    setIsDeleting(true);
+    setError('');
+
+    try {
+        // 1. Delete Image from Storage (if applicable)
+        if (formData.coverImageURL.includes('firebasestorage.googleapis.com')) {
+             try {
+                const urlPath = formData.coverImageURL.split('/o/')[1];
+                const filePath = urlPath.split('?')[0];
+                const decodedPath = decodeURIComponent(filePath);
+                
+                const imageRef = ref(storage, decodedPath);
+                await deleteObject(imageRef);
+             } catch (storageError) {
+                 console.error("Warning: Failed to delete image from storage. Continuing with document deletion.", storageError);
+             }
         }
-        return newData;
-    });
-  };
 
-  // Handle editor content change
-  const handleEditorChange = (htmlContent: string) => {
-    setPostData(prev => prev ? { ...prev, content: htmlContent } : null);
-  };
+        // 2. Delete Document from Firestore
+        const docRef = doc(db, 'blog', postId);
+        await deleteDoc(docRef);
+        
+        alert('Blog post deleted successfully!');
+        router.push('/admin/blog'); // Redirect to list page
 
-  // Handle new image selection
-   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImageFile(file); // Store the new file
-      setImagePreview(URL.createObjectURL(file)); // Show preview of new image
+    } catch (err) {
+        console.error("Error deleting blog post:", err);
+        setError('Failed to delete post. Check console.');
+    } finally {
+        setIsDeleting(false);
     }
   };
 
-  // Handle updating the post
-  const handleUpdate = async (e: React.FormEvent) => {
-     e.preventDefault();
-     if (!postData || !postId) { setError('Post data is missing.'); return; }
-     if (!postData.title || !postData.content || postData.content === '<p></p>') { setError('Please fill in title and content.'); return; } // Added check for empty editor
-     if (!imagePreview) { setError('Please ensure a cover image is present.'); return; } // Ensure image exists
 
-     setIsUpdating(true); setError(''); setUploadProgress(null);
-     try {
-         let newImageURL = postData.coverImageURL; // Assume old URL initially
-
-         // === Step 1: If a new image was selected, upload it ===
-         if (imageFile) {
-             setUploadProgress(0);
-             const storageRef = ref(storage, `blog_covers/${Date.now()}_${imageFile.name}`);
-             const uploadTask = uploadBytesResumable(storageRef, imageFile);
-
-             // Wait for upload to complete
-             await new Promise<void>((resolve, reject) => {
-                 uploadTask.on('state_changed',
-                     (snapshot) => {
-                         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                         setUploadProgress(Math.round(progress));
-                     },
-                     (uploadError) => {
-                         console.error("Image upload failed:", uploadError);
-                         setError("Image upload failed. Please try again.");
-                         reject(uploadError); // Reject the promise on error
-                     },
-                     async () => {
-                         newImageURL = await getDownloadURL(uploadTask.snapshot.ref);
-                         resolve(); // Resolve the promise on completion
-                     }
-                 );
-             });
-         }
-
-         // === Step 2: Update Firestore document with new data ===
-         const postDocRef = doc(db, 'blogs', postId);
-         await updateDoc(postDocRef, {
-             title: postData.title,
-             slug: postData.slug,
-             category: postData.category,
-             content: postData.content,
-             coverImageURL: newImageURL, // Use the potentially new URL
-         });
-
-         alert('Post updated successfully!');
-         router.push('/admin/blog'); // Go back to the blog list
-
-     } catch (err) {
-         // Error during upload or Firestore update
-         console.error("Failed to update post:", err);
-         setError("Failed to update post. Check console for details.");
-     } finally {
-         setIsUpdating(false);
-     }
- };
-
-
-  // Handle deleting the post
-  const handleDelete = async () => {
-      if (!postData || !postId) return;
-
-      if (!window.confirm(`Are you sure you want to delete the post "${postData.title}"? This cannot be undone.`)) {
-          return;
-      }
-
-      setIsDeleting(true); setError('');
-
-      try {
-          // Step 1: Delete the cover image from Firebase Storage
-          if (postData.coverImageURL) {
-              try {
-                  // IMPORTANT: Use refFromURL to get the correct reference for deletion
-                  const imageRef = ref(storage, postData.coverImageURL);
-                  await deleteObject(imageRef);
-                  console.log("Cover image deleted successfully.");
-              } catch (storageError: any) {
-                  // Handle cases where the image URL might be invalid or already deleted
-                  if (storageError.code === 'storage/object-not-found') {
-                     console.warn("Cover image not found in storage, might be already deleted or URL is invalid.");
-                  } else {
-                     console.error("Could not delete cover image:", storageError);
-                     // Optionally, you might still want to proceed with Firestore deletion
-                     // or show a more specific error to the user.
-                     // setError("Failed to delete cover image, but trying to delete post data.");
-                  }
-              }
-          }
-
-          // Step 2: Delete the post document from Firestore
-          const postDocRef = doc(db, 'blogs', postId);
-          await deleteDoc(postDocRef);
-          console.log("Firestore document deleted successfully.");
-
-          alert('Post deleted successfully!');
-          router.push('/admin/blog'); // Go back to the blog list
-
-      } catch (err) {
-          console.error("Failed to delete post:", err);
-          setError("Failed to delete post. Check console for details.");
-      } finally {
-          setIsDeleting(false);
-      }
+  // Handle standard input/select changes
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    // FIX: Directly assigning value, TypeScript will usually handle this context
+    setFormData(prev => ({ ...prev, [name]: value })); 
   };
 
+  // Handle content changes from the Rich Text Editor
+  const handleEditorChange = (htmlContent: string) => {
+    setFormData(prev => ({ ...prev, content: htmlContent }));
+  };
 
-  if (loading) { return <div className={adminStyles.loading}>Loading post data...</div>; } // Use admin loading style
-  if (error && !postData) { return <div className={adminStyles.errorMessage}>{error}</div>; }
-  if (!postData) { return <div>Could not load post data.</div>; }
+  // Handle image file selection
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
 
+  // Handle form submission (Update)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.title || !formData.content || formData.content === '<p></p>') {
+      setError('Please fill in title and content.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError('');
+    setUploadProgress(null);
+
+    try {
+      let finalImageURL = formData.coverImageURL;
+
+      if (imageFile) {
+        setUploadProgress(0);
+        const storageRef = ref(storage, `blog_covers/${Date.now()}_${imageFile.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+        await new Promise<void>((resolve, reject) => {
+          uploadTask.on('state_changed',
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              setUploadProgress(Math.round(progress));
+            },
+            (uploadError) => {
+              console.error("Image upload failed:", uploadError);
+              setError("Image upload failed. Please try again.");
+              reject(uploadError);
+            },
+            async () => {
+              finalImageURL = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve();
+            }
+          );
+        });
+      } 
+      
+      const docRef = doc(db, 'blog', postId);
+      await updateDoc(docRef, {
+        title: formData.title,
+        category: formData.category,
+        status: formData.status,
+        content: formData.content,
+        coverImageURL: finalImageURL,
+      });
+      alert('Blog post updated successfully!');
+
+      router.push('/admin/blog');
+
+    } catch (firebaseError: unknown) { // FIX: Changed 'any' to 'unknown'
+      const errorMessage = firebaseError instanceof Error ? firebaseError.message : 'An unknown error occurred during submission.';
+      console.error("Failed to update post:", firebaseError);
+      if (!error) { 
+         setError(`Failed to save post data: ${errorMessage}`);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Render Loading state
+  if (isLoading) {
+    return <div className={adminStyles.loading}>Loading post data...</div>;
+  }
+   // Render Error state
+  if (error && !isSubmitting && !isDeleting) {
+    return <div className={adminStyles.errorMessage}>{error}</div>;
+  }
+
+  // Render the form
   return (
-    <div>
+    <>
       <div className={adminStyles.pageHeader}>
-        <h1>Edit Blog Post</h1>
+        <h1>Edit Blog Post: {formData.title}</h1>
       </div>
-      <div className={adminStyles.dataContainer}>
-        <form onSubmit={handleUpdate}>
-          {/* Image Upload/Preview Section */}
-          <div className={newPostStyles.formGroup}>
-            <label htmlFor="coverImage">Cover Image (Click image to change)</label>
-            <div className={newPostStyles.imageUploadSection}>
-              <label htmlFor="coverImage" style={{ cursor: 'pointer' }}>
-                {imagePreview ? (
-                    <Image src={imagePreview} alt="Current Cover" width={300} height={169} className={newPostStyles.imagePreview} />
-                ) : (
-                    <span>No Image Available</span> // Placeholder if no image
-                )}
-              </label>
-              <input type="file" id="coverImage" className={newPostStyles.fileInput} onChange={handleFileChange} accept="image/png, image/jpeg" />
-              {uploadProgress !== null && <p className={newPostStyles.uploadProgress}>Uploading: {uploadProgress}%</p>}
-            </div>
-          </div>
-          {/* Title */}
-          <div className={newPostStyles.formGroup}> <label htmlFor="title">Post Title</label> <input type="text" name="title" value={postData.title} onChange={handleInputChange} required /> </div>
-          {/* Slug */}
-          <div className={newPostStyles.formGroup}> <label htmlFor="slug">Post Slug (URL)</label> <input type="text" name="slug" value={postData.slug} onChange={handleInputChange} required readOnly /> </div>
-          {/* Category */}
-          <div className={newPostStyles.formGroup}> <label htmlFor="category">Category</label> <select name="category" value={postData.category} onChange={handleInputChange}> <option>TUTORIAL</option> <option>WEB SECURITY</option> <option>FIREBASE</option> <option>SOFTWARE DESIGN</option> <option>TECHNOLOGY</option> </select> </div>
-          {/* Content Editor */}
-          <div className={newPostStyles.formGroup}> <label>Content</label>
-            {/* Conditional rendering for RichTextEditor */}
-            {postData.content !== undefined ? (
-                <RichTextEditor
-                    content={postData.content}
-                    onChange={handleEditorChange}
-                />
+      <form onSubmit={handleSubmit}>
+        
+        {/* Cover Image Upload */}
+        <div className={formStyles.formGroup}>
+          <label htmlFor="coverImage">Cover Image</label>
+          <div className={formStyles.imageUploadSection}>
+            {imagePreview ? (
+              <Image
+                src={imagePreview}
+                alt="Cover preview"
+                width={400} height={225} // 16:9 ratio
+                className={formStyles.imagePreview}
+              />
             ) : (
-                <p>Loading editor content...</p> // Show loading while content is undefined
+               <span>No Image Selected</span>
             )}
-           </div>
-          {error && <p className={newPostStyles.errorMessage}>{error}</p>}
-          {/* Action Buttons */}
-          <div className={adminStyles.actionButtonsContainer}>
-            <button type="submit" className={`${adminStyles.primaryButton}`} disabled={isUpdating || isDeleting}> {isUpdating ? 'Updating...' : 'Update Post'} </button>
-            <button type="button" onClick={handleDelete} className={`${adminStyles.dangerButton}`} disabled={isUpdating || isDeleting}> {isDeleting ? 'Deleting...' : 'Delete Post'} </button>
+            <input
+              type="file" id="coverImage" className={formStyles.fileInput}
+              onChange={handleFileChange} accept="image/png, image/jpeg, image/webp"
+            />
+            <label htmlFor="coverImage" className={formStyles.uploadButton}>
+              {imagePreview ? 'Change Image' : 'Choose Image'}
+            </label>
+            {uploadProgress !== null && uploadProgress < 100 && ( 
+              <p className={formStyles.uploadProgress}>Uploading: {uploadProgress}%</p>
+            )}
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+
+        {/* Post Title */}
+        <div className={formStyles.formGroup}>
+          <label htmlFor="title">Post Title *</label>
+          <input type="text" id="title" name="title" value={formData.title} onChange={handleInputChange} required />
+        </div>
+
+        {/* Category and Status Grid */}
+        <div className={formCommonStyles.formGrid}>
+            <div className={formStyles.formGroup}>
+              <label htmlFor="category">Category *</label>
+              <select id="category" name="category" value={formData.category} onChange={handleInputChange} required >
+                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              </select>
+            </div>
+             <div className={formStyles.formGroup}>
+              <label htmlFor="status">Status *</label>
+              <select id="status" name="status" value={formData.status} onChange={handleInputChange} required >
+                {statuses.map(stat => <option key={stat} value={stat}>{stat}</option>)}
+              </select>
+            </div>
+        </div>
+
+
+        {/* Content (Rich Text Editor) */}
+        <div className={formCommonStyles.fullWidth} style={{ marginTop: '1.5rem' }}>
+          <div className={formStyles.formGroup}>
+            <label htmlFor="content">Content *</label>
+            {(formData.content !== undefined) && (
+                 <RichTextEditor
+                   content={formData.content}
+                   onChange={handleEditorChange}
+                 />
+            )}
+          </div>
+        </div>
+
+
+        {/* Error Message Display */}
+        {error && !isLoading && <p className={formStyles.errorMessage}>{error}</p>}
+
+        {/* Action Buttons Container */}
+        <div className={adminStyles.actionButtonsContainer} style={{ marginTop: '2rem' }}>
+            {/* Submit/Update Button */}
+            <button
+              type="submit"
+              className={adminStyles.primaryButton}
+              disabled={isSubmitting || isLoading || isDeleting}
+            >
+              {isSubmitting ? 'Updating...' : 'Update Post'}
+            </button>
+            
+            {/* Delete Button */}
+            <button 
+                type="button" 
+                onClick={handleDelete} 
+                className={adminStyles.dangerButton}
+                disabled={isDeleting || isSubmitting}
+            >
+                {isDeleting ? 'Deleting...' : 'Delete Post'}
+            </button>
+        </div>
+        
+      </form>
+    </>
   );
 };
 
-export default EditPostPage;
+export default AdminEditPostPage;

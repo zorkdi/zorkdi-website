@@ -11,16 +11,22 @@
 .profileContainer {
   width: 100%;
   max-width: 700px;
-  background-color: #16213E;
+  /* NAYA: Glassmorphism Effect */
+  background-color: var(--color-glass-dark);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   padding: 3rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  border: 1px solid var(--color-glass-light);
+  /* NAYA: Subtle depth shadow */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .profileContainer h1 {
   font-size: 2.5rem;
   margin-bottom: 2.5rem;
   text-align: center;
+  color: var(--color-neon-green);
 }
 
 /* NAYA: Profile Picture Section */
@@ -38,8 +44,15 @@
   height: 150px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #00F5C8;
+  /* NAYA: Neon border aur drop-shadow */
+  border: 3px solid var(--color-neon-green);
+  box-shadow: 0 0 10px rgba(0, 245, 200, 0.5);
   margin-bottom: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.imageWrapper:hover {
+    transform: scale(1.05);
 }
 
 .imageWrapper img {
@@ -51,32 +64,39 @@
 .imagePlaceholder {
   width: 100%;
   height: 100%;
-  background-color: #1A1A2E;
+  background-color: var(--color-deep-blue);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  opacity: 0.6;
 }
 
 .fileInput {
-  display: none; /* Asli input ko hide karna */
+  display: none;
 }
 
 .uploadButton {
   padding: 0.6rem 1.5rem;
   background-color: transparent;
-  color: #00F5C8;
-  border: 1px solid #00F5C8;
+  color: var(--color-neon-green);
+  border: 1px solid var(--color-neon-green);
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
+  font-weight: 600;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .uploadButton:hover {
   background-color: rgba(0, 245, 200, 0.1);
+  box-shadow: 0 0 8px rgba(0, 245, 200, 0.3);
 }
 
 .uploadProgress {
   margin-top: 1rem;
   font-size: 0.9rem;
-  color: #EFEFEF;
+  color: var(--color-off-white);
+  opacity: 0.9;
 }
 
 /* Form Group styling */
@@ -91,15 +111,18 @@
   opacity: 0.8;
 }
 
-.formGroup input {
+.formGroup input,
+.formGroup select { /* NAYA: Select added for consistency */
   width: 100%;
   padding: 1rem;
-  background-color: #1A1A2E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* NAYA: Deep-blue input background */
+  background-color: var(--color-deep-blue);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  color: #EFEFEF;
+  color: var(--color-off-white);
   font-size: 1rem;
   font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .formGroup input:disabled {
@@ -107,39 +130,49 @@
   cursor: not-allowed;
 }
 
-.formGroup input:focus {
+.formGroup input:focus,
+.formGroup select:focus {
   outline: none;
-  border-color: #00F5C8;
+  /* NAYA: Neon focus border aur glow */
+  border-color: var(--color-neon-green);
+  box-shadow: 0 0 5px var(--color-neon-light);
 }
 
 /* Save button styling */
 .saveButton {
+  width: 100%; /* NAYA: Full width kiya */
   margin-top: 1rem;
   padding: 1rem 2.5rem;
-  background-color: #00F5C8;
-  color: #1A1A2E;
-  font-weight: 600;
+  background-color: var(--color-neon-green);
+  color: var(--color-dark-navy);
+  font-weight: 700;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  font-size: 1rem;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  font-size: 1.1rem;
+  /* NAYA: Neon Glow */
+  box-shadow: 0 0 15px rgba(0, 245, 200, 0.5);
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
 }
 
 .saveButton:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+  box-shadow: 0 5px 20px rgba(0, 245, 200, 0.7);
 }
 
 .saveButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Success message styling */
 .successMessage {
   margin-top: 1.5rem;
-  color: #00F5C8;
+  color: var(--color-neon-green);
   text-align: center;
+  font-weight: 600;
 }
 
 .loading {
@@ -148,4 +181,15 @@
   align-items: center;
   min-height: 80vh;
   font-size: 1.2rem;
+  color: var(--color-neon-green);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .profileContainer {
+    padding: 2rem;
+  }
+  .profileContainer h1 {
+    font-size: 2rem;
+  }
 }

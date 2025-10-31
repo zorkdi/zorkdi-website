@@ -2,167 +2,354 @@
 
 "use client";
 
-import { useState, useEffect, ChangeEvent, useRef } from 'react'; // useRef added
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react'; // FIX: ChangeEvent ko hata diya
+// FIX: Link ko hata diya kyunki woh use nahi ho raha tha
+import { FaPaperPlane, FaCheckCircle } from 'react-icons/fa'; // FIX: FaUserCircle, FaTimesCircle, FaClock ko hata diya
+import { useAuth } from '@/context/AuthContext';
 import { db } from '@/firebase';
-import {
-  doc, getDoc, updateDoc, Timestamp, collection, query, orderBy,
-  onSnapshot, addDoc, serverTimestamp, setDoc // Added setDoc just in case, though updateDoc is primary
+import { 
+  collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, limit, doc, getDoc, updateDoc,
+  Timestamp 
 } from 'firebase/firestore';
+
 import adminStyles from '../../admin.module.css';
 import styles from './project-details.module.css';
 
-// Project request structure
+// Type definitions
+type ProjectStatus = 'Pending' | 'Accepted' | 'InProgress' | 'Completed' | 'Rejected';
+
 interface ProjectRequest {
   id: string;
-  fullName: string;
-  email: string;
-  projectType: string;
-  description: string;
+  title: string;
+  status: ProjectStatus;
+  clientId: string;
+  clientName: string;
+  clientEmail: string;
+  mobile: string;
+  serviceType: string;
   budget: string;
-  country: string;
-  submittedAt: Timestamp;
-  status: string;
-  projectId?: string;
-  userId: string; // Added userId for chat security check
-  hasUnread?: boolean; // Added hasUnread
+  timeline: string;
+  description: string;
+  createdAt: Date;
 }
 
-// Message structure
 interface Message {
   id: string;
+  senderId: string;
+  senderType: 'user' | 'admin'; 
   text: string;
-  sender: 'user' | 'admin';
-  createdAt: Timestamp;
+  timestamp: Date;
 }
 
-const ProjectDetailsPage = () => {
-  const router = useRouter();
-  const params = useParams();
-  const docId = params.id as string;
+const statusOptions: ProjectStatus[] = ['Pending', 'Accepted', 'InProgress', 'Completed', 'Rejected'];
 
+const AdminProjectDetailsPage = ({ params }: { params: { id: string } }) => {
+  const { id: projectId } = params;
+  const { currentUser, loading: authLoading } = useAuth();
+  
   const [project, setProject] = useState<ProjectRequest | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [status, setStatus] = useState('');
-  const [customProjectId, setCustomProjectId] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [newStatus, setNewStatus] = useState<ProjectStatus>('Pending');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const hasMarkedProjectRead = useRef(false); // Ref for project read status
 
-  // Fetch project data and mark as read
-  useEffect(() => {
-    if (docId) {
-      const fetchProjectAndMarkRead = async () => {
-        setLoading(true);
-        setError('');
-        hasMarkedProjectRead.current = false; // Reset on ID change
-        try {
-          const docRef = doc(db, 'project_requests', docId);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            const data = { id: docSnap.id, ...docSnap.data() } as ProjectRequest;
-            setProject(data);
-            setStatus(data.status);
-            setCustomProjectId(data.projectId || '');
-
-            // Mark project as read if it has unread messages
-            if (data.hasUnread && !hasMarkedProjectRead.current) {
-              await updateDoc(docRef, { hasUnread: false });
-              hasMarkedProjectRead.current = true;
-              console.log("Marked project as read:", docId);
-            } else {
-                 hasMarkedProjectRead.current = true; // Mark as done even if already read
-            }
-
-          } else {
-            setError('Project request not found.');
-          }
-        } catch (err) {
-          setError('Failed to fetch project details.');
-          console.error(err);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchProjectAndMarkRead();
+  // Auto-scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
+  // Status Tag utility (admin styles se uthaya)
+  const getStatusClass = (status: ProjectStatus) => {
+    switch (status) {
+      case 'Pending':
+        return adminStyles.statusPending;
+      case 'Accepted':
+        return adminStyles.statusAccepted;
+      case 'InProgress':
+        return adminStyles.statusInProgress;
+      case 'Completed':
+        return adminStyles.statusCompleted;
+      case 'Rejected':
+        return adminStyles.statusRejected;
+      default:
+        return adminStyles.statusPending;
     }
-  }, [docId]);
+  };
 
-  // Fetch chat messages in real-time
+  // 1. Fetch Project Details
   useEffect(() => {
-    if (project) { // Fetch messages only after project details are loaded
-      const messagesRef = collection(db, 'project_requests', project.id, 'messages');
-      const q = query(messagesRef, orderBy('createdAt', 'asc'));
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const fetchedMessages: Message[] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Message));
-        setMessages(fetchedMessages);
-      }, (err) => { console.error("Error fetching messages:", err); setError("Could not load messages."); });
+    if (!currentUser && !authLoading) {
+        // Auth check is handled by layout.tsx, but this is a fallback
+        return; 
+    }
+
+    if (currentUser) {
+        setIsLoading(true);
+        const fetchProject = async () => {
+            try {
+                const docRef = doc(db, 'projects', projectId);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    setError("Project request not found.");
+                    return;
+                }
+
+                const data = docSnap.data();
+                const projectData = {
+                    id: projectId,
+                    title: data.title || 'Untitled Request',
+                    status: data.status as ProjectStatus || 'Pending',
+                    clientId: data.clientId || '',
+                    clientName: data.clientName || 'Unknown',
+                    clientEmail: data.clientEmail || 'N/A',
+                    mobile: data.mobile || 'N/A',
+                    serviceType: data.serviceType || 'Unknown',
+                    budget: data.budget || 'N/A',
+                    timeline: data.timeline || 'N/A',
+                    description: data.description || 'No description provided.',
+                    createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(), 
+                } as ProjectRequest;
+                
+                setProject(projectData);
+                setNewStatus(projectData.status); // Set initial status for dropdown
+                
+            } catch (err) {
+                console.error("Error fetching project:", err);
+                setError("Failed to load project details.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchProject();
+    }
+  }, [currentUser, authLoading, projectId]);
+
+  // 2. Fetch Chat Messages (Real-time)
+  useEffect(() => {
+    if (project) {
+      const messagesCollectionRef = collection(db, 'projects', projectId, 'chat');
+      const messagesQuery = query(
+        messagesCollectionRef,
+        orderBy('timestamp', 'desc'), 
+        limit(50) 
+      );
+
+      const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+        const fetchedMessages = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          timestamp: doc.data().timestamp instanceof Timestamp ? doc.data().timestamp.toDate() : new Date(),
+        })) as Message[];
+        
+        setMessages(fetchedMessages.reverse());
+      }, (err) => {
+        console.error("Error fetching project chat messages:", err);
+        // Chat error ko main error state mein nahi daalenge, sirf console mein log karenge
+      });
+
       return () => unsubscribe();
     }
-  }, [project]);
+  }, [project, projectId]);
 
-  // Auto-scroll
-  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
-  // Save changes
-  const handleSaveChanges = async () => {
-    if (!docId) return;
-    setIsSaving(true);
+  // 3. Status Update Handler
+  const handleStatusUpdate = async () => {
+    if (!project || newStatus === project.status) return;
+
+    setIsUpdating(true);
+    setError(null);
     try {
-      const docRef = doc(db, 'project_requests', docId);
-      await updateDoc(docRef, { status: status, projectId: customProjectId });
-      alert('Changes saved successfully!');
-    } catch (err) { console.error('Error updating document: ', err); alert('Failed to save changes.'); }
-    finally { setIsSaving(false); }
+        const docRef = doc(db, 'projects', projectId);
+        await updateDoc(docRef, {
+            status: newStatus,
+        });
+        // State update will be handled by onSnapshot in useEffect
+        alert(`Project status updated to ${newStatus}`);
+    } catch (err) {
+        console.error("Error updating status:", err);
+        setError("Failed to update project status.");
+    } finally {
+        setIsUpdating(false);
+    }
   };
 
-  // Handle sending a reply
-  const handleSendMessage = async (e: React.FormEvent) => {
+  // 4. Send Message Handler (Admin Reply)
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newMessage.trim() === '' || !project) return;
-    const messagesRef = collection(db, 'project_requests', project.id, 'messages');
+    const trimmedInput = input.trim();
+
+    if (!trimmedInput || !currentUser || !project) return;
+
+    setInput(''); 
+
     try {
-      await addDoc(messagesRef, { text: newMessage, sender: 'admin', createdAt: serverTimestamp() });
-      setNewMessage('');
-    } catch (error) { console.error("Error sending message: ", error); alert("Failed to send message."); }
+      const messagesCollectionRef = collection(db, 'projects', projectId, 'chat');
+      
+      await addDoc(messagesCollectionRef, {
+        senderId: currentUser.uid,
+        senderType: 'admin', // Admin sender type
+        text: trimmedInput,
+        timestamp: serverTimestamp(),
+      });
+      
+    } catch (sendError: unknown) {
+      const errorMessage = sendError instanceof Error ? sendError.message : 'An unknown error occurred during submission.';
+      console.error("Error sending message:", sendError);
+      alert(`Failed to send message: ${errorMessage}`);
+      setInput(trimmedInput); 
+    }
   };
 
-  // Render logic...
-  if (loading) { return <div>Loading project details...</div>; }
-  if (error) { return <div className={adminStyles.errorMessage}>{error}</div>; }
-  if (!project) { return <div>No project data found.</div>; }
+
+  // --- Render Logic ---
+
+  if (isLoading) {
+    return <div className={adminStyles.loading}>Loading Project Details...</div>;
+  }
+  
+  if (error || !project) {
+    return <div className={adminStyles.errorMessage}>{error || "Project not found."}</div>;
+  }
 
   return (
-    <div>
-      <div className={adminStyles.pageHeader}> <h1>Manage Project: {project.projectType}</h1> </div>
-      <div className={`${adminStyles.dataContainer} ${styles.detailsContainer}`}>
-        {/* Project Details */}
-        <div className={styles.detailsGrid}>
-          <div className={styles.detailItem}><label>Client Name</label><p>{project.fullName}</p></div>
-          <div className={styles.detailItem}><label>Client Email</label><p>{project.email}</p></div>
-          <div className={styles.detailItem}><label>Country</label><p>{project.country}</p></div>
-          <div className={styles.detailItem}><label>Budget</label><p>{project.budget}</p></div>
-          <div className={`${styles.detailItem} ${styles.fullWidth}`}><label>Project Description</label><p className={styles.descriptionBox}>{project.description}</p></div>
-        </div>
-        <hr className={styles.divider} />
-        {/* Management Section */}
-        <div className={styles.managementGrid}>
-          <div className={styles.formGroup}> <label htmlFor="status">Project Status</label> <select id="status" value={status} onChange={(e) => setStatus(e.target.value)}> <option>Pending</option> <option>Accepted</option> <option>In Progress</option> <option>Completed</option> <option>Rejected</option> </select> </div>
-          <div className={styles.formGroup}> <label htmlFor="projectId">Assign Project ID (e.g., ZDI-001)</label> <input id="projectId" type="text" value={customProjectId} onChange={(e) => setCustomProjectId(e.target.value)} placeholder="ZDI-001" /> </div>
-        </div>
-        <button onClick={handleSaveChanges} className={adminStyles.primaryButton} disabled={isSaving}> {isSaving ? 'Saving...' : 'Save Changes'} </button>
-        {/* Chat Section */}
-        <div className={styles.chatSection}>
-          <div className={styles.chatSectionHeader}>Project Chat</div>
-          <div className={styles.messagesContainer}> <div className={styles.messageList}> <div ref={messagesEndRef} /> {messages.map((msg) => ( <div key={msg.id} className={`${styles.message} ${msg.sender === 'user' ? styles.user : styles.admin}`} > {msg.text} </div> ))} {!loading && messages.length === 0 && <p style={{textAlign: 'center', opacity: 0.7}}>No messages yet.</p>} </div> </div>
-          <form onSubmit={handleSendMessage} className={styles.inputArea}> <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type your reply..." /> <button type="submit" className={styles.sendButton}>Send</button> </form>
-        </div>
+    <>
+      <div className={adminStyles.pageHeader}>
+        <h1>{project.title}</h1>
+        <span className={`${adminStyles.statusTag} ${getStatusClass(project.status)}`}>
+            {project.status}
+        </span>
       </div>
-    </div>
+
+      <div className={styles.detailsContainer}>
+        
+        {/* --- Project Details --- */}
+        <div className={adminStyles.dataContainer} style={{marginBottom: '3rem'}}>
+            <h2 style={{color: 'var(--color-neon-green)', marginBottom: '1.5rem'}}>Project Overview</h2>
+            <div className={styles.detailsGrid}>
+                <div className={styles.detailItem}>
+                    <label>Requested By</label>
+                    <p>{project.clientName}</p>
+                </div>
+                <div className={styles.detailItem}>
+                    <label>Client Email</label>
+                    <p>{project.clientEmail}</p>
+                </div>
+                <div className={styles.detailItem}>
+                    <label>Mobile</label>
+                    <p>{project.mobile}</p>
+                </div>
+                <div className={styles.detailItem}>
+                    <label>Requested Service</label>
+                    <p>{project.serviceType}</p>
+                </div>
+                <div className={styles.detailItem}>
+                    <label>Budget</label>
+                    <p>{project.budget}</p>
+                </div>
+                <div className={styles.detailItem}>
+                    <label>Timeline</label>
+                    <p>{project.timeline}</p>
+                </div>
+                <div className={`${styles.detailItem} ${styles.fullWidth}`}>
+                    <label>Requested On</label>
+                    <p>{project.createdAt.toLocaleDateString()} at {project.createdAt.toLocaleTimeString()}</p>
+                </div>
+                <div className={`${styles.detailItem} ${styles.fullWidth}`}>
+                    <label>Description</label>
+                    <p className={styles.descriptionBox}>{project.description}</p>
+                </div>
+            </div>
+        </div>
+
+        <hr className={styles.divider} />
+        
+        {/* --- Project Management & Chat --- */}
+        <div className={styles.managementGrid}>
+            
+            {/* Left Column: Status Update */}
+            <div className={adminStyles.dataContainer}>
+                <h2 style={{color: 'var(--color-secondary-accent)', marginBottom: '1.5rem'}}>Project Status Control</h2>
+                <div className={styles.formGroup}>
+                    <label htmlFor="statusSelect">Update Status</label>
+                    <select 
+                        id="statusSelect" 
+                        value={newStatus} 
+                        onChange={(e) => setNewStatus(e.target.value as ProjectStatus)}
+                        disabled={isUpdating}
+                    >
+                        {statusOptions.map(status => (
+                            <option key={status} value={status}>{status}</option>
+                        ))}
+                    </select>
+                </div>
+                <button
+                    onClick={handleStatusUpdate}
+                    className={adminStyles.primaryButton}
+                    disabled={isUpdating || newStatus === project.status}
+                    style={{width: '100%', marginTop: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                >
+                    {isUpdating ? 'Updating...' : <><FaCheckCircle style={{marginRight: '0.5rem'}}/> Confirm Status Change</>}
+                </button>
+            </div>
+            
+            {/* Right Column: Chat Section */}
+            <div className={styles.chatSection}>
+                <div className={styles.chatSectionHeader}>
+                    Client Chat ({project.clientName})
+                </div>
+                
+                {/* Messages Container */}
+                <div className={styles.messagesContainer}>
+                    <div className={styles.messageList}>
+                        {messages.map((msg) => (
+                            <div 
+                                key={msg.id} 
+                                className={`${styles.message} ${msg.senderType === 'user' ? styles.user : styles.admin}`}
+                            >
+                                <span className={styles.messageSource}>
+                                    {msg.senderType === 'admin' ? 'You' : project.clientName}:
+                                </span>
+                                {msg.text}
+                                <span style={{fontSize: '0.7em', opacity: 0.5, marginLeft: '0.5rem', whiteSpace: 'nowrap'}}>
+                                    {msg.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </span>
+                            </div>
+                        ))}
+                        <div ref={messagesEndRef} />
+                        {messages.length === 0 && (
+                            <p style={{textAlign: 'center', opacity: 0.6, marginTop: '2rem'}}>
+                                Start the conversation!
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Input Area */}
+                <form className={styles.inputArea} onSubmit={handleSend}>
+                    <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Reply to client..."
+                        disabled={!currentUser}
+                    />
+                    <button type="submit" className={styles.sendButton} disabled={!input.trim() || !currentUser}>
+                        <FaPaperPlane />
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+      </div>
+    </>
   );
 };
 
-export default ProjectDetailsPage; // Sirf ek hi default export
+export default AdminProjectDetailsPage;

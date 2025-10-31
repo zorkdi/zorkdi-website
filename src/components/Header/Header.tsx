@@ -5,12 +5,26 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import Image from 'next/image'; // Already imported
 import styles from './Header.module.css';
-import { CgMenuRight, CgClose, CgProfile } from "react-icons/cg";
+import { CgMenuRight, CgClose } from "react-icons/cg";
+import { FaUserCircle } from "react-icons/fa"; // Default profile icon ke liye
 import { useAuth } from '../../context/AuthContext';
 import { signOut } from 'firebase/auth';
-import { auth } from '../../firebase';
+import { auth, db } from '../../firebase';
+import { doc, getDoc } from 'firebase/firestore'; 
+
+// Global settings data type
+interface BrandingData {
+  websiteTitle: string;
+  websiteTagline: string;
+}
+
+// Default/Fallback values (Used during loading or if CMS fails)
+const defaultBranding: BrandingData = {
+    websiteTitle: "ZORK DI",
+    websiteTagline: "Empowering Ideas With Technology",
+};
 
 const Header = () => {
   const { currentUser, userProfile } = useAuth();
@@ -18,27 +32,87 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
+  
+  // Branding state
+  const [branding, setBranding] = useState<BrandingData>(defaultBranding);
+  const [brandingLoading, setBrandingLoading] = useState(true);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
+  // Function to close both menus
+  const closeMenus = () => {
       setMenuOpen(false);
       setProfileMenuOpen(false);
-      router.push('/login');
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
   };
+  
+  // Fetch branding data from CMS
+  useEffect(() => {
+      const fetchBranding = async () => {
+          try {
+              const docRef = doc(db, 'cms', 'global_settings');
+              const docSnap = await getDoc(docRef);
+              if (docSnap.exists()) {
+                  const data = docSnap.data();
+                  setBranding({
+                      websiteTitle: data.websiteTitle || defaultBranding.websiteTitle,
+                      websiteTagline: data.websiteTagline || defaultBranding.websiteTagline,
+                  });
+              }
+          } catch (error) {
+              console.error("Failed to fetch branding from CMS:", error);
+          } finally {
+              setBrandingLoading(false);
+          }
+      };
+      fetchBranding();
+  }, []); 
 
+  // Mobile menu toggle hone par profile dropdown close karna
+  useEffect(() => {
+    if (menuOpen) {
+      setProfileMenuOpen(false);
+    }
+  }, [menuOpen]);
+  
+  // Profile menu toggle hone par mobile menu close karna
+  useEffect(() => {
+    if (profileMenuOpen) {
+      setMenuOpen(false);
+    }
+  }, [profileMenuOpen]); 
+
+  // Esc key listener aur click outside functionality
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
         setProfileMenuOpen(false);
       }
     };
+    
+    // Esc Key Handler
+    const handleEsc = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            closeMenus(); // Dono menus ko close karo
+        }
+    };
+    
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEsc); // Esc key listener add kiya
+    
+    return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+        document.removeEventListener("keydown", handleEsc); // Cleanup
+    };
   }, [profileMenuRef]);
+
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      closeMenus(); // Updated to use closeMenus
+      router.push('/login');
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
 
   return (
@@ -48,14 +122,20 @@ const Header = () => {
           <Link href="/">
             <Image
               src="/logo.png"
-              alt="ZORK DI Logo"
+              alt={`${branding.websiteTitle} Logo`}
               width={55} 
               height={55}
               priority
+              className={styles.logoImage}
             />
             <div className={styles.logoTextContainer}>
-              <span className={styles.brandName}>ZORK DI</span>
-              <span className={styles.brandTagline}>Empowering Ideas With Technology</span>
+              {/* Dynamic Brand Name and Tagline */}
+              <span className={styles.brandName}>
+                 {brandingLoading ? defaultBranding.websiteTitle : branding.websiteTitle}
+              </span>
+              <span className={styles.brandTagline}>
+                 {brandingLoading ? defaultBranding.websiteTagline : branding.websiteTagline}
+              </span>
             </div>
           </Link>
         </div>
@@ -75,20 +155,24 @@ const Header = () => {
           
           <div className={styles.profileMenuContainer} ref={profileMenuRef}>
             
+            {/* Agar logged in hai aur photo hai, toh Image component dikhao */}
             {currentUser && userProfile?.photoURL ? (
-              <img 
+              <Image // <img> tag ko <Image /> component se badla
                 src={userProfile.photoURL} 
                 alt="Profile" 
+                width={40} // Default width (CSS mein bhi set hai)
+                height={40} // Default height (CSS mein bhi set hai)
                 className={styles.profileImage}
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)} 
               />
             ) : (
+                /* Agar logged in nahi hai ya photo nahi hai, toh FaUserCircle icon dikhao */
               <button 
                 className={styles.profileIcon} 
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                 aria-label="Profile menu"
               >
-                <CgProfile />
+                <FaUserCircle /> 
               </button>
             )}
             
@@ -96,16 +180,18 @@ const Header = () => {
               <div className={styles.profileDropdown}>
                 {currentUser ? (
                   <ul>
-                    <li><Link href="/profile" onClick={() => setProfileMenuOpen(false)}>My Profile</Link></li>
-                    {/* NAYA: "My Projects" ka link add kiya */}
-                    <li><Link href="/my-projects" onClick={() => setProfileMenuOpen(false)}>My Projects</Link></li>
-                    <li><Link href="/chat" onClick={() => setProfileMenuOpen(false)}>Chat</Link></li>
+                    {/* Admin link add kiya */}
+                    {userProfile?.email === 'admin@zorkdi.com' && (
+                        <li><Link href="/admin" onClick={closeMenus}>Admin Dashboard</Link></li>
+                    )}
+                    <li><Link href="/profile" onClick={closeMenus}>My Profile</Link></li>
+                    <li><Link href="/my-projects" onClick={closeMenus}>My Projects</Link></li>
                     <li><button onClick={handleLogout}>Logout</button></li>
                   </ul>
                 ) : (
                   <ul>
-                    <li><Link href="/login" onClick={() => setProfileMenuOpen(false)}>Login</Link></li>
-                    <li><Link href="/signup" onClick={() => setProfileMenuOpen(false)}>Sign Up</Link></li>
+                    <li><Link href="/login" onClick={closeMenus}>Login</Link></li>
+                    <li><Link href="/signup" onClick={closeMenus}>Sign Up</Link></li>
                   </ul>
                 )}
               </div>
@@ -123,15 +209,24 @@ const Header = () => {
       </div>
 
       {menuOpen && (
+        // Close button mobile menu ke andar add kiya
         <div className={styles.mobileMenu}>
+          <button 
+            className={styles.hamburgerButton} 
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close menu"
+            style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }} 
+          >
+            <CgClose />
+          </button>
           <nav>
             <ul className={styles.mobileNavLinks}>
-              <li><Link href="/services" onClick={() => setMenuOpen(false)}>Services</Link></li>
-              <li><Link href="/portfolio" onClick={() => setMenuOpen(false)}>Portfolio</Link></li>
-              <li><Link href="/about" onClick={() => setMenuOpen(false)}>About Us</Link></li>
-              <li><Link href="/blog" onClick={() => setMenuOpen(false)}>Blog</Link></li>
-              <li><Link href="/contact" onClick={() => setMenuOpen(false)}>Contact</Link></li>
-              <li><Link href="/new-project" className={styles.mobileCta} onClick={() => setMenuOpen(false)}>Start a Project</Link></li>
+              <li><Link href="/services" onClick={closeMenus}>Services</Link></li>
+              <li><Link href="/portfolio" onClick={closeMenus}>Portfolio</Link></li>
+              <li><Link href="/about" onClick={closeMenus}>About Us</Link></li>
+              <li><Link href="/blog" onClick={closeMenus}>Blog</Link></li>
+              <li><Link href="/contact" onClick={closeMenus}>Contact</Link></li>
+              <li><Link href="/new-project" className={styles.mobileCta} onClick={closeMenus}>Start a Project</Link></li>
             </ul>
           </nav>
         </div>

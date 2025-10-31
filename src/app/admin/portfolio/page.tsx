@@ -1,107 +1,164 @@
 // src/app/admin/portfolio/page.tsx
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { db } from '@/firebase';
-import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
-import styles from '../admin.module.css'; // Reuse admin styles
+"use client";
 
-// Define the structure, ensure Timestamp is imported
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+// FIX: useRouter ko hata diya kyunki woh use nahi ho raha
+import { db } from '@/firebase';
+import { collection, query, onSnapshot, orderBy, Timestamp } from 'firebase/firestore';
+
+import styles from '../admin.module.css';
+import { FaPlus, FaTrashAlt, FaPen, FaExternalLinkAlt } from 'react-icons/fa'; 
+
+// Type definitions
 interface PortfolioItem {
   id: string;
   title: string;
   category: string;
-  coverImageURL?: string;
-  createdAt?: Timestamp; // Make createdAt optional as well, just in case
+  coverImageURL: string;
+  createdAt: Date;
 }
 
-// Server Component data fetching function
-async function getPortfolioItems(): Promise<PortfolioItem[]> { // Add return type
-  try {
-    const portfolioCollection = collection(db, 'portfolio');
-    // Sort by creation date if the field exists, otherwise skip sorting
-    // For now, let's keep it simple and fetch without sorting first
-    // const q = query(portfolioCollection, orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(portfolioCollection); // Fetch without sorting
+// Dummy Categories for filters
+const allCategories = ['All', 'Web App', 'Mobile App', 'Finance Solution', 'Custom Software', 'UI/UX Design'];
 
-    const items = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      title: doc.data().title || 'No Title', // Add fallbacks
-      category: doc.data().category || 'Uncategorized',
-      coverImageURL: doc.data().coverImageURL,
-      createdAt: doc.data().createdAt, // Include timestamp if available
-    })) as PortfolioItem[]; // Assert type
+const AdminPortfolioPage = () => {
+  // FIX: useRouter ko hata diya
+  const [items, setItems] = useState<PortfolioItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // NAYA: Filtering State
+  const [activeFilter, setActiveFilter] = useState<string>('All');
 
-    // Sort manually after fetching if createdAt exists
-    items.sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
+  // 1. Fetch Portfolio Items (Real-time)
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+    
+    const itemsCollectionRef = collection(db, 'portfolio');
+    const itemsQuery = query(
+        itemsCollectionRef,
+        orderBy('createdAt', 'desc')
+    );
+    
+    const unsubscribe = onSnapshot(itemsQuery, (snapshot) => {
+        const fetchedItems = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                title: data.title || 'Untitled Project',
+                category: data.category || 'Uncategorized',
+                coverImageURL: data.coverImageURL || '',
+                // Firestore Timestamp ko Date mein convert karna
+                createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(), 
+            } as PortfolioItem;
+        });
+        setItems(fetchedItems);
+        setIsLoading(false);
+    }, (err) => {
+        console.error("Error fetching portfolio items:", err);
+        setError("Failed to load portfolio items. Check console.");
+        setIsLoading(false);
+    });
 
-    return items;
-  } catch (error) {
-    console.error("Error fetching portfolio items:", error);
-    // It's better to throw the error or return empty, depending on how you want to handle it
-    // throw new Error("Failed to fetch portfolio items"); // Option 1: Throw error
-    return []; // Option 2: Return empty array
-  }
-}
+    return () => unsubscribe();
+  }, []);
 
-// The Page Component itself (must be default export)
-const AdminPortfolioPage = async () => {
-  let items: PortfolioItem[] = [];
-  let fetchError: string | null = null;
+  // 2. Client-side Filtering Logic
+  const filteredItems = items.filter(item => {
+      if (activeFilter === 'All') return true;
+      return item.category === activeFilter;
+  });
 
-  try {
-      items = await getPortfolioItems();
-  } catch (error) {
-      console.error("Failed getting portfolio items for page:", error);
-      fetchError = "Failed to load portfolio items. Please check server logs.";
-  }
+  // 3. Delete Logic (Placeholder)
+  const handleDelete = (item: PortfolioItem) => {
+      if (confirm(`Are you sure you want to delete the portfolio item: "${item.title}"?`)) {
+          // Future: Implement Firestore delete and Storage delete here
+          alert(`Deleting is not yet implemented. Pretending to delete: ${item.title}`);
+      }
+  };
 
 
   return (
-    <div>
+    <>
       <div className={styles.pageHeader}>
         <h1>Manage Portfolio</h1>
         <Link href="/admin/portfolio/new" className={styles.primaryButton}>
-          + Add New Project
+          <FaPlus style={{ marginRight: '0.5rem' }}/> New Item
         </Link>
       </div>
 
-      <div className={styles.dataContainer}>
-        {/* Display error if fetching failed */}
-        {fetchError && <p className={styles.errorMessage}>{fetchError}</p>}
+      {/* --- Filter Section --- */}
+      <div className={styles.dataContainer} style={{ marginBottom: '2rem', padding: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+        {allCategories.map(category => (
+          <button
+            key={category}
+            onClick={() => setActiveFilter(category)}
+            // Active filter ke liye styling classes use kiye
+            className={`${styles.primaryButton} ${activeFilter === category ? styles.activeFilter : ''}`}
+            style={{ 
+                padding: '0.6rem 1.2rem', 
+                backgroundColor: activeFilter === category ? 'var(--color-secondary-accent)' : 'var(--color-dark-navy)',
+                color: activeFilter === category ? 'var(--color-off-white)' : 'var(--color-neon-green)',
+                border: activeFilter === category ? 'none' : '1px solid var(--color-neon-green)',
+                boxShadow: activeFilter === category ? '0 0 10px rgba(139, 92, 246, 0.5)' : 'none',
+                transform: activeFilter === category ? 'translateY(-3px)' : 'none',
+            }}
+          >
+            {category} ({category === 'All' ? items.length : items.filter(i => i.category === category).length})
+          </button>
+        ))}
+      </div>
 
-        {/* Display table only if no error and items exist */}
-        {!fetchError && items.length > 0 ? (
+      {/* --- Items Table --- */}
+      <div className={styles.dataContainer}>
+        {isLoading ? (
+          <div className={styles.loading}>Loading portfolio items...</div>
+        ) : error ? (
+          <div className={styles.errorMessage}>{error}</div>
+        ) : filteredItems.length === 0 ? (
+          <p style={{textAlign: 'center', opacity: 0.8}}>No {activeFilter === 'All' ? '' : activeFilter} items found.</p>
+        ) : (
           <table className={styles.dataTable}>
             <thead>
               <tr>
                 <th>Title</th>
                 <th>Category</th>
+                <th>Created Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {items.map(item => (
+              {filteredItems.map((item) => (
                 <tr key={item.id}>
                   <td>{item.title}</td>
                   <td>{item.category}</td>
+                  <td>{item.createdAt.toLocaleDateString()}</td>
                   <td>
-                    <Link href={`/admin/portfolio/edit/${item.id}`} className={styles.actionLink}>
-                      Edit
+                    <Link href={`/admin/portfolio/edit/${item.id}`} className={styles.actionLink} style={{marginRight: '1rem'}}>
+                       <FaPen /> Edit
                     </Link>
+                    <a href={`/portfolio/${item.id}`} target="_blank" rel="noopener noreferrer" className={styles.actionLink} style={{marginRight: '1rem', color: 'var(--color-neon-green)'}}>
+                       <FaExternalLinkAlt /> View
+                    </a>
+                    <button 
+                        onClick={() => handleDelete(item)} 
+                        className={styles.actionLink} 
+                        style={{ color: '#e74c3c' }}
+                    >
+                        <FaTrashAlt /> Delete
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        ) : (
-          // Display message if no items and no error
-          !fetchError && <p>No portfolio projects found. Click 'Add New Project' to create one.</p>
         )}
       </div>
-    </div>
+    </>
   );
 };
 
-// Ensure this is the ONLY default export
 export default AdminPortfolioPage;

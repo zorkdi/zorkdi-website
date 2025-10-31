@@ -2,17 +2,17 @@
 
 "use client";
 
-// NAYA: useEffect import kiya
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, Editor } from '@tiptap/react'; // FIX: Editor type import kiya
 import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
+import ImageExtension from '@tiptap/extension-image'; // FIX: Naming collision se bachne ke liye rename kiya
 import { storage } from '@/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import styles from './Editor.module.css';
-import { ChangeEvent, useRef, useEffect } from 'react'; // useEffect added
+import { ChangeEvent, useRef, useEffect } from 'react';
 
 // Toolbar component
-const Toolbar = ({ editor }: { editor: any }) => {
+// FIX: editor type ko 'any' se 'Editor' type mein badla
+const Toolbar = ({ editor }: { editor: Editor | null }) => { 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!editor) {
@@ -21,7 +21,7 @@ const Toolbar = ({ editor }: { editor: any }) => {
 
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !editor) return; // Add check for editor
+    if (!file || !editor) return; 
 
     const storageRef = ref(storage, `blog_images/${Date.now()}_${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
@@ -42,7 +42,7 @@ const Toolbar = ({ editor }: { editor: any }) => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          // NAYA: Check if editor is still available before running command
+          // Check if editor is still available before running command
           if (editor && !editor.isDestroyed) {
              editor.chain().focus().setImage({ src: downloadURL }).run();
           }
@@ -74,7 +74,6 @@ const Toolbar = ({ editor }: { editor: any }) => {
         style={{ display: 'none' }}
         accept="image/png, image/jpeg, image/gif"
       />
-      {/* NAYA: Changed button type to "button" to prevent form submission */}
       <button type="button" onClick={() => fileInputRef.current?.click()} className={styles.toolbarButton}>
         Image
       </button>
@@ -87,7 +86,7 @@ const RichTextEditor = ({ content, onChange }: { content: string, onChange: (ric
   const editor = useEditor({
     extensions: [
       StarterKit.configure(),
-      Image.configure({
+      ImageExtension.configure({ // FIX: Renamed extension use kiya
         inline: false,
       }),
     ],
@@ -103,12 +102,12 @@ const RichTextEditor = ({ content, onChange }: { content: string, onChange: (ric
     },
   });
 
-  // NAYA: Explicitly destroy the editor on component unmount
+  // Explicitly destroy the editor on component unmount
   useEffect(() => {
     return () => {
       editor?.destroy();
     };
-  }, [editor]); // Dependency array includes editor
+  }, [editor]); 
 
   return (
     <div className={styles.editorContainer}>

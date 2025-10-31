@@ -17,10 +17,7 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Keep your existing devServer config if you added it (Corrected IP)
-  devServer: {
-      allowedDevOrigins: ["http://192.168.1.15:3000"],
-  },
+  // FIX: devServer option ko hata diya gaya hai
 };
 
 export default nextConfig;

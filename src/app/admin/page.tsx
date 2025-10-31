@@ -1,96 +1,83 @@
-// src/app/admin/page.tsx
+// app/admin/page.tsx
+
+"use client";
 
 import styles from './admin.module.css';
-import { db } from '@/firebase';
-import { collection, query, where, getCountFromServer } from 'firebase/firestore';
-
-// Function to fetch stats on the server
-async function getDashboardStats() {
-    try {
-        const projectsRef = collection(db, 'project_requests');
-        const blogsRef = collection(db, 'blogs');
-        const chatsRef = collection(db, 'chats');
-
-        // Project Counts
-        const projectsSnapshot = await getCountFromServer(projectsRef);
-        const totalProjects = projectsSnapshot.data().count;
-        const pendingQuery = query(projectsRef, where('status', '==', 'Pending'));
-        const pendingSnapshot = await getCountFromServer(pendingQuery);
-        const pendingProjects = pendingSnapshot.data().count;
-
-        // Blog Count
-        const blogsSnapshot = await getCountFromServer(blogsRef);
-        const totalBlogs = blogsSnapshot.data().count;
-
-        // General Chat Count
-        const totalChatsSnapshot = await getCountFromServer(chatsRef);
-        const totalChats = totalChatsSnapshot.data().count;
-
-        // Unread General Chats Count
-        const unreadChatsQuery = query(chatsRef, where('hasUnread', '==', true));
-        const unreadChatsSnapshot = await getCountFromServer(unreadChatsQuery);
-        const unreadGeneralChats = unreadChatsSnapshot.data().count;
-
-        // Unread Project Chats Count
-        const unreadProjectsQuery = query(projectsRef, where('hasUnread', '==', true));
-        const unreadProjectsSnapshot = await getCountFromServer(unreadProjectsQuery);
-        const unreadProjectChats = unreadProjectsSnapshot.data().count;
-
-        // Total Unread Count
-        const totalUnread = unreadGeneralChats + unreadProjectChats;
-
-        return {
-            totalProjects,
-            pendingProjects,
-            totalBlogs,
-            totalChats,
-            totalUnread
-        };
-    } catch (error) {
-        console.error("Error fetching dashboard stats:", error);
-        return { totalProjects: 0, pendingProjects: 0, totalBlogs: 0, totalChats: 0, totalUnread: 0 };
-    }
-}
+import Link from 'next/link';
+import { FaUsers, FaTasks, FaFeatherAlt, FaChartLine, FaEnvelope } from 'react-icons/fa'; // NAYA: FaEnvelope import kiya
+import { useAuth } from '@/context/AuthContext';
+// Dummy data ke liye naya import
+// NAYA: Abhi dummy hook use kar rahe hain, isko baad mein actual data fetching se replace kar sakte hain.
+const useDashboardStats = () => ({
+    stats: [
+        { title: 'New Project Requests', value: 3, icon: FaTasks, link: '/admin/projects', unread: true },
+        { title: 'New Client Chats', value: 5, icon: FaUsers, link: '/admin/chat', unread: true },
+        { title: 'New Client Mail', value: 2, icon: FaEnvelope, link: '/admin/mail', unread: true }, // NAYA: Client Mail Stat Card add kiya
+        { title: 'Total Blog Posts', value: 12, icon: FaFeatherAlt, link: '/admin/blog', unread: false },
+        { title: 'Total Portfolio Items', value: 8, icon: FaChartLine, link: '/admin/portfolio', unread: false },
+    ],
+    loading: false,
+    error: null
+});
 
 
-const AdminDashboardPage = async () => {
-  const stats = await getDashboardStats();
+const AdminDashboardPage = () => {
+  const { userProfile } = useAuth();
+  const { stats, loading, error } = useDashboardStats(); 
+
+  // User ka naam display karne ke liye logic
+  const userName = userProfile?.fullName || userProfile?.email?.split('@')[0] || 'Admin';
+
+  if (loading) {
+      return <div className={styles.loading}>Loading Dashboard Data...</div>;
+  }
+  
+  if (error) {
+      return <div className={styles.errorMessage}>{error}</div>;
+  }
 
   return (
-    <div>
+    <>
       <div className={styles.pageHeader}>
         <h1>Dashboard</h1>
       </div>
+      
+      {/* Welcome Message Section */}
+      <section className={styles.welcomeMessage}>
+          <h2>Welcome Back, {userName}!</h2>
+          <p>
+              Yahan aap apne business ka high-level overview dekh sakte hain. Niche diye gaye stats par dhyaan dein aur apne pending tasks ko complete karein.
+          </p>
+          <div className={styles.actionButtonsContainer}>
+              <Link href="/admin/projects" className={styles.primaryButton}>Review Projects</Link>
+              <Link href="/admin/blog/new" className={styles.secondaryCtaButton} style={{color: 'var(--color-neon-green)'}}>Create New Post</Link>
+          </div>
+      </section>
 
-      {/* Stat Cards Section */}
-      <div className={styles.statsGrid}>
-        <div className={`${styles.statCard} ${styles.unreadCard}`}>
-          <h2>Unread Messages</h2>
-          <p>{stats.totalUnread}</p>
-        </div>
-         <div className={styles.statCard}>
-          <h2>Pending Projects</h2>
-          <p>{stats.pendingProjects}</p>
-        </div>
-         <div className={styles.statCard}>
-          <h2>Total Projects</h2>
-          <p>{stats.totalProjects}</p>
-        </div>
-        <div className={styles.statCard}>
-          <h2>Published Blogs</h2>
-          <p>{stats.totalBlogs}</p>
-        </div>
-        <div className={styles.statCard}>
-          <h2>Active Chats</h2>
-          <p>{stats.totalChats}</p>
-        </div>
+      {/* Stats Grid */}
+      <section style={{ marginTop: '3rem' }}>
+          <div className={styles.statsGrid}>
+              {stats.map((stat, index) => (
+                  // Link ko hi statCard jaisa style kiya gaya hai
+                  <Link href={stat.link} key={index} style={{textDecoration: 'none'}}>
+                      <div className={`${styles.statCard} ${stat.unread ? styles.unreadCard : ''}`}>
+                          <h2 style={{ display: 'flex', alignItems: 'center' }}>
+                              <stat.icon style={{ marginRight: '0.75rem', color: 'var(--color-secondary-accent)' }}/>
+                              {stat.title}
+                          </h2>
+                          <p>{stat.value}</p>
+                      </div>
+                  </Link>
+              ))}
+          </div>
+      </section>
+      
+      {/* Quick Actions Section (Placeholder) */}
+      <div className={styles.dataContainer} style={{marginTop: '2rem'}}>
+          <h2 style={{ marginBottom: '1.5rem', color: 'var(--color-neon-green)'}}>Quick Actions</h2>
+          <p style={{opacity: 0.8}}>Yahan aap future mein important tasks ya To-Do list add kar sakte hain.</p>
       </div>
-
-      <div className={styles.welcomeMessage}>
-        <h2>Welcome back!</h2>
-        <p>This is your control center. Use the sidebar to manage your website content.</p>
-      </div>
-    </div>
+    </>
   );
 };
 
