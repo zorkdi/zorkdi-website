@@ -14,28 +14,28 @@ interface AboutContent {
     heroTitle: string;
     heroSubtitle: string;
     storyTitle: string;
-    storyParagraph1: string;
-    storyParagraph2: string;
+    storyParagraph1: string; // Will contain HTML from Rich Text Editor
+    storyParagraph2: string; // Will contain HTML from Rich Text Editor
     missionTitle: string;
     missionText: string;
     visionTitle: string;
     visionText: string;
     valuesTitle: string;
-    founderImageUrl: string; // URL for the founder's image
+    founderImageUrl: string;
 }
 
 const defaultContent: AboutContent = {
-    heroTitle: "Redefining Digital Experiences.",
-    heroSubtitle: "We are ZorkDI: The force accelerating the next generation of web development.",
-    storyTitle: "Our Story: Built on Passion and Precision",
-    storyParagraph1: "ZorkDI was founded with a simple, yet ambitious goal: to bridge the gap between complex technology and compelling user experience. We started as a small team of innovators, fuelled by coffee and a shared passion for clean code and flawless design.",
-    storyParagraph2: "Today, we've grown into a full-service digital agency, but our core philosophy remains the same—every line of code and every pixel matters. We believe that the best digital solutions are built not just with tools, but with dedication and a deep understanding of our clients' visions.",
+    heroTitle: "From Vision to Code: Engineering the Future of Digital Accountability.",
+    heroSubtitle: "ZORK DI is the foundational brand for precision software development.",
+    storyTitle: "Our Genesis: The Drive for Uncompromised Excellence",
+    storyParagraph1: "I'm Gadadhar Bairagya, the Founder and Lead Developer. Zork DI was born from a singular conviction: to establish a technology brand that stands for unyielding quality and technical mastery. I recognized the limitations of fragmented execution and the vital need for a unified, accountable source for critical software projects.",
+    storyParagraph2: "Here, every line of code written here, and every strategic decision is under my direct oversight, ensuring consistent, high-performance outcomes. We provide a comprehensive system for seamless project tracking, clear milestones, and guaranteed technical delivery—a standard clients rarely find.",
     missionTitle: "Our Mission",
-    missionText: "To empower businesses globally with cutting-edge, scalable, and secure digital platforms that drive measurable growth and transform the way they interact with their customers.",
+    missionText: "To transition clients to a model of singular accountability, personally delivering integrated, enterprise-grade software (Web, Windows, Mobile) with superior quality assurance, powering their sustained growth.",
     visionTitle: "Our Vision",
-    visionText: "To be the recognized leader in bespoke digital innovation, setting the benchmark for quality, speed, and client satisfaction in the tech industry worldwide.",
-    valuesTitle: "Core Values",
-    founderImageUrl: "/images/founder.jpg", // Default placeholder image
+    visionText: "To evolve ZORK DI into the most trusted global technology brand, recognized for technical excellence, innovative solutions, and setting the global standard for bespoke digital engineering.",
+    valuesTitle: "Core Values That Drive Us",
+    founderImageUrl: "/images/founder_placeholder.jpg",
 };
 
 const AboutPage = () => {
@@ -49,8 +49,9 @@ const AboutPage = () => {
 
                 if (docSnap.exists()) {
                     const data = docSnap.data() as AboutContent;
+                    // FIX: Ensure content loads with defaults if any field is missing
                     setContent({
-                        ...defaultContent, // Keep defaults for fields not in CMS
+                        ...defaultContent, 
                         ...data,
                     });
                 }
@@ -81,22 +82,23 @@ const AboutPage = () => {
             <section className={styles.storySection}>
                 <div className={styles.storyContent}>
                     <h2>{content.storyTitle}</h2>
-                    <p style={{ marginBottom: '1.5rem' }}>
-                        {content.storyParagraph1}
-                    </p>
-                    <p>
-                        {content.storyParagraph2}
-                    </p>
+                    {/* FIX: dangerouslySetInnerHTML se HTML content ko sahi se render karna */}
+                    <p 
+                        style={{ marginBottom: '1.5rem' }} 
+                        dangerouslySetInnerHTML={{ __html: content.storyParagraph1 }} 
+                    />
+                    <p 
+                        dangerouslySetInnerHTML={{ __html: content.storyParagraph2 }} 
+                    />
                 </div>
                 <div className={styles.founderImageContainer}>
-                    {/* Yahan par Founder ki Image aayegi, abhi placeholder use kiya hai */}
+                    {/* Founder Image (Image URL is from CMS) */}
                     {content.founderImageUrl && content.founderImageUrl !== defaultContent.founderImageUrl ? (
-                        // <Image /> component use kiya for optimization
                         <Image 
                             src={content.founderImageUrl} 
-                            alt="Founder of ZorkDI" 
+                            alt="Founder of ZorkDI - Gadadhar Bairagya" 
                             fill 
-                            sizes="(max-width: 768px) 200px, 450px" // Responsive size for performance
+                            sizes="(max-width: 768px) 200px, 450px" 
                             className={styles.founderImage}
                         />
                     ) : (

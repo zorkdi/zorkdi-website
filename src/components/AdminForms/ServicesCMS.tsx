@@ -23,7 +23,7 @@ interface ServicesContent {
     services: ServiceOffering[];
 }
 
-// Default/Initial values
+// Default/Initial values (6 services)
 const initialServiceData: ServicesContent = {
     heroHeadline: "Our Digital Engineering Services",
     heroSubheadline: "Transforming complex ideas into clean, high-performance, and scalable software solutions.",
@@ -47,6 +47,16 @@ const initialServiceData: ServicesContent = {
             id: '4', title: 'Custom Software Solutions',
             description: "Tailored software development for unique business needs, including internal tools and enterprise systems.",
             offerings: ["Cloud Infrastructure Setup (AWS/GCP/Azure)", "Legacy System Modernization", "Automated Workflows & Integrations", "Database Design & Management"]
+        },
+        {
+            id: '5', title: 'Strategic Digital Marketing',
+            description: "Driving measurable ROI through data-backed SEO, content strategy, and campaign management.",
+            offerings: ["SEO & Content Strategy", "Performance & Conversion Optimization", "Data Analytics Integration (GA4)", "Paid Media Campaign Setup"]
+        },
+        {
+            id: '6', title: 'Enterprise Desktop Solutions',
+            description: "Building robust, high-performance Windows and cross-platform desktop software for internal tools and automation.",
+            offerings: ["Windows Application Development (C#/C++)", "Electron/Tauri Cross-Platform Apps", "Business Process Automation (BPA)", "High-Security Local Data Management"]
         },
     ],
 };
@@ -109,12 +119,26 @@ const ServicesCMS = () => {
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
-                    setContent(docSnap.data() as ServicesContent);
+                    const fetchedData = docSnap.data() as ServicesContent;
+                    
+                    // NAYA FIX: Humein hamesha initial data ke services array ko use karna hai
+                    // aur Firestore se sirf Title/Description update karna hai.
+                    // Ye guaranteed karega ki array size hamesha 6 rahega.
+                    const mergedServices = initialServiceData.services.map(initialSvc => {
+                        const existingSvc = fetchedData.services?.find(fSvc => fSvc.id === initialSvc.id);
+                        return existingSvc ? { ...initialSvc, ...existingSvc } : initialSvc;
+                    });
+                    
+                    setContent({ 
+                        ...initialServiceData, 
+                        ...fetchedData, 
+                        services: mergedServices // Force use the 6-service array
+                    });
                 } else {
                     await setDoc(docRef, initialServiceData);
                     setContent(initialServiceData);
                 }
-            } catch (_err: unknown) { // FIX: err replaced with _err
+            } catch (_err: unknown) { 
                 console.error("Error fetching Services CMS:", _err);
                 setError('Failed to load Services CMS content.');
             } finally {
@@ -122,9 +146,9 @@ const ServicesCMS = () => {
             }
         };
         fetchData();
-    }, []);
+    }, []); // Dependency array empty rakha for initial load only
 
-    // --- Handlers ---
+    // --- Handlers (Content is the same) ---
     const handleHeroChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setContent(prev => ({ ...prev, [name]: value }));
@@ -163,23 +187,22 @@ const ServicesCMS = () => {
         try {
             const docRef = doc(db, 'cms', 'services_page');
             
-            // Clean up offerings before saving
+            // Clean up offerings and ensure unique IDs
             const cleanedContent = {
                 ...content,
                 services: content.services.map(svc => ({
                     ...svc,
-                    offerings: svc.offerings.filter(o => o.trim() !== '') // Remove empty bullets
+                    id: svc.id || Math.random().toString(36).substring(2, 9), 
+                    offerings: svc.offerings.filter(o => o.trim() !== '') 
                 }))
             };
 
             await setDoc(docRef, cleanedContent, { merge: true });
 
-            // Update local state with cleaned data
             setContent(cleanedContent);
             setSuccess('Services Page content updated successfully!');
 
         } catch (err: unknown) {
-            // Is catch block mein 'err' use ho raha hai, isliye isko change nahi kiya
             console.error('Failed to save Services CMS content. Check console.', err); 
             setError('Failed to save Services CMS content. Check console.');
         } finally {
@@ -218,7 +241,7 @@ const ServicesCMS = () => {
             <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '2rem', color: 'var(--color-neon-light)' }}>Individual Services ({content.services.length} Services)</h3>
 
             {content.services.map((service, index) => (
-                <div key={service.id} style={{ border: '1px solid rgba(255, 255, 255, 0.1)', padding: '2rem', borderRadius: '12px', marginBottom: '2rem' }}>
+                <div key={service.id} style={{ border: '1px solid rgba(255, 255, 255, 0.1)', padding: '2rem', borderRadius: '12px', marginBottom: '2rem', backgroundColor: 'var(--color-deep-blue)' }}>
                     <h4 style={{ color: 'var(--color-neon-green)', marginBottom: '1.5rem' }}>Service #{index + 1}: {service.title || 'Untitled'}</h4>
 
                     <div className={formStyles.formGrid}>
@@ -268,6 +291,7 @@ const ServicesCMS = () => {
                 type="submit"
                 className={formStyles.saveButton}
                 disabled={isSubmitting || isLoading}
+                style={{ width: '100%', marginTop: '3rem' }}
             >
                 {isSubmitting ? 'Saving Services...' : 'Save All Services Content'}
             </button>
