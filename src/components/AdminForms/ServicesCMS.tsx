@@ -20,6 +20,7 @@ interface ServiceOffering {
 interface ServicesContent {
     heroHeadline: string;
     heroSubheadline: string;
+    heroButtonText: string; // NAYA FIELD
     services: ServiceOffering[];
 }
 
@@ -27,6 +28,7 @@ interface ServicesContent {
 const initialServiceData: ServicesContent = {
     heroHeadline: "Our Digital Engineering Services",
     heroSubheadline: "Transforming complex ideas into clean, high-performance, and scalable software solutions.",
+    heroButtonText: "Explore Our Services", // NAYA DEFAULT VALUE
     services: [
         {
             id: '1', title: 'Custom Web App Development',
@@ -119,21 +121,19 @@ const ServicesCMS = () => {
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
-                    const fetchedData = docSnap.data() as ServicesContent;
+                    const fetchedData = docSnap.data();
                     
-                    // NAYA FIX: Humein hamesha initial data ke services array ko use karna hai
-                    // aur Firestore se sirf Title/Description update karna hai.
-                    // Ye guaranteed karega ki array size hamesha 6 rahega.
+                    // FIX: Explicitly typed 'fSvc' as ServiceOffering to resolve the TypeScript error 7006.
                     const mergedServices = initialServiceData.services.map(initialSvc => {
-                        const existingSvc = fetchedData.services?.find(fSvc => fSvc.id === initialSvc.id);
+                        const existingSvc = fetchedData.services?.find((fSvc: ServiceOffering) => fSvc.id === initialSvc.id);
                         return existingSvc ? { ...initialSvc, ...existingSvc } : initialSvc;
                     });
                     
                     setContent({ 
                         ...initialServiceData, 
                         ...fetchedData, 
-                        services: mergedServices // Force use the 6-service array
-                    });
+                        services: mergedServices 
+                    } as ServicesContent); 
                 } else {
                     await setDoc(docRef, initialServiceData);
                     setContent(initialServiceData);
@@ -146,7 +146,7 @@ const ServicesCMS = () => {
             }
         };
         fetchData();
-    }, []); // Dependency array empty rakha for initial load only
+    }, []); 
 
     // --- Handlers (Content is the same) ---
     const handleHeroChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -223,14 +223,21 @@ const ServicesCMS = () => {
             <div className={formStyles.formGrid}>
                 <div className={formStyles.fullWidth}>
                     <div className={formStyles.formGroup}>
-                        <label htmlFor="heroHeadline">Hero Headline</label>
+                        <label htmlFor="heroHeadline">Hero Headline (Our Digital Engineering Services)</label>
                         <input type="text" id="heroHeadline" name="heroHeadline" value={content.heroHeadline} onChange={handleHeroChange} required />
                     </div>
                 </div>
                 <div className={formStyles.fullWidth}>
                     <div className={formStyles.formGroup}>
-                        <label htmlFor="heroSubheadline">Hero Subheadline</label>
+                        <label htmlFor="heroSubheadline">Hero Subheadline (Transforming Complex Ideas...)</label>
                         <textarea id="heroSubheadline" name="heroSubheadline" value={content.heroSubheadline} onChange={handleHeroChange} required />
+                    </div>
+                </div>
+                {/* NAYA FIELD: Button Text */}
+                 <div className={formStyles.fullWidth}>
+                    <div className={formStyles.formGroup}>
+                        <label htmlFor="heroButtonText">Hero Button Text (Explore Our Services)</label>
+                        <input type="text" id="heroButtonText" name="heroButtonText" value={content.heroButtonText} onChange={handleHeroChange} required />
                     </div>
                 </div>
             </div>

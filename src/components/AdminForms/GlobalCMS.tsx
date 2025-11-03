@@ -3,17 +3,25 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent } from 'react';
+import Image from 'next/image'; // NAYA: Image component import kiya
+// Firebase services
 import { doc, getDoc, setDoc } from 'firebase/firestore'; 
-import { db } from '@/firebase';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'; // NAYA: Storage imports
+import { db, storage } from '@/firebase';
 
 import adminStyles from '@/app/admin/admin.module.css';
 import formStyles from './forms.module.css';
-import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaChartLine, FaSearch } from "react-icons/fa"; // NAYE ICONS IMPORT KIYE
+import newPostStyles from '@/app/admin/blog/new/new-post.module.css'; // Image upload styles reuse kiya
+import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaChartLine, FaSearch, FaTimesCircle } from "react-icons/fa"; // NAYE ICONS IMPORT KIYE
 
 // Type for Firestore data structure
 interface GlobalSettings {
   websiteTitle: string; 
   websiteTagline: string; 
+  
+  // NAYE FIELDS FOR HERO BACKGROUND
+  heroBackgroundURL: string; // The dynamic image URL
+  defaultHeroBackground: string; // Placeholder or default CSS URL
   
   // NAYE FIELDS FOR DIGITAL MARKETING
   googleAnalyticsId: string;
@@ -31,10 +39,16 @@ interface GlobalSettings {
 }
 
 // Default/Initial values
+const defaultHeroURL = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'matrix\' values=\'1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.08 0\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")';
+
 const initialData: GlobalSettings = {
   websiteTitle: "ZORK DI - Custom Tech Solutions",
   websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
   
+  // NAYE DEFAULT VALUES FOR HERO BACKGROUND
+  heroBackgroundURL: "", // Shuru mein empty rakha
+  defaultHeroBackground: defaultHeroURL, // CSS texture as default fallback
+
   // NAYE DEFAULT VALUES FOR MARKETING
   googleAnalyticsId: "G-XXXXXXXXXX", 
   googleSearchConsoleId: "",
@@ -52,27 +66,42 @@ const initialData: GlobalSettings = {
 
 const GlobalCMS = () => {
   const [content, setContent] = useState<GlobalSettings>(initialData);
+  
+  // NAYA: State for image handling
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [currentHeroURL, setCurrentHeroURL] = useState<string>(''); // For tracking Firestore URL
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const DOC_REF = doc(db, 'cms', 'global_settings');
 
   // --- Data Fetching ---
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const docRef = doc(db, 'cms', 'global_settings');
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDoc(DOC_REF);
 
         if (docSnap.exists()) {
           const fetchedData = docSnap.data();
-          // Default values ko use kiya taaki naye fields bhi set ho jayein agar Firestore mein nahi hain
-          setContent({ ...initialData, ...fetchedData } as GlobalSettings); 
+          // Merge kiya taaki naye fields bhi set ho jayein agar Firestore mein nahi hain
+          const mergedData = { ...initialData, ...fetchedData } as GlobalSettings;
+          
+          setContent(mergedData); 
+          setCurrentHeroURL(mergedData.heroBackgroundURL);
+          setImagePreview(mergedData.heroBackgroundURL || '');
+
         } else {
           // Agar document nahi mila, toh default data ke saath create kar do
-          await setDoc(docRef, initialData);
+          await setDoc(DOC_REF, initialData);
           setContent(initialData);
+          setCurrentHeroURL(initialData.heroBackgroundURL);
+          setImagePreview(initialData.heroBackgroundURL);
         }
       } catch (_err: unknown) {
         console.error("Error fetching Global CMS:", _err);
@@ -91,6 +120,31 @@ const GlobalCMS = () => {
     setSuccess('');
     setError('');
   };
+  
+  // NAYA: Handle image file selection
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+  
+  // NAYA: Handle image delete (from CMS view only)
+  const handleImageDelete = () => {
+    // Ye sirf UI se hatata hai aur Final URL ko empty karta hai. Actual Firestore/Storage deletion handleSubmit mein hoga.
+    const confirmDelete = window.confirm("Are you sure you want to remove the Hero Background Image?");
+    if (confirmDelete) {
+        setImagePreview('');
+        setCurrentHeroURL(''); 
+        setImageFile(null); // Clear any pending file upload
+        setContent(prev => ({...prev, heroBackgroundURL: ''}));
+        setSuccess('');
+        setError('');
+    }
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,9 +153,59 @@ const GlobalCMS = () => {
     setSuccess('');
 
     try {
-      const docRef = doc(db, 'cms', 'global_settings');
-      await setDoc(docRef, content, { merge: true }); 
+      let finalImageURL = currentHeroURL; // Firestore se aayi hui URL
 
+      // 1. Image Upload Logic
+      if (imageFile) {
+        setUploadProgress(0);
+        const storageRef = ref(storage, `cms_images/hero_background_${Date.now()}`);
+        const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+        await new Promise<void>((resolve, reject) => {
+          uploadTask.on('state_changed',
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              setUploadProgress(Math.round(progress));
+            },
+            (uploadError) => {
+              console.error("Image upload failed:", uploadError);
+              setError("Image upload failed. Please try again.");
+              reject(uploadError);
+            },
+            async () => {
+              finalImageURL = await getDownloadURL(uploadTask.snapshot.ref);
+              // Agar koi purani image ho toh usko delete karne ki logic yahan aayegi (Optional)
+              resolve();
+            }
+          );
+        });
+      } else if (!imagePreview && currentHeroURL) {
+          // 2. Image Deletion (Agar user ne UI se image delete ki ho)
+          if (currentHeroURL.includes('firebasestorage.googleapis.com')) {
+               try {
+                   const urlPath = currentHeroURL.split('/o/')[1];
+                   const filePath = urlPath.split('?')[0];
+                   const decodedPath = decodeURIComponent(filePath);
+                   const imageRef = ref(storage, decodedPath);
+                   await deleteObject(imageRef);
+                   finalImageURL = ''; // Final URL ko empty set kiya
+                   setCurrentHeroURL('');
+               } catch (storageError) {
+                   console.error("Warning: Failed to delete old storage image.", storageError);
+                   // continue execution, finalImageURL will be cleared in next step
+               }
+          }
+          finalImageURL = ''; // Final URL ko empty set kiya
+      }
+
+
+      // 3. Update Document in Firestore
+      const docRef = doc(db, 'cms', 'global_settings');
+      await setDoc(docRef, { ...content, heroBackgroundURL: finalImageURL }, { merge: true }); 
+
+      // Final state update
+      setCurrentHeroURL(finalImageURL);
+      setImagePreview(finalImageURL || ''); 
       setSuccess('Global Settings updated successfully!');
 
     } catch (err: unknown) {
@@ -109,6 +213,8 @@ const GlobalCMS = () => {
       setError('Failed to save global settings. Check console.');
     } finally {
       setIsSubmitting(false);
+      setUploadProgress(null);
+      setImageFile(null); // Clear file state
     }
   };
 
@@ -138,6 +244,42 @@ const GlobalCMS = () => {
             <textarea id="websiteTagline" name="websiteTagline" value={content.websiteTagline} onChange={handleTextChange} required />
           </div>
         </div>
+        
+        {/* --- HERO BACKGROUND IMAGE --- */}
+        <div className={formStyles.fullWidth}>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-green)' }}>Home Hero Background Image (NVIDIA/TCS style)</h3>
+        </div>
+        <div className={formStyles.fullWidth}>
+             <div className={newPostStyles.imageUploadSection}>
+                {imagePreview ? (
+                    <>
+                        <Image
+                          src={imagePreview}
+                          alt="Hero Background Preview"
+                          width={400} height={250} 
+                          className={newPostStyles.imagePreview}
+                          style={{ objectFit: 'cover', width: '100%', maxWidth: '400px', height: 'auto', border: '1px solid var(--color-neon-green)'}}
+                        />
+                        <button type="button" onClick={handleImageDelete} className={adminStyles.dangerButton} style={{marginTop: '1rem', width: 'auto', display: 'flex', alignItems: 'center', gap: '5px'}}>
+                            <FaTimesCircle /> Remove Image
+                        </button>
+                    </>
+                ) : (
+                    <span style={{opacity: 0.7, padding: '1rem', display: 'block'}}>No Image Selected. Default CSS texture will be used.</span>
+                )}
+                <input
+                    type="file" id="heroBackground" className={newPostStyles.fileInput}
+                    onChange={handleFileChange} accept="image/png, image/jpeg, image/webp"
+                />
+                <label htmlFor="heroBackground" className={newPostStyles.uploadButton} style={{marginTop: '1.5rem'}}>
+                    {imagePreview ? 'Change Image' : 'Upload Hero Background'}
+                </label>
+                {uploadProgress !== null && uploadProgress < 100 && ( 
+                    <p className={newPostStyles.uploadProgress}>Uploading: {uploadProgress}%</p>
+                )}
+            </div>
+        </div>
+
         
         {/* --- DIGITAL MARKETING / SEO --- */}
         <div className={formStyles.fullWidth}>

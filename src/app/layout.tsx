@@ -25,14 +25,20 @@ interface GlobalSettings {
   websiteTagline: string;
   googleAnalyticsId?: string; 
   googleSearchConsoleId?: string; 
+  heroBackgroundURL?: string; // NAYA: Hero Background URL field add kiya
+  defaultHeroBackground?: string; // NAYA: Default/CSS texture field add kiya
 }
 
 // Default/Fallback settings
+const defaultHeroURL = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'matrix\' values=\'1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.08 0\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")';
+
 const defaultSettings: GlobalSettings = {
     websiteTitle: "ZORK DI - Custom Tech Solutions",
     websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
     googleAnalyticsId: "G-XXXXXXXXXX", 
     googleSearchConsoleId: "", 
+    heroBackgroundURL: "", 
+    defaultHeroBackground: defaultHeroURL,
 };
 
 // Function to fetch ALL Global Settings from Firestore
@@ -61,7 +67,6 @@ export async function generateMetadata(): Promise<Metadata> {
     const globalSettings = await getGlobalSettings();
     
     // FIX: Verification meta tag ko correct Next.js Metadata format mein set karna
-    // Yeh "google-site-verification" property ko "google" key ke andar string value expect karta hai.
     const verificationMeta = globalSettings.googleSearchConsoleId 
         ? { google: globalSettings.googleSearchConsoleId } 
         : {};
@@ -82,6 +87,16 @@ export default async function RootLayout({
   // Global settings ko fetch kiya
   const globalSettings = await getGlobalSettings();
   const gaId = globalSettings.googleAnalyticsId;
+  
+  // NAYA LOGIC: Hero Background URL ko determine karna
+  const heroBackground = globalSettings.heroBackgroundURL 
+    ? `url('${globalSettings.heroBackgroundURL}')` // CMS URL
+    : globalSettings.defaultHeroBackground; // CSS Texture Fallback
+    
+  // CSS variable define karna jise hum globals.css mein use karenge
+  const customCssVars = {
+      '--hero-bg-image': heroBackground,
+  };
 
   return (
     <html lang="en">
@@ -105,7 +120,8 @@ export default async function RootLayout({
         </>
       )}
 
-      <body className={poppins.className}>
+      {/* NAYA: customCssVars ko body tag par apply kiya */}
+      <body className={poppins.className} style={customCssVars as React.CSSProperties}>
         <AuthProvider>
           <Header />
           {children}

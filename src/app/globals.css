@@ -17,6 +17,9 @@
   /* Shadows/Glows */
   --shadow-neon: 0 0 15px rgba(0, 245, 200, 0.4);
   --shadow-subtle: 0 5px 15px rgba(0, 0, 0, 0.3);
+  
+  /* NAYA: CSS Variable for Hero Background - Layout.tsx se aayega */
+  --hero-bg-image: none; 
 }
 
 /* Hum yahan saari default browser styling ko reset kar rahe hain */

@@ -16,35 +16,94 @@
   min-height: 100vh;
   padding: 2rem;
   text-align: center;
+  position: relative; 
+  overflow: hidden; 
 }
 
+/* NAYA FIX: Ek invisible spacer div Hero Section ke liye */
+.heroSpacer {
+    width: 100%;
+    height: 100vh; /* CRITICAL: Isko 100vh height denge */
+    flex-shrink: 0;
+    position: relative;
+    z-index: 4; 
+}
+
+/* CRITICAL FIX: Hero Content aur Background Container */
+.heroFixedContent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    padding: 2rem;
+    /* CHANGE 1: Z-index wapas 2 kiya. Yeh sirf background overlay hai. */
+    z-index: 2; 
+
+    /* CRITICAL FIX: Hero Background Image ko yahan CSS Variable se load karna */
+    background-image: var(--hero-bg-image); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.5s ease;
+
+    /* Dynamic Overlay Layer (TCS/NVIDIA style dark overlay for text visibility) */
+    box-shadow: inset 0 0 0 2000px rgba(26, 26, 46, 0.7); 
+}
+
+/* NAYA CLASS: Hero Content ko Services Section ke upar rakhne ke liye */
+.heroContentWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    /* CHANGE 2: Z-index Services Section (10) se zyada rakha (15) */
+    z-index: 15; 
+}
+
+
+/* --- Hero Element Styles (FINAL TEXT SIZE AND SPACING) --- */
 .heroHeadline {
-  font-size: 4.5rem; /* NAYA: Bigger and bolder */
+  /* FIX: Heading font size chota kiya (3.2rem) aur white-space: nowrap use kiya */
+  font-size: 3.2rem; 
   font-weight: 700;
-  line-height: 1.1;
-  max-width: 900px;
-  /* NAYA: Stronger neon text glow */
-  color: var(--color-neon-light);
-  text-shadow: 0 0 10px rgba(0, 245, 200, 0.4);
+  line-height: 1.1; 
+  max-width: 100%; /* FIX: Width badhai */
+  color: var(--color-neon-green); 
+  text-shadow: 0 0 8px rgba(0, 245, 200, 0.6), 0 0 15px rgba(0, 245, 200, 0.3); 
+  margin-bottom: 2rem; 
+  /* CRITICAL FIX: Text ko wrap hone se roka */
+  white-space: nowrap; 
 }
 
 .heroSubheadline {
-  font-size: 1.5rem; /* NAYA: Bigger subheadline */
-  margin-top: 1.5rem;
+  font-size: 1.75rem; 
+  margin-top: 0; 
+  margin-bottom: 3rem; 
   max-width: 700px;
-  opacity: 0.9;
-  font-weight: 300;
+  opacity: 1.0; 
+  font-weight: 500;
+  line-height: 1.6; 
 }
 
 .heroButton {
-  margin-top: 3rem;
-  padding: 1rem 3rem; /* Bigger padding */
+  margin-top: 0; 
+  padding: 1rem 3rem; 
   background-color: var(--color-neon-green);
   color: var(--color-dark-navy);
-  font-weight: 700; /* Bolder text */
+  font-weight: 700; 
   border-radius: 10px;
   font-size: 1.1rem;
-  /* NAYA: Stronger neon glow on CTA */
   box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -56,34 +115,40 @@
 
 /* Universal Section Title */
 .sectionTitle {
-  font-size: 3rem; /* NAYA: Bigger titles */
+  font-size: 3rem; 
   font-weight: 700;
-  margin-bottom: 4rem; /* Zyaada space */
+  margin-bottom: 4rem; 
   color: var(--color-neon-light);
   text-shadow: 0 0 3px rgba(0, 245, 200, 0.3);
 }
 
 /* Services Section */
 .servicesSection {
+  /* CHANGE: Negative margin diya taaki Hero Section par overlap ho smooth transition ke liye */
+  margin-top: -60px; 
   width: 100%;
   max-width: 1200px;
-  padding: 8rem 2rem; /* Zyaada vertical space */
+  padding: 8rem 2rem; 
   text-align: center;
+  position: relative; 
+  z-index: 10; 
+  background-color: var(--color-dark-navy); 
 }
 
+
+/* Services Grid (Rest of the CSS is maintained) */
 .servicesGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 3rem; /* Zyaada gap */
+  gap: 3rem; 
   text-align: left;
 }
 
 .serviceCard {
-  /* NAYA: Glassmorphism Card Style */
   background-color: var(--color-glass-dark);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  padding: 3rem; /* Zyaada padding */
+  padding: 3rem; 
   border-radius: 16px;
   border: 1px solid var(--color-glass-light);
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
@@ -91,18 +156,18 @@
 }
 
 .serviceCard:hover {
-  transform: translateY(-15px); /* Stronger lift */
-  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5), var(--shadow-neon); /* Neon outer glow on hover */
+  transform: translateY(-15px); 
+  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5), var(--shadow-neon); 
 }
 
 .serviceIcon {
-  font-size: 3rem; /* Bigger icon */
+  font-size: 3rem; 
   margin-bottom: 1.5rem;
   color: var(--color-neon-green);
 }
 
 .serviceCard h3 {
-  font-size: 1.8rem; /* Bigger heading */
+  font-size: 1.8rem; 
   font-weight: 700;
   margin-bottom: 1rem;
 }
@@ -115,55 +180,93 @@
 /* Portfolio Section */
 .portfolioSection {
   width: 100%;
-  /* NAYA: Background Color Change for contrast */
   background-color: var(--color-deep-blue);
-  padding: 8rem 2rem;
+  padding: 8rem 0; 
   text-align: center;
+  position: relative; 
 }
 
-.portfolioGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2rem;
+/* Portfolio Scroll Container - NAYA */
+.portfolioScrollContainer {
+  display: flex;
+  overflow-x: scroll; 
+  scroll-snap-type: x mandatory; 
+  gap: 2.5rem; 
   margin-top: 4rem;
   text-align: left;
+  padding: 0 4rem; 
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
 }
 
-.portfolioItem {
-  background-color: var(--color-dark-navy);
-  border-radius: 16px;
+.portfolioScrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+/* Portfolio Card */
+.portfolioCard {
+  flex-shrink: 0; 
+  width: 350px; 
+  scroll-snap-align: start; 
+  
+  background-color: var(--color-dark-navy); 
+  border-radius: 12px; 
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1); 
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: auto; 
+  display: flex;
+  flex-direction: column;
 }
 
-.portfolioItem:hover {
-  transform: scale(1.03); /* Subtle zoom */
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 10px var(--color-secondary-accent); /* Secondary neon glow */
+.portfolioCard:hover {
+  transform: translateY(-8px); 
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6), 0 0 8px var(--color-neon-green); 
 }
 
-.portfolioImagePlaceholder {
+.portfolioImageWrapper {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 10; 
+  position: relative;
   background-color: #2c3e50;
   display: flex;
   justify-content: center;
   align-items: center;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.5);
+  overflow: hidden; 
 }
 
-.portfolioItem h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+.portfolioContent {
+    padding: 1.2rem;
+}
+
+.portfolioCategory {
+    opacity: 0.7; 
+    font-size: 0.85rem; 
+    color: var(--color-neon-green);
+    margin-bottom: 0.5rem;
+}
+
+.portfolioCard h3 {
+  font-size: 1.4rem; 
+  font-weight: 700;
   color: var(--color-off-white);
+  margin-bottom: 0.5rem;
 }
 
-.portfolioItem p {
-  padding: 0 1.5rem 1.5rem 1.5rem;
-  opacity: 0.8;
-  font-size: 0.95rem;
+.portfolioCard p {
+  opacity: 0.7; 
+  font-size: 0.9rem;
+  flex-grow: 1; 
+}
+
+.noImagePlaceholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Why Choose Us Section */
@@ -172,6 +275,7 @@
   max-width: 1200px;
   padding: 8rem 2rem;
   text-align: center;
+  position: relative; 
 }
 
 .whyUsGrid {
@@ -182,7 +286,6 @@
 }
 
 .whyUsItem {
-  /* NAYA: Style jaisa service card */
   background-color: var(--color-glass-dark);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -202,7 +305,7 @@
 .whyUsIcon {
   font-size: 3rem;
   margin-bottom: 1.5rem;
-  color: var(--color-secondary-accent); /* Secondary accent color */
+  color: var(--color-secondary-accent); 
   text-shadow: 0 0 5px rgba(139, 92, 246, 0.6);
 }
 
@@ -225,6 +328,7 @@
   text-align: center;
 }
 
+/* Blog Section */
 .blogSection {
   width: 100%;
   max-width: 1200px;
@@ -232,38 +336,101 @@
   text-align: center;
 }
 
+.blogGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 4rem;
+}
+
+.blogCard {
+    background-color: var(--color-dark-navy);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.blogImageWrapper {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    position: relative;
+    background-color: #2c3e50;
+    overflow: hidden;
+}
+
 /* ===== Mobile Responsive Styles ===== */
 @media (max-width: 768px) {
+  /* FIX: Heading font size kam kiya */
   .heroHeadline {
     font-size: 2.5rem;
   }
 
+  /* FIX: Subheading font size chota kiya */
   .heroSubheadline {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
   
   .sectionTitle {
     font-size: 2.2rem;
   }
   
-  .servicesSection, .whyUsSection, .portfolioSection {
-      padding: 4rem 1.5rem;
+  /* Services Section ko sirf top padding se adjust kiya */
+  .servicesSection {
+      padding-top: 4rem;
+      padding-bottom: 4rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      margin-top: 0; /* FIX: Mobile par margin top zero rakha */
+  }
+  
+  /* Portfolio Section ki side padding zero ki taaki full width scroll ho sake */
+  .portfolioSection {
+      padding: 4rem 0; 
   }
 
-  .servicesGrid, .whyUsGrid, .portfolioGrid {
+  .servicesGrid, .whyUsGrid, .blogGrid {
     gap: 2rem;
   }
 
   /* Mobile par cards ke content ko center karna */
   .serviceCard,
   .whyUsItem {
-    text-align: left; /* Text alignment ko left rakha for better readability on cards */
+    text-align: left; 
     padding: 2rem;
   }
   
   .serviceCard:hover,
-  .whyUsItem:hover,
-  .portfolioItem:hover {
-      transform: translateY(-5px); /* Mobile par kam lift */
+  .whyUsItem:hover {
+      transform: translateY(-5px); 
+  }
+
+  /* Portfolio grid mobile par bhi horizontal scroll karega */
+  .portfolioScrollContainer {
+    padding: 0 1.5rem; 
+    gap: 1.5rem;
+  }
+
+  /* Mobile par card ki width kam ki taaki 2 cards fit ho sakein */
+  .portfolioCard {
+    width: 280px; 
+  }
+
+  .portfolioCard:hover {
+    transform: scale(1.02); 
+  }
+  
+  .blogSection {
+      padding: 4rem 1.5rem;
+  }
+  
+  /* Blog section mobile par vertical rahega */
+  .blogGrid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
   }
 }

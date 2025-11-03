@@ -9,6 +9,11 @@
     box-shadow: 0 0 10px rgba(0, 245, 200, 0.1);
 }
 
+/* NOTE: TinyMCE ke toolbar aur content area par direct styling karna mushkil hota hai
+   isliye yeh CSS file mostly future TipTap editor ya custom editor ke liye thi.
+   TinyMCE ki dark theme zyada control leti hai.
+   Lekin hum is file ko jaisa tha, waise hi rakhenge taki future mein TipTap use ho toh kaam aaye. */
+
 .toolbar {
     padding: 0.75rem; /* Zyaada padding */
     background-color: var(--color-dark-navy);

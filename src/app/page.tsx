@@ -4,67 +4,197 @@
 
 import Link from 'next/link';
 import styles from './page.module.css';
-// FIX: FaSpinner icon ko import list mein add kiya
-import { FaLaptopCode, FaMobileAlt, FaDraftingCompass, FaRegLightbulb, FaUserShield, FaRocket, FaSpinner } from "react-icons/fa";
+import { FaLaptopCode, FaMobileAlt, FaDraftingCompass, FaRegLightbulb, FaUserShield, FaRocket, FaSpinner, FaNewspaper, FaChartLine, FaDesktop } from "react-icons/fa";
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore'; 
 import { db } from '@/firebase';
+import Image from 'next/image'; 
 
-import React, { useState, useEffect } from 'react'; // React import ensure kiya
+import React, { useState, useEffect } from 'react';
 
-// Helper component for dynamic icon display (assuming it's a client component)
+// Helper Components ko define kiya
 const ServiceIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
 const WhyUsIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
 
-// --- Interface for Services Content (Jaisa ServicesCMS.tsx mein define kiya tha) ---
-interface ServiceOffering {
-    id: string;
-    title: string;
-    description: string;
-    offerings: string[]; 
+
+// --- Interfaces ---
+interface ServiceOffering { id: string; title: string; description: string; offerings: string[]; }
+// FIX: HeroButtonText field ServicesContent mein add kiya
+interface ServicesContent { heroHeadline: string; heroSubheadline: string; heroButtonText: string; services: ServiceOffering[]; }
+interface BlogPreview { id: string; title: string; slug: string; coverImageURL: string; summary: string; createdAt: any; }
+
+// Portfolio Interface
+interface PortfolioPreview { 
+    id: string; 
+    title: string; 
+    category: string; 
+    coverImageURL: string; 
+    content: string; 
 }
 
-interface ServicesContent {
-    heroHeadline: string;
-    heroSubheadline: string;
-    services: ServiceOffering[];
-}
+// Global Settings Interface (Background ke liye) - REMOVED AS LAYOUT.TSX HANDLES IT
+// interface GlobalSettings {
+//     heroBackgroundURL: string;
+//     defaultHeroBackground: string; 
+// }
 
-// Dummy/Fallback data (Client-side fetching ke liye zaroori)
+
+// --- Fallback Data ---
 const fallbackServiceData: ServicesContent = {
-    heroHeadline: "Engineering Your Vision into Reality.",
-    heroSubheadline: "We transform your ideas into high-performance applications, websites, and software that drive growth and user engagement.",
+    websiteTitle: "ZORK DI - Custom Tech Solutions",
+    websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
+    heroHeadline: "Our Digital Engineering Services",
+    heroSubheadline: "Transforming complex ideas into clean, high-performance, and scalable software solutions.",
+    heroButtonText: "Explore Our Services", // FIX: Fallback value set ki
     services: [
-        { id: '1', title: 'Custom Web Apps', description: 'Scalable and secure web applications tailored to your business needs.', offerings: [] },
-        { id: '2', title: 'Mobile App Development', description: 'Engaging iOS and Android apps that captivate your audience and provide native-like performance.', offerings: [] },
-        { id: '3', title: 'UI/UX Design', description: 'Intuitive and beautiful designs that provide a seamless user experience, driving conversions and loyalty.', offerings: [] },
+        { id: '1', title: 'Custom Web Apps', description: 'Building fast, secure, and resilient web applications using modern frameworks like Next.js and React.', offerings: [] },
+        { id: '2', title: 'Mobile App Development', description: 'Creating engaging native and cross-platform mobile experiences for iOS and Android devices.', offerings: [] },
+        { id: '3', title: 'UI/UX Design & Branding', description: 'Focusing on user-centric design to create intuitive, beautiful interfaces that drive user engagement.', offerings: [] },
     ],
 };
+const fallbackBlogPosts: BlogPreview[] = [
+    { id: 'dummy1', title: 'No Blog Posts Found', slug: '#', coverImageURL: '', summary: 'The latest tech insights will appear here once you publish your first blog post from the admin panel.', createdAt: null },
+];
+const fallbackPortfolio: PortfolioPreview[] = [
+    { id: 'p1', title: 'Quantum E-commerce', category: 'Web App', coverImageURL: '', content: 'A short description of the project.' },
+    { id: 'p2', title: 'Aura FinTech Dashboard', category: 'Finance', coverImageURL: '', content: 'A short description of the project.' },
+    { id: 'p3', title: 'SaaS Management Portal', category: 'Custom Software', coverImageURL: '', content: 'A short description of the project.' },
+];
 
-// Icon Map (CMS se aaye hue text ko icon se map karna)
-// NOTE: Abhi hum sirf service title ke base par hardcoded icon de rahe hain.
+// FIX: Icon Map ko maintain rakha
 const iconMap: { [key: string]: React.ElementType } = {
-    'Web Apps': FaLaptopCode,
+    'Web App': FaLaptopCode,
     'Mobile App': FaMobileAlt,
     'UI/UX': FaDraftingCompass,
-    'Custom Software': FaRocket,
+    'Custom Software': FaRocket, 
+    'Digital Marketing': FaChartLine, 
+    'Desktop Solutions': FaDesktop, 
 };
+
+// --- Data Fetching Functions ---
+
+const fetchServiceContent = async (): Promise<ServicesContent> => {
+    try {
+        const docRef = doc(db, 'cms', 'services_page');
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return { ...fallbackServiceData, ...docSnap.data() as ServicesContent };
+        }
+    } catch (error) {
+        console.error("Error fetching services content:", error);
+    }
+    return fallbackServiceData;
+};
+
+const fetchBlogPosts = async (): Promise<BlogPreview[]> => {
+    try {
+        const q = query(
+            collection(db, 'blog'),
+            orderBy('createdAt', 'desc'),
+            limit(3) 
+        );
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) return fallbackBlogPosts;
+
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                title: data.title,
+                slug: data.slug,
+                coverImageURL: data.coverImageURL || '',
+                summary: data.summary || data.content?.substring(0, 80).replace(/<\/?[^>]+(>|$)/g, "") + '...',
+                createdAt: data.createdAt,
+            } as BlogPreview;
+        });
+
+    } catch (error) {
+        console.error("Error fetching blog posts:", error);
+        return fallbackBlogPosts;
+    }
+};
+
+const fetchPortfolioProjects = async (): Promise<PortfolioPreview[]> => {
+    try {
+        const q = query(
+            collection(db, 'portfolio'), 
+            orderBy('createdAt', 'desc'),
+            limit(3) 
+        );
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) return fallbackPortfolio;
+
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                title: data.title,
+                category: data.category,
+                content: data.content?.substring(0, 80).replace(/<\/?[^>]+(>|$)/g, "") + '...' || 'Project description is missing.',
+                coverImageURL: data.coverImageURL || '',
+            } as PortfolioPreview;
+        });
+
+    } catch (error) {
+        console.error("Error fetching portfolio projects:", error);
+        return fallbackPortfolio; 
+    }
+};
+
+// Global Settings Fetch Function (CMS Image ke liye) - REMOVED AS LAYOUT.TSX HANDLES IT
+// async function getGlobalSettings(): Promise<GlobalSettings> {
+//     const defaultHeroURL = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'matrix\' values=\'1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.08 0\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")';
+//     const initialData: GlobalSettings = { heroBackgroundURL: "", defaultHeroBackground: defaultHeroURL };
+    
+//     try {
+//         const docRef = doc(db, 'cms', 'global_settings');
+//         const docSnap = await getDoc(docRef);
+
+//         if (docSnap.exists()) {
+//             const data = docSnap.data();
+//             return {
+//                 heroBackgroundURL: data.heroBackgroundURL || "",
+//                 defaultHeroBackground: data.defaultHeroBackground || defaultHeroURL,
+//             };
+//         }
+//     } catch (error) {
+//         console.error("Error fetching global settings:", error);
+//     }
+//     return initialData;
+// }
+
 
 const HomePage = () => {
     const [serviceContent, setServiceContent] = useState<ServicesContent>(fallbackServiceData);
+    const [blogPosts, setBlogPosts] = useState<BlogPreview[]>(fallbackBlogPosts); 
+    const [portfolioProjects, setPortfolioProjects] = useState<PortfolioPreview[]>(fallbackPortfolio); 
     const [isLoading, setIsLoading] = useState(true);
+    // REMOVED: globalSettings state, since fetching is moved to layout.tsx
+    // const [globalSettings, setGlobalSettings] = useState<GlobalSettings | null>(null); 
 
+
+    // Fetch Services and Blog/Portfolio Content
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const docRef = doc(db, 'cms', 'services_page');
-                const docSnap = await getDoc(docRef);
+                // Fetch Content
+                // globalSettings fetch removed from Promise.all
+                const [fetchedServices, fetchedPosts, fetchedProjects] = await Promise.all([
+                    fetchServiceContent(), 
+                    fetchBlogPosts(), 
+                    fetchPortfolioProjects()
+                ]);
+                
+                setServiceContent(fetchedServices);
+                setBlogPosts(fetchedPosts);
+                setPortfolioProjects(fetchedProjects); 
+                // setGlobalSettings(settings); // State update removed
 
-                if (docSnap.exists()) {
-                    setServiceContent(docSnap.data() as ServicesContent);
-                }
             } catch (error) {
-                console.error("Error fetching Services Content:", error);
+                console.error("Error fetching homepage content:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -72,67 +202,100 @@ const HomePage = () => {
         fetchData();
     }, []);
     
+    
     // --- Render Logic ---
+    if (isLoading) {
+        // FIX: Loading state CSS ko inline rakha
+        return (
+            <main className={styles.main} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <FaSpinner style={{ fontSize: '3rem', color: 'var(--color-neon-green)', animation: 'spin 1s linear infinite' }} />
+                <h1 style={{ marginLeft: '1rem', color: 'var(--color-neon-green)', marginTop: '1rem' }}>Loading...</h1>
+                <p style={{ marginTop: '0.5rem', opacity: 0.8 }}>Please wait while we fetch the content.</p>
+            </main>
+        );
+    }
+    
     return (
         <main className={styles.main}>
-            {/* Hero Section */}
-            <section className={styles.heroSection}>
-                <h1 className={styles.heroHeadline}>{fallbackServiceData.heroHeadline}</h1>
-                <p className={styles.heroSubheadline}>{fallbackServiceData.heroSubheadline}</p>
-                <Link href="/services" className={styles.heroButton}>Explore Our Services</Link>
-            </section>
+            {/* HERO SECTION - IMAGE + OVERLAP FIX */}
+            <div className={styles.heroSpacer}>
+                 <section 
+                    className={styles.heroFixedContent}
+                    // REMOVED: Redundant inline style, CSS variable is now applied via page.module.css
+                    // style={{ backgroundImage: 'var(--hero-bg-image)' }} 
+                 >
+                    {/* CRITICAL FIX: Hero Content aur Positioning */}
+                    {/* NAYA CHANGE: Content ko separate Z-index wrapper mein daala */}
+                    <div className={styles.heroContentWrapper}> 
+                        <AnimationWrapper delay={0.1}>
+                            <h1 className={styles.heroHeadline}>{serviceContent.heroHeadline}</h1>
+                        </AnimationWrapper>
+                        <AnimationWrapper delay={0.2}>
+                            <p className={styles.heroSubheadline}>{serviceContent.heroSubheadline}</p>
+                        </AnimationWrapper>
+                        <AnimationWrapper delay={0.3}>
+                            {/* FIX: Hero Button Text CMS se control kiya */}
+                            <Link href="/services" className={styles.heroButton}>{serviceContent.heroButtonText}</Link>
+                        </AnimationWrapper>
+                    </div>
+                </section>
+            </div>
+
 
             {/* Services Section (DYNAMIC) */}
             <section className={styles.servicesSection}>
                 <h2 className={styles.sectionTitle}>Our Core Services</h2>
                 
-                {isLoading ? (
-                    <div className={styles.loadingMessage} style={{padding: '3rem', color: 'var(--color-neon-green)'}}>
-                        {/* FaSpinner yahan use ho raha tha */}
-                        <FaSpinner style={{animation: 'spin 1s linear infinite', marginRight: '1rem'}}/> Loading core services...
-                    </div>
-                ) : (
-                    <div className={styles.servicesGrid}>
-                        {serviceContent.services.map((service, index) => {
-                            // Service Title se icon select karna (ya koi default icon)
-                            const IconComponent = iconMap[Object.keys(iconMap).find(key => service.title.includes(key)) || 'Web Apps'];
-                            
-                            return (
-                                <AnimationWrapper key={service.id} delay={index * 0.2}>
-                                    <div className={styles.serviceCard}>
-                                        <div className={styles.serviceIcon}>
-                                            <ServiceIcon icon={IconComponent} />
-                                        </div> 
-                                        <h3>{service.title}</h3>
-                                        <p>{service.description}</p>
-                                    </div>
-                                </AnimationWrapper>
-                            );
-                        })}
-                    </div>
-                )}
+                <div className={styles.servicesGrid}>
+                    {serviceContent.services.map((service, index) => {
+                        const IconKey = Object.keys(iconMap).find(key => service.title.includes(key)) || 'Custom Software'; 
+                        const IconComponent = iconMap[IconKey];
+
+                        return (
+                            <AnimationWrapper key={service.id} delay={index * 0.2}>
+                                <div className={styles.serviceCard}>
+                                    <div className={styles.serviceIcon}>
+                                        <ServiceIcon icon={IconComponent} />
+                                    </div> 
+                                    <h3>{service.title}</h3>
+                                    <p>{service.description}</p>
+                                </div>
+                            </AnimationWrapper>
+                        );
+                    })}
+                </div>
             </section>
 
-            {/* Portfolio Section */}
+            {/* Portfolio Section (DYNAMIC - Featured Work) */}
             <section className={styles.portfolioSection}>
-                <h2 className={styles.sectionTitle}>Featured Work</h2>
-                <div className={styles.portfolioGrid}>
-                    {/* NOTE: Dummy Content maintained for now */}
-                    <div className={styles.portfolioItem}>
-                        <div className={styles.portfolioImagePlaceholder}>Project 1 - E-commerce Platform</div>
-                        <h3>Quantum E-commerce</h3>
-                        <p>A short description of the project.</p>
-                    </div>
-                    <div className={styles.portfolioItem}>
-                        <div className={styles.portfolioImagePlaceholder}>Project 2 - FinTech Dashboard</div>
-                        <h3>Aura FinTech Dashboard</h3>
-                        <p>A short description of the project.</p>
-                    </div>
-                    <div className={styles.portfolioItem}>
-                        <div className={styles.portfolioImagePlaceholder}>Project 3 - SaaS Portal</div>
-                        <h3>SaaS Management Portal</h3>
-                        <p>A short description of the project.</p>
-                    </div>
+                <h2 className={styles.sectionTitle} style={{ textAlign: 'center' }}>Featured Work</h2>
+                <div className={styles.portfolioScrollContainer}>
+                    {portfolioProjects.map((project, index) => (
+                        <AnimationWrapper key={project.id} delay={index * 0.2}>
+                            <Link href={`/portfolio/${project.id}`} className={styles.portfolioCard}>
+                                <div className={styles.portfolioImageWrapper}>
+                                    {project.coverImageURL ? (
+                                        <Image
+                                            src={project.coverImageURL}
+                                            alt={project.title}
+                                            fill
+                                            sizes="(max-width: 768px) 280px, 350px"
+                                            style={{ objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        <div className={styles.noImagePlaceholder}>
+                                            <span style={{ color: 'var(--color-neon-green)', fontWeight: 600 }}>No Image</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className={styles.portfolioContent}>
+                                    <p className={styles.portfolioCategory}>{project.category}</p>
+                                    <h3>{project.title}</h3>
+                                    <p style={{marginBottom: '1.2rem', opacity: 0.8}}>{project.content}</p> 
+                                </div>
+                            </Link>
+                        </AnimationWrapper>
+                    ))}
                 </div>
                 <Link href="/portfolio" className={styles.heroButton} style={{ marginTop: '3rem' }}>View All Projects</Link>
             </section>
@@ -141,7 +304,7 @@ const HomePage = () => {
             <section className={styles.whyUsSection}>
                 <h2 className={styles.sectionTitle}>Why Choose ZORK DI?</h2>
                 <div className={styles.whyUsGrid}>
-                    {/* NOTE: Dummy Content maintained for now */}
+                    {/* NOTE: Dummy Content maintained */}
                     <AnimationWrapper>
                         <div className={styles.whyUsItem}>
                             <div className={styles.whyUsIcon}><WhyUsIcon icon={FaUserShield} /></div>
@@ -172,10 +335,58 @@ const HomePage = () => {
                 <p style={{ opacity: 0.7, fontSize: '1.2rem' }}>We turn complex challenges into simple, elegant digital products. See what our clients say.</p>
             </section>
             
-            {/* Blog Section (Future CMS control ke liye structure rakha) */}
+            {/* Blog Section (DYNAMIC) */}
             <section className={styles.blogSection}>
                 <h2 className={styles.sectionTitle}>Latest Tech Insights</h2>
-                <p style={{ opacity: 0.7, fontSize: '1.2rem' }}>Stay updated with the latest in web development, design, and mobile tech.</p>
+                <p style={{ opacity: 0.7, fontSize: '1.2rem', marginBottom: '3rem' }}>Stay updated with the latest in web development, design, and mobile tech.</p>
+                
+                {blogPosts[0]?.id === 'dummy1' && blogPosts.length === 1 ? (
+                    <div style={{ 
+                        padding: '2rem', 
+                        border: '1px solid rgba(255, 255, 255, 0.1)', 
+                        borderRadius: '12px', 
+                        opacity: 0.8, 
+                        maxWidth: '600px', 
+                        margin: '0 auto',
+                        backgroundColor: 'var(--color-deep-blue)'
+                    }}>
+                        <FaNewspaper style={{marginRight: '0.5rem', color: 'var(--color-neon-green)'}}/> 
+                        {blogPosts[0].summary}
+                    </div>
+                ) : (
+                    <div className={styles.blogGrid} style={{ gap: '2rem' }}>
+                        {blogPosts.map((post, index) => (
+                            <AnimationWrapper key={post.id} delay={index * 0.2}>
+                                <Link href={`/blog/${post.slug}`} className={styles.blogCard}>
+                                    <div className={styles.blogImageWrapper}>
+                                        {post.coverImageURL ? (
+                                            <Image
+                                                src={post.coverImageURL}
+                                                alt={post.title}
+                                                fill
+                                                sizes="(max-width: 768px) 280px, 350px"
+                                                style={{ objectFit: 'cover' }}
+                                            />
+                                        ) : (
+                                            <div className={styles.noImagePlaceholder}>
+                                                <span style={{ color: 'var(--color-neon-green)', fontWeight: 600 }}>No Image</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div style={{ padding: '0 1.2rem', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                        <p style={{ opacity: 0.7, fontSize: '0.85rem', marginTop: '1.2rem', color: 'var(--color-neon-green)' }}>
+                                            {post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Draft'}
+                                        </p>
+                                        <h3>{post.title}</h3>
+                                        <p style={{marginBottom: '1.2rem', opacity: 0.8}}>{post.summary}</p>
+                                    </div>
+                                </Link>
+                            </AnimationWrapper>
+                        ))}
+                    </div>
+                )}
+                
+                <Link href="/blog" className={styles.heroButton} style={{ marginTop: '3rem' }}>Read All Insights</Link>
             </section>
         </main>
     );
