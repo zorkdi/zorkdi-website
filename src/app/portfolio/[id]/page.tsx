@@ -40,8 +40,13 @@ interface PortfolioDetailPageProps {
 }
 
 // The Page Component (Server Component)
-const PortfolioDetailPage = async ({ params }: PortfolioDetailPageProps) => {
-  const { id } = params;
+const PortfolioDetailPage = async (props: PortfolioDetailPageProps) => {
+  // FIX: Next.js 14+ or Turbopack often requires explicit awaiting of the
+  // props object (which includes dynamic segments like params) to resolve 
+  // the "params should be awaited" error.
+  const awaitedProps = await props;
+  const { id } = awaitedProps.params;
+
   const item = await getPortfolioItem(id);
 
   // If item not found, show 404 page

@@ -8,8 +8,9 @@ import dynamic from 'next/dynamic';
 
 // Firebase services
 import { db, storage } from '@/firebase';
+// FIX: deleteObject ko hata diya, kyunki yeh use nahi ho raha tha
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'; 
 
 // Dynamically import the editor (assuming you have this path)
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor/RichTextEditor'), {
@@ -20,9 +21,9 @@ const RichTextEditor = dynamic(() => import('@/components/RichTextEditor/RichTex
 // Styles
 import adminStyles from '@/app/admin/admin.module.css';
 import formStyles from '../AdminForms/forms.module.css'; 
-import newPostStyles from '@/app/admin/blog/new/new-post.module.css'; // Image upload styles reuse kiya
+import newPostStyles from '@/app/admin/blog/new/new-post.module.css'; 
 
-// Type definitions (About Page se liye gaye)
+// Type definitions (About Page se liye गए)
 interface AboutContent {
     heroTitle: string;
     heroSubtitle: string;
@@ -91,7 +92,8 @@ const AboutCMS = () => {
       }
     };
     fetchData();
-  }, []);
+    // FIX: DOC_REF ko dependencies mein add kiya
+  }, [DOC_REF]);
 
   // --- Handlers ---
   const handleTextChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

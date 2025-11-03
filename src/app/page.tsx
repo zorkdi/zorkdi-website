@@ -6,7 +6,7 @@ import Link from 'next/link';
 import styles from './page.module.css';
 import { FaLaptopCode, FaMobileAlt, FaDraftingCompass, FaRegLightbulb, FaUserShield, FaRocket, FaSpinner, FaNewspaper, FaChartLine, FaDesktop } from "react-icons/fa";
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
-import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore'; 
+import { doc, getDoc, collection, query, orderBy, limit, getDocs, Timestamp } from 'firebase/firestore'; 
 import { db } from '@/firebase';
 import Image from 'next/image'; 
 
@@ -19,9 +19,10 @@ const WhyUsIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
 
 // --- Interfaces ---
 interface ServiceOffering { id: string; title: string; description: string; offerings: string[]; }
-// FIX: HeroButtonText field ServicesContent mein add kiya
+// FIX: HeroButtonText field ServicesContent mein add kiya. websiteTitle aur websiteTagline ko nikal diya.
 interface ServicesContent { heroHeadline: string; heroSubheadline: string; heroButtonText: string; services: ServiceOffering[]; }
-interface BlogPreview { id: string; title: string; slug: string; coverImageURL: string; summary: string; createdAt: any; }
+// FIX: createdAt: any ko createdAt: Timestamp | null kiya
+interface BlogPreview { id: string; title: string; slug: string; coverImageURL: string; summary: string; createdAt: Timestamp | null; }
 
 // Portfolio Interface
 interface PortfolioPreview { 
@@ -41,8 +42,8 @@ interface PortfolioPreview {
 
 // --- Fallback Data ---
 const fallbackServiceData: ServicesContent = {
-    websiteTitle: "ZORK DI - Custom Tech Solutions",
-    websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
+    // REMOVED: websiteTitle: "ZORK DI - Custom Tech Solutions",
+    // REMOVED: websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
     heroHeadline: "Our Digital Engineering Services",
     heroSubheadline: "Transforming complex ideas into clean, high-performance, and scalable software solutions.",
     heroButtonText: "Explore Our Services", // FIX: Fallback value set ki
@@ -53,6 +54,7 @@ const fallbackServiceData: ServicesContent = {
     ],
 };
 const fallbackBlogPosts: BlogPreview[] = [
+    // FIX: createdAt: null set kiya as per new interface
     { id: 'dummy1', title: 'No Blog Posts Found', slug: '#', coverImageURL: '', summary: 'The latest tech insights will appear here once you publish your first blog post from the admin panel.', createdAt: null },
 ];
 const fallbackPortfolio: PortfolioPreview[] = [
@@ -106,7 +108,8 @@ const fetchBlogPosts = async (): Promise<BlogPreview[]> => {
                 slug: data.slug,
                 coverImageURL: data.coverImageURL || '',
                 summary: data.summary || data.content?.substring(0, 80).replace(/<\/?[^>]+(>|$)/g, "") + '...',
-                createdAt: data.createdAt,
+                // FIX: data.createdAt ab correctly mapped ho jayega as Timestamp | null
+                createdAt: data.createdAt || null, 
             } as BlogPreview;
         });
 
@@ -143,28 +146,6 @@ const fetchPortfolioProjects = async (): Promise<PortfolioPreview[]> => {
         return fallbackPortfolio; 
     }
 };
-
-// Global Settings Fetch Function (CMS Image ke liye) - REMOVED AS LAYOUT.TSX HANDLES IT
-// async function getGlobalSettings(): Promise<GlobalSettings> {
-//     const defaultHeroURL = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'matrix\' values=\'1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.08 0\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")';
-//     const initialData: GlobalSettings = { heroBackgroundURL: "", defaultHeroBackground: defaultHeroURL };
-    
-//     try {
-//         const docRef = doc(db, 'cms', 'global_settings');
-//         const docSnap = await getDoc(docRef);
-
-//         if (docSnap.exists()) {
-//             const data = docSnap.data();
-//             return {
-//                 heroBackgroundURL: data.heroBackgroundURL || "",
-//                 defaultHeroBackground: data.defaultHeroBackground || defaultHeroURL,
-//             };
-//         }
-//     } catch (error) {
-//         console.error("Error fetching global settings:", error);
-//     }
-//     return initialData;
-// }
 
 
 const HomePage = () => {
@@ -375,6 +356,7 @@ const HomePage = () => {
                                     </div>
                                     <div style={{ padding: '0 1.2rem', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                                         <p style={{ opacity: 0.7, fontSize: '0.85rem', marginTop: '1.2rem', color: 'var(--color-neon-green)' }}>
+                                            {/* FIX: Timestamp object se date string generate karna */}
                                             {post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Draft'}
                                         </p>
                                         <h3>{post.title}</h3>

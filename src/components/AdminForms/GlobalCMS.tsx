@@ -3,16 +3,16 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent } from 'react';
-import Image from 'next/image'; // NAYA: Image component import kiya
+import Image from 'next/image'; 
 // Firebase services
 import { doc, getDoc, setDoc } from 'firebase/firestore'; 
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'; // NAYA: Storage imports
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'; 
 import { db, storage } from '@/firebase';
 
 import adminStyles from '@/app/admin/admin.module.css';
 import formStyles from './forms.module.css';
-import newPostStyles from '@/app/admin/blog/new/new-post.module.css'; // Image upload styles reuse kiya
-import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaChartLine, FaSearch, FaTimesCircle } from "react-icons/fa"; // NAYE ICONS IMPORT KIYE
+import newPostStyles from '@/app/admin/blog/new/new-post.module.css'; 
+import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaChartLine, FaSearch, FaTimesCircle } from "react-icons/fa"; 
 
 // Type for Firestore data structure
 interface GlobalSettings {
@@ -39,7 +39,7 @@ interface GlobalSettings {
 }
 
 // Default/Initial values
-const defaultHeroURL = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'matrix\' values=\'1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.08 0\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")';
+const defaultHeroURL = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'matrix\' values=\'1 0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0.08 0\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")';
 
 const initialData: GlobalSettings = {
   websiteTitle: "ZORK DI - Custom Tech Solutions",
@@ -111,7 +111,8 @@ const GlobalCMS = () => {
       }
     };
     fetchData();
-  }, []);
+    // FIX: DOC_REF ko dependencies mein add kiya
+  }, [DOC_REF]);
 
   // --- Handlers ---
   const handleTextChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

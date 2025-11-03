@@ -2,7 +2,7 @@
 
 "use client"; // CRITICAL: Yeh client component hai
 
-import { notFound } from 'next/navigation';
+// FIX: notFound ko hata diya
 import Image from 'next/image';
 import { db } from '@/firebase';
 import { doc, getDoc, Timestamp } from 'firebase/firestore';

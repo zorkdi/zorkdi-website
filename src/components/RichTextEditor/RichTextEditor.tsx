@@ -2,9 +2,10 @@
 
 "use client";
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react'; 
 import { Editor } from '@tinymce/tinymce-react';
-import { FaSpinner } from 'react-icons/fa'; // FaSpinner import kiya
+
+import { FaSpinner } from 'react-icons/fa'; 
 
 // Firebase imports for image upload
 import { storage } from '@/firebase';
@@ -19,6 +20,7 @@ interface RichTextEditorProps {
 }
 
 const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const editorRef = useRef<any>(null);
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState('');
@@ -32,11 +34,12 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
                     <p><img src="/images/placeholder.png" alt="Second Image" /></p>
                 </div>
             `;
-            editorRef.current.execCommand('mceInsertContent', false, htmlToInsert);
+            editorRef.current.execCommand('mceInsertContent', false, htmlToInsert); 
         }
     };
 
     // --- Image Upload Handler ---
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const imageUploadHandler = (blobInfo: any, success: (url: string) => void, failure: (error: string) => void) => {
         setUploading(true);
         setUploadError('');
@@ -60,13 +63,11 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
                 setUploadError('');
                 
                 // CRITICAL FIX: Inline styling REMOVED. Ab CSS control karegi.
-                // Image ko <p> tag mein wrap kiya (Rich Text Editor mein common hai)
                 const imageHTML = `<p><img 
                     src="${finalImageURL}" 
                     alt="Uploaded Content Image" 
                 /></p>`; 
 
-                // Success callback: Editor mein content insert karna
                 success(imageHTML);
             }
         );
@@ -82,14 +83,12 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
             'insertdatetime media table paste code help wordcount'
         ],
         
-        // FIX: Toolbar mein 'imagerow' button add kiya
         toolbar: 'undo redo | bold italic | h1 h2 h3 | link image imagerow | bullist numlist | blockquote | code | help',
         
         content_style: 'body { font-family:Poppins,sans-serif; font-size:16px; color: #EFEFEF; }',
         skin: 'oxide-dark', 
         content_css: 'dark', 
         
-        // NAYA CRITICAL FIX: plugins ko cloud se load karne ke liye
         tinymceScriptURL: 'https://cdn.tiny.cloud/1/' + TINYMCE_API_KEY + '/tinymce/6/tinymce.min.js',
 
         images_upload_handler: imageUploadHandler,
@@ -97,7 +96,7 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
         automatic_uploads: true,
         file_picker_types: 'image',
 
-        // NAYA: Custom button setup karna
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setup: (editor: any) => {
             editor.ui.registry.addButton('imagerow', {
                 text: 'Image Row',
@@ -118,8 +117,8 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
             {uploadError && <p style={{ color: '#ff4757', textAlign: 'center', padding: '0.5rem' }}>{uploadError}</p>}
 
             <Editor
-                // FIX: Key ko Environment Variable se use kiya
                 apiKey={TINYMCE_API_KEY === 'no-api-key-found' ? undefined : TINYMCE_API_KEY} 
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onInit={(_evt: any, editor: any) => editorRef.current = editor} 
                 initialValue={content}
                 onEditorChange={(newContent: string) => onChange(newContent)} 
