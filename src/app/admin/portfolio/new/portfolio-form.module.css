@@ -1,59 +1,70 @@
 /* src/app/admin/portfolio/new/portfolio-form.module.css */
-/* Reusing styles similar to new-post.module.css */
 
-.formGroup {
-    margin-bottom: 1.5rem;
+/* CRITICAL CHANGE: Reverting to single column, focused flow */
+.formWrapper {
+    display: flex; /* Use flex for vertical stacking */
+    flex-direction: column;
+    gap: 2rem;
+    padding-bottom: 4rem; /* Bottom padding for space below buttons */
+}
+
+/* Metadata and Image Section Wrapper */
+.metadataColumn {
     display: flex;
     flex-direction: column;
+    gap: 1.5rem;
+    /* Sticky for desktop view (Google Docs sidebar feel) */
+    position: sticky;
+    top: 2rem; 
+    height: fit-content;
+    padding-bottom: 2rem;
 }
 
-.formGroup label {
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    opacity: 0.85; /* Thodi zyada opacity */
+.metadataSection {
+    background-color: var(--color-deep-blue);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.formGroup input,
-.formGroup select,
-.formGroup textarea { 
-    width: 100%;
-    padding: 0.9rem 1rem; /* Thodi zyada padding */
-    background-color: var(--color-deep-blue); /* Deep Blue input background */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px; /* Zyaada rounded */
-    color: var(--color-off-white);
-    font-size: 1rem;
-    font-family: inherit;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+/* Single column form layout within the metadata card */
+.metadataGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+    gap: 1.5rem;
 }
 
-.formGroup input:focus,
-.formGroup select:focus,
-.formGroup textarea:focus {
-    outline: none;
-    /* NAYA: Neon Focus */
-    border-color: var(--color-neon-green);
-    box-shadow: 0 0 5px var(--color-neon-light);
+/* Content Editor (Takes full width below metadata) */
+.contentColumn {
+    /* No specific background, relies on the full page dark color */
+    background-color: var(--color-dark-navy);
+    padding-top: 1rem;
 }
+
 
 /* Image Upload Section */
 .imageUploadSection {
-    border: 2px dashed var(--color-neon-green); /* Neon dashed border */
-    border-radius: 12px;
-    padding: 2rem; /* Zyaada padding */
+    /* Cover image upload will be a prominent block in the metadata section */
+    border: 2px dashed var(--color-neon-green); 
+    border-radius: 8px;
+    padding: 2rem; 
     text-align: center;
-    background-color: var(--color-deep-blue);
+    background-color: var(--color-dark-navy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .imagePreview {
     width: 100%;
-    max-width: 350px; /* Thodi zyada width */
+    max-width: 450px; 
     height: auto;
-    aspect-ratio: 16 / 10; /* Portfolio image ratio */
+    aspect-ratio: 16 / 9; /* Wider ratio for impact */
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 4px;
     margin: 0 auto 1.5rem auto;
-    border: 1px solid var(--color-neon-green); /* Neon border to preview */
+    border: 1px solid var(--color-neon-green); 
 }
 
 .fileInput {
@@ -61,57 +72,111 @@
 }
 
 .uploadButton {
-    padding: 0.6rem 1.5rem;
-    background-color: transparent;
-    color: var(--color-neon-green);
-    border: 1px solid var(--color-neon-green);
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--color-neon-green);
+    color: var(--color-dark-navy);
     border-radius: 6px;
     cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .uploadButton:hover {
-    background-color: rgba(0, 245, 200, 0.15);
-    box-shadow: 0 0 8px rgba(0, 245, 200, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 245, 200, 0.5);
 }
 
 .uploadProgress {
     margin-top: 1rem;
     font-size: 0.9rem;
-    color: var(--color-off-white);
+    color: var(--color-neon-light);
+}
+
+/* Form Groups ko clean kiya */
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0; 
+}
+
+.formGroup label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
     opacity: 0.9;
+    color: var(--color-off-white);
 }
 
-.submitButton { 
-    width: 100%;
-    padding: 1.1rem; /* Zyaada padding */
-    margin-top: 2rem; /* Zyaada margin */
-    font-size: 1.2rem;
-    font-weight: 700;
-    /* NAYA: Neon Glow */
-    box-shadow: 0 0 15px rgba(0, 245, 200, 0.5);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* Input/Select/Textarea focus styles */
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+    outline: none;
+    border-color: var(--color-neon-green);
+    box-shadow: 0 0 5px var(--color-neon-light);
 }
 
-.submitButton:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 5px 20px rgba(0, 245, 200, 0.7);
-}
-
-.submitButton:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.errorMessage {
-    color: #ff4757;
-    background-color: rgba(255, 71, 87, 0.15);
-    padding: 1rem;
+/* CRITICAL FIX: Content Image Uploader Styling */
+.contentImageUploader {
+    background-color: var(--color-dark-navy); /* Dark background */
+    padding: 1.5rem;
     border-radius: 8px;
+    border: 1px solid rgba(139, 92, 246, 0.3); /* Secondary accent border */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.uploadedURLContainer {
+    padding: 1rem;
+    background-color: rgba(0, 245, 200, 0.1);
+    border-radius: 6px;
+    border: 1px solid var(--color-neon-green);
+}
+
+
+/* CRITICAL FIX: Content Editor Height */
+.contentColumn textarea {
+    min-height: 600px;
+    /* Custom styling jo forms.module.css se inherit nahi ho rahi */
+    background-color: var(--color-dark-navy); 
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--color-off-white);
+    font-size: 1rem;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+
+/* Error/Success messages */
+.errorMessage, .successMessage {
+    padding: 1rem;
+    border-radius: 6px;
     margin-top: 1.5rem;
     text-align: center;
     font-weight: 600;
+}
+
+/* Action Buttons ko form ke neeche poori width mein dikhana (Ye adminStyles se override ho jayenge) */
+.actionButtonsContainer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 2rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 992px) {
+    .metadataColumn {
+        position: static; 
+    }
+    .imagePreview {
+        max-width: 100%;
+    }
+    .contentColumn textarea {
+        min-height: 400px;
+    }
 }

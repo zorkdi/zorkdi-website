@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { db } from '@/firebase';
 import { doc, getDoc, Timestamp } from 'firebase/firestore';
-import styles from './portfolio-detail.module.css';
+import styles from './portfolio-detail.module.css'; //
 
 // Define Portfolio Item structure
 interface PortfolioItem {
@@ -54,15 +54,21 @@ const PortfolioDetailPage = async (props: PortfolioDetailPageProps) => {
     notFound();
   }
 
+  // --- CRITICAL FIX: ImageRow class ko replace karna taaki CSS apply ho ---
+  // Yeh logic PortfolioContent.tsx se uthaya gaya hai aur yahan implement kiya ja raha hai
+  // taaki Server Component mein image row ki styling sahi ho
+  const contentWithImageRowStyles = item!.content.replace(/<div class="ImageRow"/g, `<div class="ImageRow ${styles.imageRow}"`);
+
+
   return (
     <main className={styles.main}>
       <article>
         {/* Cover Image */}
         <div className={styles.coverImageContainer}>
-          {item.coverImageURL && (
+          {item!.coverImageURL && (
             <Image
-              src={item.coverImageURL}
-              alt={item.title}
+              src={item!.coverImageURL}
+              alt={item!.title}
               fill
               style={{ objectFit: 'cover' }}
               priority // Load cover image faster
@@ -72,13 +78,14 @@ const PortfolioDetailPage = async (props: PortfolioDetailPageProps) => {
         </div>
 
         {/* Title and Category */}
-        <h1 className={styles.projectTitle}>{item.title}</h1>
-        <p className={styles.projectCategory}>{item.category}</p>
+        <h1 className={styles.projectTitle}>{item!.title}</h1>
+        <p className={styles.projectCategory}>{item!.category}</p>
 
         {/* Formatted Content (Rendered from HTML) */}
         <div
           className={styles.projectContent}
-          dangerouslySetInnerHTML={{ __html: item.content }} // IMPORTANT: Renders the HTML
+          // IMPORTANT FIX: Ab contentWithImageRowStyles ko render kar rahe hain
+          dangerouslySetInnerHTML={{ __html: contentWithImageRowStyles }} 
         />
       </article>
     </main>

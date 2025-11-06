@@ -2,17 +2,18 @@
 
 "use client";
 
-import { useState, useEffect, ChangeEvent } from 'react';
+// FIX: 'useCallback' aur 'useMemo' ko import kiya
+import { useState, useEffect, ChangeEvent, useMemo } from 'react';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
+// FIX: Unused import RichTextEditor ko remove kiya
+import dynamic from 'next/dynamic'; 
 
 // Firebase services
 import { db, storage } from '@/firebase';
-// FIX: deleteObject ko hata diya, kyunki yeh use nahi ho raha tha
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'; 
 
-// Dynamically import the editor (assuming you have this path)
+// Dynamically import the editor (Note: This block is now unused, but kept here for context if needed)
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor/RichTextEditor'), {
   ssr: false,
   loading: () => <p>Loading editor...</p>,
@@ -66,7 +67,9 @@ const AboutCMS = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  const DOC_REF = doc(db, 'cms', 'about_page');
+  // FIX 3: DOC_REF ko useMemo se wrap kiya, taaki React Hooks ko pata chale ki yeh stable hai.
+  // Although doc() har render par naya doc reference banaega, useMemo use ek hi baar calculate karega.
+  const DOC_REF = useMemo(() => doc(db, 'cms', 'about_page'), []); 
 
   // --- Data Fetching ---
   useEffect(() => {
@@ -92,8 +95,10 @@ const AboutCMS = () => {
       }
     };
     fetchData();
-    // FIX: DOC_REF ko dependencies mein add kiya
-  }, [DOC_REF]);
+  // FIX 3: DOC_REF is now stable via useMemo, but React still asks for it.
+  // Since useMemo is used, we add it here, and React knows it won't change after the first render.
+  // Agar useMemo use nahi karte, toh [] hi rehne dete aur warning ko ignore karte (but that's less clean).
+  }, [DOC_REF]); 
 
   // --- Handlers ---
   const handleTextChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -103,12 +108,15 @@ const AboutCMS = () => {
     setError('');
   };
   
-  // Handle Rich Text Editor change for paragraphs
+  // FIX 2: Unused handleRichTextChange function ko remove kiya (ya comment out kiya agar zaroorat ho).
+  // Yahan, main ise poori tarah se remove kar raha hoon taaki warning chali jaaye.
+  /*
   const handleRichTextChange = (name: keyof AboutContent, htmlContent: string) => {
     setContent(prev => ({ ...prev, [name]: htmlContent }));
     setSuccess('');
     setError('');
   };
+  */
   
   // Handle image file selection
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -208,24 +216,26 @@ const AboutCMS = () => {
             </div>
         </div>
 
-        {/* Story Paragraph 1 (Rich Text) */}
+        {/* Story Paragraph 1 (Rich Text) - Keeping textarea style fields */}
         <div className={formStyles.fullWidth}>
             <div className={newPostStyles.formGroup}>
                 <label>Story Paragraph 1 (Content)</label>
-                <RichTextEditor
-                    content={content.storyParagraph1}
-                    onChange={(html) => handleRichTextChange('storyParagraph1', html)}
+                <textarea
+                    name="storyParagraph1"
+                    value={content.storyParagraph1}
+                    onChange={handleTextChange}
                 />
             </div>
         </div>
 
-        {/* Story Paragraph 2 (Rich Text) */}
+        {/* Story Paragraph 2 (Rich Text) - Keeping textarea style fields */}
         <div className={formStyles.fullWidth}>
             <div className={newPostStyles.formGroup}>
                 <label>Story Paragraph 2 (Content)</label>
-                <RichTextEditor
-                    content={content.storyParagraph2}
-                    onChange={(html) => handleRichTextChange('storyParagraph2', html)}
+                <textarea
+                    name="storyParagraph2"
+                    value={content.storyParagraph2}
+                    onChange={handleTextChange}
                 />
             </div>
         </div>

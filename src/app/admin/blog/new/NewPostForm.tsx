@@ -1,11 +1,11 @@
-// src/components/AdminForms/PortfolioForm.tsx
+// src/app/admin/blog/new/NewPostForm.tsx
 
 "use client";
 
 import { useState, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-// import dynamic from 'next/dynamic'; <-- Removed TinyMCE imports
+// TinyMCE imports removed
 
 // Firebase services
 import { db, storage } from '@/firebase';
@@ -13,38 +13,45 @@ import {
   collection, addDoc, serverTimestamp, doc, getDoc, updateDoc, Timestamp, deleteDoc
 } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'; 
-import { FaUpload, FaCopy, FaCheck } from 'react-icons/fa'; // NAYA: Icons for upload/copy
+import { FaUpload, FaCopy, FaCheck } from 'react-icons/fa'; // Icons for upload/copy
 
 // Styles
 import adminStyles from '@/app/admin/admin.module.css'; 
-import formCommonStyles from '../AdminForms/forms.module.css'; 
-import formStyles from '@/app/admin/portfolio/new/portfolio-form.module.css'; 
+import formStyles from './new-post.module.css'; // Blog specific styles
+import formCommonStyles from '@/components/AdminForms/forms.module.css'; // Common form styles
 
-// Define the structure for portfolio data from Firestore
-interface PortfolioData {
+
+// Define the structure for blog post data from Firestore
+interface BlogPostData {
   title: string;
+  slug: string; // URL slug
   category: string;
   content: string;
   coverImageURL: string;
+  isPublished: boolean; 
   createdAt?: Timestamp; // Optional existing timestamp
 }
 
 // Props for the component
-interface PortfolioFormProps {
-  postId?: string; // Optional ID for edit mode
+interface NewPostFormProps {
+  postId?: string; // Optional ID for edit mode (if reused for edit)
 }
 
-const PortfolioForm = ({ postId }: PortfolioFormProps) => {
+// Default data for new post
+const initialData: BlogPostData = {
+    title: '',
+    slug: '',
+    category: 'TUTORIAL',
+    content: '',
+    coverImageURL: '',
+    isPublished: false, 
+};
+
+const NewPostForm = ({ postId }: NewPostFormProps) => {
   const router = useRouter();
   const isEditMode = Boolean(postId);
 
-  // State for form data
-  const [formData, setFormData] = useState<PortfolioData>({
-    title: '',
-    category: 'Web App', // Default category
-    content: '', // Simple string content now
-    coverImageURL: '',
-  });
+  const [formData, setFormData] = useState<BlogPostData>(initialData);
 
   // State for cover image handling
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -69,18 +76,18 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
         setIsLoading(true);
         setError('');
         try {
-          const docRef = doc(db, 'portfolio', postId);
+          const docRef = doc(db, 'blog', postId);
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
-            const data = docSnap.data() as PortfolioData;
-            setFormData(data);
+            const data = docSnap.data() as BlogPostData;
+            setFormData({ ...data, isPublished: data.isPublished ?? false }); 
             setImagePreview(data.coverImageURL);
           } else {
-            setError('Portfolio item not found.');
+            setError('Blog post not found.');
           }
-        } catch (err) {
-          console.error("Error fetching portfolio item:", err);
-          setError('Failed to load portfolio item.');
+        } catch (err) { // Line 209: 'err' was defined but not used. Now using it in console.error.
+          console.error("Error fetching blog post:", err); 
+          setError('Failed to load blog post.');
         } finally {
           setIsLoading(false);
         }
@@ -89,11 +96,11 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
     }
   }, [postId, isEditMode]);
 
-  // --- DELETE LOGIC ---
+  // --- DELETE LOGIC (Edit Mode Only) ---
   const handleDelete = async () => {
     if (!postId || !formData.coverImageURL) return;
 
-    if (!confirm(`Are you sure you want to delete the project: "${formData.title}"? This action cannot be undone.`)) {
+    if (!confirm(`Are you sure you want to delete the post: "${formData.title}"? This action cannot be undone.`)) {
         return;
     }
 
@@ -101,7 +108,7 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
     setError('');
 
     try {
-        // 1. Delete Cover Image from Storage
+        // 1. Delete Cover Image from Storage (if applicable)
         if (formData.coverImageURL.includes('firebasestorage.googleapis.com')) {
              try {
                 const urlPath = formData.coverImageURL.split('/o/')[1];
@@ -116,25 +123,32 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
         }
 
         // 2. Delete Document from Firestore
-        const docRef = doc(db, 'portfolio', postId);
+        const docRef = doc(db, 'blog', postId);
         await deleteDoc(docRef);
         
-        alert('Portfolio project deleted successfully!');
-        router.push('/admin/portfolio'); 
+        alert('Blog post deleted successfully!');
+        router.push('/admin/blog'); // Redirect to list page
 
     } catch (err) {
-        console.error("Error deleting portfolio item:", err);
-        setError('Failed to delete project. Check console.');
+        console.error("Error deleting blog post:", err);
+        setError('Failed to delete post. Check console.');
     } finally {
         setIsDeleting(false);
     }
   };
 
 
-  // Handle standard input/select changes
+  // --- Handlers ---
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => { 
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  // CRITICAL FIX: Dedicated handler for the boolean status select field
+  const handleStatusChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const isPublishedValue = e.target.value === 'Published';
+    setFormData(prev => ({ ...prev, isPublished: isPublishedValue }));
+    setError('');
   };
 
   // Handle cover image file selection
@@ -167,10 +181,10 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
     setError('');
 
     try {
-        const storageRef = ref(storage, `portfolio_content/${Date.now()}_${contentImageFile.name}`);
+        const storageRef = ref(storage, `blog_content/${Date.now()}_${contentImageFile.name}`); 
         const uploadTask = uploadBytesResumable(storageRef, contentImageFile);
         
-        await new Promise<void>((resolve, reject) => {
+        await new Promise<string>((resolve, reject) => {
             uploadTask.on('state_changed',
                 (snapshot) => {
                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -183,16 +197,16 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
                 },
                 async () => {
                     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                    setUploadedContentURL(downloadURL);
-                    setContentUploadProgress(null);
-                    setContentImageFile(null);
-                    resolve();
+                    resolve(downloadURL);
                 }
             );
+        }).then(downloadURL => {
+            setUploadedContentURL(downloadURL);
+            setContentUploadProgress(null);
+            setContentImageFile(null);
         });
 
-    } catch (_err: unknown) { // FIX: Line 194: 'err' was defined but not used. Changed to '_err'.
-        // Error already set inside the state_changed observer
+    } catch (_err: unknown) { // Line 288: 'error' was defined but not used. Changed to '_err' to suppress warning.
         setContentUploadProgress(null);
     }
   };
@@ -208,7 +222,7 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
   // Handle form submission (Save or Update)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.content || formData.content.trim() === '' || (!imageFile && !isEditMode && !formData.coverImageURL)) {
+    if (!formData.title || !formData.content || formData.content.trim() === '' || (!imageFile && !formData.coverImageURL && !isEditMode)) {
       setError('Please fill in title, content, and select a cover image.');
       return;
     }
@@ -220,9 +234,10 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
     try {
       let finalImageURL = formData.coverImageURL;
 
+      // 1. Cover Image Upload Logic
       if (imageFile) {
         setUploadProgress(0);
-        const storageRef = ref(storage, `portfolio_covers/${Date.now()}_${imageFile.name}`);
+        const storageRef = ref(storage, `blog_covers/${Date.now()}_${imageFile.name}`); 
         const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
         await new Promise<void>((resolve, reject) => {
@@ -242,45 +257,44 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
             }
           );
         });
-      } else if (!isEditMode && !finalImageURL) {
-         setError('Cover image is required.');
-         setIsSubmitting(false);
-         return;
       }
 
+      // 2. Add/Update Document in Firestore
       const postData = {
           title: formData.title,
+          slug: formData.slug || formData.title.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-'), // Better slug generation
           category: formData.category,
           content: formData.content, // Simple string content
           coverImageURL: finalImageURL,
+          isPublished: formData.isPublished, // Use boolean value
       };
 
       if (isEditMode && postId) {
-        const docRef = doc(db, 'portfolio', postId);
+        // Update logic (Edit Mode)
+        const docRef = doc(db, 'blog', postId);
         await updateDoc(docRef, postData);
-        alert('Portfolio project updated successfully!');
+        alert('Blog post updated successfully!');
       } else {
-        await addDoc(collection(db, 'portfolio'), {
+        // Add logic (New Post)
+        await addDoc(collection(db, 'blog'), {
           ...postData,
           createdAt: serverTimestamp(),
         });
-        alert('Portfolio project added successfully!');
+        alert('Blog post added successfully!');
       }
 
-      router.push('/admin/portfolio');
+      router.push('/admin/blog');
 
     } catch (error: unknown) { 
-      if (error !== "Cover image upload failed. Please try again.") {
-         console.error("Failed to save project data. Check console.", error);
-         setError("Failed to save project data. Check console.");
-      }
+      setError("Failed to save post data. Check console.");
     } finally {
       setIsSubmitting(false);
+      setUploadProgress(null);
     }
   };
 
   // Define Page Title
-  const pageTitle = isEditMode ? 'Edit Portfolio Project' : 'Create New Portfolio Project';
+  const pageTitle = isEditMode ? 'Edit Blog Post' : 'Add New Blog Post';
 
   // Render Loading state (System Integration)
   if (isLoading) {
@@ -293,17 +307,6 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
               Loading form...
           </div>
       </div>
-    );
-  }
-   // Render Error state (System Integration)
-  if (error && !isSubmitting && !isDeleting && !isEditMode) {
-    return (
-        <div>
-            <div className={adminStyles.pageHeader}>
-                <h1>{pageTitle}</h1>
-            </div>
-            <div className={adminStyles.errorMessage} style={{ padding: '2rem' }}>{error}</div>
-        </div>
     );
   }
 
@@ -338,7 +341,7 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
               )}
               <input
                 type="file" id="coverImage" className={formStyles.fileInput}
-                onChange={handleFileChange} accept="image/png, image/jpeg"
+                onChange={handleFileChange} accept="image/png, image/jpeg, image/webp"
                 required={!isEditMode && !formData.coverImageURL} 
               />
               <label htmlFor="coverImage" className={formStyles.uploadButton}>
@@ -348,23 +351,6 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
                 <p className={formStyles.uploadProgress}>Uploading: {uploadProgress}%</p>
               )}
             </div>
-          </div>
-
-          {/* Project Title and Category */}
-          <div className={formStyles.formGroup}>
-            <label htmlFor="title">Project Title *</label>
-            <input type="text" id="title" name="title" value={formData.title} onChange={handleInputChange} required />
-          </div>
-
-          <div className={formStyles.formGroup}>
-            <label htmlFor="category">Category *</label>
-            <select id="category" name="category" value={formData.category} onChange={handleInputChange} required >
-              <option>Web App</option>
-              <option>Mobile App</option>
-              <option>Finance Solution</option>
-              <option>Custom Software</option>
-              <option>UI/UX Design</option>
-            </select>
           </div>
           
           {/* NAYA FEATURE: Content Image Uploader */}
@@ -399,27 +385,65 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
             
             {uploadedContentURL && (
                 <div className={formStyles.uploadedURLContainer}>
-                    <p>Image URL Ready:</p>
+                    <p style={{fontWeight: '600', opacity: '0.9'}}>Image URL Ready:</p>
                     <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                         <input type="text" value={uploadedContentURL} readOnly style={{ padding: '5px', fontSize: '0.85rem' }} />
-                        <button type="button" onClick={() => copyURLToClipboard(uploadedContentURL)} className={adminStyles.primaryButton} style={{ padding: '0.6rem', width: 'auto', minWidth: '80px' }}>
-                            {isURLCopied ? <FaCheck /> : <FaCopy />} Copy
+                        <button type="button" onClick={() => copyURLToClipboard(uploadedContentURL)} className={adminStyles.primaryButton} style={{ padding: '0.6rem', width: 'auto', minWidth: '80px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            {isURLCopied ? <FaCheck /> : <FaCopy />} {isURLCopied ? 'Copied!' : 'Copy'}
                         </button>
                     </div>
-                    <p style={{opacity: 0.8, marginTop: '5px'}}>Paste this URL into your content using the &lt;img&gt; tag or Markdown.</p>
+                    <p style={{opacity: 0.8, marginTop: '5px', fontSize: '0.8rem'}}>Paste this URL into the content area using the &lt;img&gt; tag or Markdown.</p>
                 </div>
             )}
 
           </div>
-          
         </div>
         
         {/* === RIGHT COLUMN: CONTENT TEXTAREA === */}
         <div className={formStyles.contentColumn}>
-          {/* Description (Simple Textarea) */}
+          
+          {/* Post Title & Slug */}
+          <div className={formStyles.metadataGrid} style={{marginBottom: '1.5rem'}}>
+              <div className={formStyles.formGroup}>
+                <label htmlFor="title">Post Title *</label>
+                <input type="text" id="title" name="title" value={formData.title} onChange={handleInputChange} required />
+              </div>
+              <div className={formStyles.formGroup}>
+                <label htmlFor="slug">Post Slug (URL)</label>
+                <input type="text" id="slug" name="slug" value={formData.slug} onChange={handleInputChange} placeholder="auto-generated if empty" />
+              </div>
+          </div>
+          
+          {/* Category Select & Status (Adjusted for Blog needs) */}
+          <div className={formStyles.metadataGrid} style={{marginBottom: '1.5rem'}}>
+              <div className={formStyles.formGroup}>
+                <label htmlFor="category">Category *</label>
+                <select id="category" name="category" value={formData.category} onChange={handleInputChange} required >
+                    <option>TUTORIAL</option>
+                    <option>NEWS</option>
+                    <option>TECH</option>
+                    <option>BUSINESS</option>
+                </select>
+              </div>
+               <div className={formStyles.formGroup}>
+                <label htmlFor="isPublished">Status *</label>
+                <select 
+                    id="isPublished" 
+                    name="isPublished" 
+                    value={formData.isPublished ? 'Published' : 'Draft'} 
+                    onChange={handleStatusChange} // CRITICAL FIX: Using dedicated handler
+                    required 
+                >
+                    <option value="Draft">Draft</option>
+                    <option value="Published">Published</option>
+                </select>
+              </div>
+          </div>
+          
+          {/* Content Textarea */}
           <div className={formCommonStyles.fullWidth}>
             <div className={formStyles.formGroup}>
-              <label htmlFor="content">Description (HTML / Markdown Supported)</label>
+              <label htmlFor="content">Content (HTML / Markdown Supported)</label>
               <textarea 
                   id="content"
                   name="content"
@@ -427,7 +451,7 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
                   onChange={handleInputChange} 
                   required
                   rows={20} 
-                  placeholder="Enter detailed description, use HTML tags for formatting (e.g., <h2>, <ul>, <blockquote>), or basic Markdown."
+                  placeholder="Enter blog content. Use HTML tags for formatting (e.g., <h2>, <ul>, <blockquote>), or basic Markdown."
               />
             </div>
           </div>
@@ -438,14 +462,14 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
       {error && !isLoading && <p className={formStyles.errorMessage}>{error}</p>}
 
       {/* 4. Action Buttons Container (Full Width) */}
-      <div className={adminStyles.actionButtonsContainer} style={{ marginTop: '3rem', borderTop: 'none', justifyContent: 'space-between' }}>
+      <div className={adminStyles.actionButtonsContainer} style={{ marginTop: '3rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', justifyContent: 'space-between' }}>
           {/* Submit/Update Button */}
           <button
             type="submit"
             className={adminStyles.primaryButton}
             disabled={isSubmitting || isLoading || isDeleting}
           >
-            {isSubmitting ? (isEditMode ? 'Updating...' : 'Saving...') : (isEditMode ? 'Update Project' : 'Save Project')}
+            {isSubmitting ? 'Saving...' : (isEditMode ? 'Update Post' : 'Publish Post')}
           </button>
           
           {/* Delete Button (Edit Mode only) */}
@@ -456,7 +480,7 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
                   className={adminStyles.dangerButton}
                   disabled={isDeleting || isSubmitting}
               >
-                  {isDeleting ? 'Deleting...' : 'Delete Project'}
+                  {isDeleting ? 'Deleting...' : 'Delete Post'}
               </button>
           )}
       </div>
@@ -465,4 +489,4 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
   );
 };
 
-export default PortfolioForm;
+export default NewPostForm;

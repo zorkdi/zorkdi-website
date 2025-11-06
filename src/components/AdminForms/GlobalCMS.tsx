@@ -2,7 +2,8 @@
 
 "use client";
 
-import { useState, useEffect, ChangeEvent } from 'react';
+// FIX: useMemo ko import kiya
+import { useState, useEffect, ChangeEvent, useMemo } from 'react';
 import Image from 'next/image'; 
 // Firebase services
 import { doc, getDoc, setDoc } from 'firebase/firestore'; 
@@ -78,7 +79,8 @@ const GlobalCMS = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const DOC_REF = doc(db, 'cms', 'global_settings');
+  // FIX: DOC_REF ko useMemo se wrap kiya taaki woh stable reference de.
+  const DOC_REF = useMemo(() => doc(db, 'cms', 'global_settings'), []);
 
   // --- Data Fetching ---
   useEffect(() => {
@@ -111,8 +113,8 @@ const GlobalCMS = () => {
       }
     };
     fetchData();
-    // FIX: DOC_REF ko dependencies mein add kiya
-  }, [DOC_REF]);
+    // FIX: DOC_REF ko dependency array mein add kiya
+  }, [DOC_REF]); 
 
   // --- Handlers ---
   const handleTextChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -201,8 +203,8 @@ const GlobalCMS = () => {
 
 
       // 3. Update Document in Firestore
-      const docRef = doc(db, 'cms', 'global_settings');
-      await setDoc(docRef, { ...content, heroBackgroundURL: finalImageURL }, { merge: true }); 
+      // DOC_REF is used here, no need to redefine
+      await setDoc(DOC_REF, { ...content, heroBackgroundURL: finalImageURL }, { merge: true }); 
 
       // Final state update
       setCurrentHeroURL(finalImageURL);

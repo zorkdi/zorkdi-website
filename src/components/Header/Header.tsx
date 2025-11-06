@@ -157,11 +157,11 @@ const Header = () => {
             
             {/* Agar logged in hai aur photo hai, toh Image component dikhao */}
             {currentUser && userProfile?.photoURL ? (
-              <Image // <img> tag ko <Image /> component se badla
+              <Image 
                 src={userProfile.photoURL} 
                 alt="Profile" 
-                width={40} // Default width (CSS mein bhi set hai)
-                height={40} // Default height (CSS mein bhi set hai)
+                width={40} 
+                height={40} 
                 className={styles.profileImage}
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)} 
               />

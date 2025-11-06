@@ -39,10 +39,13 @@
     opacity: 0.8;
 }
 
+/* CRITICAL FIX: Input/Select/Textarea styles */
 .formGroup input,
+.formGroup select,
 .formGroup textarea {
     width: 100%;
-    padding: 0.8rem 1rem;
+    padding: 0.7rem 1rem; /* Padding kam kiya */
+    /* Light background and text for clear input/select contrast */
     background-color: var(--color-dark-navy);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
@@ -52,6 +55,7 @@
 }
 
 .formGroup input:focus,
+.formGroup select:focus,
 .formGroup textarea:focus {
     outline: none;
     border-color: var(--color-neon-green);
@@ -59,10 +63,42 @@
 }
 
 .formGroup textarea {
-    min-height: 120px;
+    min-height: 100px; /* Default height kam kiya */
     resize: vertical;
 }
 
+/* NAYA/CRITICAL FIX: Rich Text Editor Container Styling */
+/* Ye class RichTextEditor component ke wrapper par apply hoti hai */
+/* Isko separate, clean white editor look denge */
+:global(.tox-tinymce) {
+    border-radius: 8px !important;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+:global(.tox-editor-header) {
+    /* Header ko dark theme maintain karne diya */
+    background-color: var(--color-deep-blue) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+:global(.tox .tox-toolbar-overlord) {
+    /* Toolbar ko dark theme maintain karne diya */
+    background-color: var(--color-deep-blue) !important;
+}
+
+:global(.tox .tox-menu) {
+    /* Dropdown menus ko dark theme maintain karne diya */
+    background-color: var(--color-deep-blue) !important;
+}
+
+/* CRITICAL FIX: Content Area (The actual writing space) */
+:global(.tox .tox-edit-area__iframe) {
+    /* Editor area ko white background for distraction-free writing */
+    background-color: white !important;
+}
+
+/* Upload Section */
 .imageUpload {
     display: flex;
     flex-direction: column;

@@ -41,7 +41,6 @@
     justify-content: center; 
     align-items: center; 
     padding: 2rem;
-    /* CHANGE 1: Z-index wapas 2 kiya. Yeh sirf background overlay hai. */
     z-index: 2; 
 
     /* CRITICAL FIX: Hero Background Image ko yahan CSS Variable se load karna */
@@ -69,21 +68,23 @@
     padding: 2rem;
     /* CHANGE 2: Z-index Services Section (10) se zyada rakha (15) */
     z-index: 15; 
+    
+    /* FIX 3: Content Wrapper ko center align kiya */
+    text-align: center;
 }
 
 
 /* --- Hero Element Styles (FINAL TEXT SIZE AND SPACING) --- */
 .heroHeadline {
-  /* FIX: Heading font size chota kiya (3.2rem) aur white-space: nowrap use kiya */
+  /* FIX: Heading font size chota kiya (3.2rem) */
   font-size: 3.2rem; 
   font-weight: 700;
   line-height: 1.1; 
-  max-width: 100%; /* FIX: Width badhai */
+  max-width: 100%;
   color: var(--color-neon-green); 
   text-shadow: 0 0 8px rgba(0, 245, 200, 0.6), 0 0 15px rgba(0, 245, 200, 0.3); 
   margin-bottom: 2rem; 
-  /* CRITICAL FIX: Text ko wrap hone se roka */
-  white-space: nowrap; 
+  /* white-space: nowrap ko hata diya gaya hai */
 }
 
 .heroSubheadline {
@@ -364,14 +365,22 @@
 
 /* ===== Mobile Responsive Styles ===== */
 @media (max-width: 768px) {
-  /* FIX: Heading font size kam kiya */
+  /* FIX 1: Heading font size kam kiya */
   .heroHeadline {
     font-size: 2.5rem;
+    /* white-space: nowrap property hata diya gaya hai */
+    
+    /* CRITICAL FIX 4: Mobile par Text Alignment Center kiya */
+    text-align: center; 
   }
 
-  /* FIX: Subheading font size chota kiya */
+  /* FIX 2: Subheading font size chota kiya */
   .heroSubheadline {
     font-size: 1.2rem;
+    
+    /* CRITICAL FIX 5: Mobile par Subheadline Text Alignment Center kiya */
+    text-align: center; 
+    line-height: 1.5; /* Line spacing theek kiya */
   }
   
   .sectionTitle {

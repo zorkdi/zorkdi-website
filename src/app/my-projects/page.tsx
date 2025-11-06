@@ -2,152 +2,204 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+// FIX: 'useCallback' ko import kiya
+import { useState, useEffect, useCallback } from 'react'; 
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/firebase';
-import { collection, query, where, onSnapshot, orderBy, Timestamp } from 'firebase/firestore'; // FIX: Unused 'where' ko rehne diya (logic mein use ho raha hai)
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import styles from '../page.module.css';
+import { FaExternalLinkAlt, FaCheckCircle, FaStar } from 'react-icons/fa';
+import ReviewModal from '@/components/ReviewModal/ReviewModal'; 
+import { DocumentData } from 'firebase/firestore'; 
 
-import styles from './my-projects.module.css';
-
-// Type definitions (Status enum ko string literal se define kiya)
-type ProjectStatus = 'Pending' | 'Accepted' | 'InProgress' | 'Completed' | 'Rejected';
-
-interface ProjectRequest {
-  id: string;
-  title: string;
-  status: ProjectStatus;
-  createdAt: Date;
+interface Project {
+    id: string;
+    title: string;
+    description: string;
+    status: 'pending' | 'in-progress' | 'completed';
+    projectUrl: string;
+    hasReview: boolean;
+    userId: string;
+    createdAt: {
+        seconds: number;
+        nanoseconds: number;
+    }; 
 }
 
-// Dummy Projects (Real-time data na hone par error handle karega)
-const dummyRequests: ProjectRequest[] = [
-    { id: 'proj1', title: 'New E-commerce Platform', status: 'Pending', createdAt: new Date(Date.now() - 86400000 * 1) },
-    { id: 'proj2', title: 'Mobile App Concept', status: 'Accepted', createdAt: new Date(Date.now() - 86400000 * 3) },
-    { id: 'proj3', title: 'CMS Backend Tool', status: 'InProgress', createdAt: new Date(Date.now() - 86400000 * 10) },
-    { id: 'proj4', title: 'Website Redesign', status: 'Completed', createdAt: new Date(Date.now() - 86400000 * 20) },
-];
-
-
 const MyProjectsPage = () => {
-  const { currentUser, loading: authLoading } = useAuth();
-  const [requests, setRequests] = useState<ProjectRequest[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // 1. Fetch Project Requests (Real-time)
-  useEffect(() => {
-    if (authLoading || !currentUser) {
-        // Auth Loading complete hone par ya logged out hone par data fetch nahi hoga
-        return; 
-    }
+    const { currentUser, loading: authLoading } = useAuth(); 
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+    // FIX: fetchProjects function ko useCallback se wrap kiya
+    const fetchProjects = useCallback(async () => {
+        if (!currentUser) return; 
+        setLoading(true);
+        try {
+            const projectsRef = collection(db, 'projects');
+            
+            const q = query(
+                projectsRef,
+                where('userId', '==', currentUser.uid), 
+                orderBy('createdAt', 'desc')
+            );
+
+            const snapshot = await getDocs(q);
+
+            const fetchedProjects = snapshot.docs.map(doc => {
+                const data = doc.data() as DocumentData; 
+                return {
+                    id: doc.id,
+                    ...data,
+                } as Project;
+            });
+
+            setProjects(fetchedProjects);
+
+        } catch (error) {
+            console.error("Error fetching projects:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [currentUser]); // currentUser dependency mein dala
+
+    useEffect(() => {
+        if (!authLoading && currentUser) { 
+            fetchProjects();
+        }
+    // FIX: fetchProjects ko dependency array mein add kiya
+    }, [currentUser, authLoading, fetchProjects]); 
+
+
+    const openReviewModal = (project: Project) => {
+        setSelectedProject(project);
+        setIsReviewModalOpen(true);
+    };
+
+    const closeReviewModal = () => {
+        setIsReviewModalOpen(false);
+        setSelectedProject(null);
+        fetchProjects(); 
+    };
     
-    setIsLoading(true);
-    setError(null);
-    
-    const requestsCollectionRef = collection(db, 'projects');
-    const requestsQuery = query(
-        requestsCollectionRef,
-        where('clientId', '==', currentUser.uid), // Sirf current user ke projects
-        orderBy('createdAt', 'desc')
-    );
-    
-    const unsubscribe = onSnapshot(requestsQuery, (snapshot) => {
-        const fetchedRequests = snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                title: data.title || 'Untitled Request',
-                status: data.status as ProjectStatus || 'Pending',
-                // Firestore Timestamp ko Date mein convert karna
-                createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(), 
-            } as ProjectRequest;
-        });
-        setRequests(fetchedRequests);
-        setIsLoading(false);
-    }, (err) => {
-        console.error("Error fetching client projects:", err);
-        setError("Failed to load your projects. Please try logging in again.");
-        setRequests(dummyRequests); // Fallback to dummy data on error
-        setIsLoading(false);
-    });
+    const getStatusStyle = (status: Project['status']) => {
+        switch (status) {
+            case 'pending':
+                return { color: '#ffc107', text: 'Pending' };
+            case 'in-progress':
+                return { color: '#00bcd4', text: 'In Progress' };
+            case 'completed':
+                return { color: '#4CAF50', text: 'Completed' };
+            default:
+                return { color: '#aaaaaa', text: 'Unknown' };
+        }
+    };
 
-    return () => unsubscribe();
-  }, [currentUser, authLoading]);
-
-  // 2. Status Tag utility
-  const getStatusClass = (status: ProjectStatus) => {
-    switch (status) {
-      case 'Pending':
-        return styles.statusPending;
-      case 'Accepted':
-        return styles.statusAccepted;
-      case 'InProgress':
-        return styles.statusInProgress;
-      case 'Completed':
-        return styles.statusCompleted;
-      case 'Rejected':
-        return styles.statusRejected;
-      default:
-        return styles.statusPending;
-    }
-  };
-
-
-  // --- Render Logic ---
-
-  if (authLoading) {
-    return <div className={styles.loading}>Checking Authentication...</div>;
-  }
-  
-  if (!currentUser) {
-      // FIX: Agar logged-out hai, toh login page par redirect karein (Header.tsx mein bhi ho raha hai)
-      return <div className={styles.noProjects}><p>Please <Link href="/login">Login</Link> to view your projects.</p></div>
-  }
-
-  if (isLoading) {
-    return <div className={styles.loading}>Loading your projects...</div>;
-  }
-
-  return (
-    <main className={styles.main}>
-      <header className={styles.header}>
-        <h1>My Active Projects</h1>
-        <p>Track the status and progress of all your submitted project requests here. Click &quot;Discuss&quot; to chat with your dedicated project manager.</p> {/* FIX: Double quotes escaped */}
-      </header>
-
-      <section className={styles.projectsGrid}>
-        {error && <div className={styles.noProjects} style={{color: '#ff4757', border: '1px solid #e74c3c'}}>Error: {error}</div>}
-        
-        {requests.length === 0 && !error ? (
-            <div className={styles.noProjects}>
-                <p>You haven&apos;t submitted any project requests yet. <Link href="/new-project">Start a new project now!</Link></p> {/* FIX: Apostrophe escaped */}
-            </div>
-        ) : (
-            requests.map((project) => (
-                <div key={project.id} className={styles.projectCard}>
-                    <div className={styles.projectInfo}>
-                        <h2>{project.title}</h2>
-                        <p>Requested on: {project.createdAt.toLocaleDateString()}</p>
-                        <span className={styles.projectId}>ID: {project.id}</span>
-                    </div>
-                    <div className={styles.projectActions}>
-                        <span className={`${styles.projectStatus} ${getStatusClass(project.status)}`}>
-                            {project.status}
-                        </span>
-                        <Link 
-                            href={`/project-chat/${project.id}`} 
-                            className={styles.discussButton}
-                        >
-                            Discuss
-                        </Link>
-                    </div>
+    if (authLoading || loading) {
+        return (
+            <main className={styles.main}>
+                <div style={{ textAlign: 'center', padding: '4rem' }}>
+                    Loading your projects...
                 </div>
-            ))
-        )}
-      </section>
-    </main>
-  );
+            </main>
+        );
+    }
+
+    if (!currentUser) { 
+        return (
+            <main className={styles.main}>
+                <div style={{ textAlign: 'center', padding: '4rem' }}>
+                    Please log in to view your projects.
+                </div>
+            </main>
+        );
+    }
+
+    return (
+        <main className={styles.main}>
+            <section className={styles.heroSection} style={{ minHeight: '30vh', padding: '8rem 2rem 4rem' }}>
+                <h1 className={styles.sectionTitle} style={{ marginBottom: '1rem' }}>My Projects</h1>
+                <p style={{ opacity: 0.8, fontSize: '1.2rem', maxWidth: '600px', textAlign: 'center' }}>
+                    Track the progress and status of your ongoing and completed projects with ZORK DI.
+                </p>
+            </section>
+
+            <section className={styles.servicesSection} style={{ marginTop: '0', paddingTop: '0' }}>
+                {projects.length === 0 ? (
+                     <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--color-neon-green)', fontSize: '1.5rem' }}>
+                        No projects found for your account. Start a new project with us!
+                     </div>
+                ) : (
+                    <div className={styles.whyUsGrid} style={{ marginTop: '0', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+                        {projects.map((project) => (
+                            <div key={project.id} className={styles.whyUsItem} style={{ textAlign: 'left', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                    <h3 style={{ color: 'var(--color-neon-green)', fontWeight: 600 }}>{project.title}</h3>
+                                    <span style={{ 
+                                        color: getStatusStyle(project.status).color, 
+                                        fontWeight: 600, 
+                                        fontSize: '0.9rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '5px'
+                                    }}>
+                                        <FaCheckCircle /> {getStatusStyle(project.status).text}
+                                    </span>
+                                </div>
+                                <p style={{ marginBottom: '1.5rem', flexGrow: 1 }}>{project.description}</p>
+                                
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '1rem' }}>
+                                    
+                                    {project.status === 'completed' && !project.hasReview && (
+                                        <button 
+                                            onClick={() => openReviewModal(project)} 
+                                            className={styles.heroButton}
+                                            style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                        >
+                                            <FaStar /> Rate Us &amp; Give Review
+                                        </button>
+                                    )}
+                                    {project.status === 'completed' && project.hasReview && (
+                                         <span style={{ color: '#4CAF50', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                            <FaCheckCircle /> Review Given
+                                         </span>
+                                    )}
+
+                                    {project.projectUrl && (
+                                        <a 
+                                            href={project.projectUrl} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className={styles.heroButton}
+                                            style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: 'transparent', border: '1px solid var(--color-neon-green)' }}
+                                        >
+                                            View Project <FaExternalLinkAlt style={{ marginLeft: '5px' }} />
+                                        </a>
+                                    )}
+
+                                    {project.status !== 'completed' && (
+                                        <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>
+                                            Created: {new Date(project.createdAt?.seconds * 1000).toLocaleDateString()}
+                                        </p>
+                                    )}
+
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </section>
+            
+            <ReviewModal 
+                isOpen={isReviewModalOpen} 
+                onClose={closeReviewModal} 
+                projectId={selectedProject?.id || ''}
+            />
+
+        </main>
+    );
 };
 
 export default MyProjectsPage;

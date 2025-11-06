@@ -10,7 +10,8 @@
 .hero {
   text-align: center;
   padding-bottom: 4rem;
-  border-bottom: 1px solid var(--color-glass-light);
+  /* High Tech: Border ko thoda bright kiya */
+  border-bottom: 2px solid var(--color-neon-green); 
   margin-bottom: 3rem;
 }
 
@@ -19,19 +20,20 @@
   font-weight: 700;
   margin-bottom: 1rem;
   color: var(--color-neon-green);
-  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
+  /* UI/UX Tweak: Stronger Neon Glow */
+  text-shadow: 0 0 10px rgba(0, 245, 200, 0.7), 0 0 20px rgba(0, 245, 200, 0.4); 
 }
 
 .hero p {
   font-size: 1.5rem;
-  opacity: 0.85;
+  opacity: 0.95; /* Text visibility badhai */
 }
 
 /* NAYA: Filters ko Futuristic look */
 .filters {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.25rem; /* Gap badhaya */
   margin-bottom: 4rem;
   flex-wrap: wrap;
 }
@@ -39,67 +41,81 @@
 .filters button {
   background-color: var(--color-deep-blue);
   color: var(--color-off-white);
-  border: 1px solid rgba(255, 255, 255, 0.3); /* Clearer border */
+  /* UI/UX Tweak: Border ko Neon diya */
+  border: 1px solid var(--color-secondary-accent); 
   padding: 0.75rem 1.75rem;
   border-radius: 2rem;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .filters button:hover {
   background-color: var(--color-dark-navy);
   border-color: var(--color-neon-light);
   transform: translateY(-3px);
+  /* Subtle Neon glow on hover */
+  box-shadow: 0 0 8px rgba(0, 245, 200, 0.4); 
 }
 
 .filters .activeFilter {
   background-color: var(--color-neon-green);
   color: var(--color-dark-navy);
   border-color: var(--color-neon-green);
-  /* NAYA: Neon glow on active filter */
-  box-shadow: 0 0 10px rgba(0, 245, 200, 0.5);
+  /* UI/UX Tweak: Stronger Neon glow on active filter */
+  box-shadow: 0 0 15px rgba(0, 245, 200, 0.8); 
   font-weight: 700;
 }
 
+/* CRITICAL FIX: Grid ko 3-column layout enforce kiya */
 .portfolioGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); /* Thoda zyaada size */
-  gap: 3rem; /* Zyaada space */
+  /* Desktop par Explicitly 3-column */
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 2rem; 
+  width: 100%; 
 }
 
-/* NAYA: Advanced Portfolio Item Card */
+/* NAYA: Advanced Portfolio Item Card (High-Tech Glass Card) */
 .portfolioItem {
   display: flex;
   flex-direction: column; 
-  /* NAYA: Glassmorphism Card Effect */
-  background-color: var(--color-glass-dark); 
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  flex-grow: unset;
+  flex-shrink: unset;
+  width: 100%; 
+  
+  /* UI/UX Tweak: Deeper Glass Effect */
+  background-color: rgba(22, 33, 62, 0.85); /* Thoda aur dark kiya */
+  backdrop-filter: blur(12px); /* Blur badhaya */
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid var(--color-glass-light);
+  /* UI/UX Tweak: Border ko thoda neon tint diya */
+  border: 1px solid rgba(139, 92, 246, 0.3); 
   text-decoration: none;
   color: var(--color-off-white);
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.6); /* Shadow badhaya */
   transition: transform 0.4s ease, box-shadow 0.4s ease;
 
-  /* NAYA: Prepare for 3D tilt effect */
   transform-style: preserve-3d;
 }
 
 .portfolioItem:hover {
-  /* Subtle 3D tilt + strong lift */
-  transform: translateY(-15px) rotateX(1deg) rotateY(1deg);
-  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6), 0 0 15px var(--color-secondary-accent); /* Purple neon glow */
+  /* UI/UX Tweak: Stronger 3D lift/tilt */
+  transform: translateY(-10px) rotateX(1deg) rotateY(1deg); 
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 15px var(--color-neon-green); /* Hover glow badhaya */
 }
 
 /* Image container */
 .portfolioImagePlaceholder {
   width: 100%;
-  aspect-ratio: 16 / 10; 
+  aspect-ratio: 16 / 9; 
   position: relative; 
   background-color: var(--color-deep-blue);
+  overflow: hidden; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .portfolioImagePlaceholder img {
     object-fit: cover;
@@ -107,7 +123,15 @@
 }
 
 .portfolioItem:hover .portfolioImagePlaceholder img {
-    transform: scale(1.05); /* Image par subtle zoom on card hover */
+    transform: scale(1.1); /* Zoom effect badhaya */
+}
+
+/* Image Placeholder Text ki Styling */
+.imagePlaceholderText {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 2rem;
+    text-align: center;
 }
 
 /* NAYA: Text Info Container */
@@ -119,14 +143,15 @@
 }
 
 .portfolioItemInfo h3 {
-  font-size: 1.5rem; 
+  font-size: 1.4rem; 
   font-weight: 700;
   margin: 0 0 0.5rem 0;
+  color: var(--color-off-white); /* Ensure title is bright */
 }
 
 .portfolioItemInfo p {
-  font-size: 0.95rem; 
-  color: var(--color-neon-green); /* Category ko highlight kiya */
+  font-size: 0.9rem; 
+  color: var(--color-neon-green); /* Category color maintain */
   opacity: 1;
   margin: 0;
   margin-top: 0.5rem; 
@@ -165,10 +190,15 @@
   }
   .hero h1 { font-size: 2.5rem; }
   .filters button { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
-  .portfolioGrid { grid-template-columns: 1fr; } 
+  
+  /* Mobile par auto-fit, taaki 1 ya 2 card dikh sakein */
+  .portfolioGrid { 
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+      gap: 1.5rem;
+  } 
   
   .portfolioItem:hover {
-    transform: translateY(-8px); /* Mobile par kam lift */
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5); 
+    transform: translateY(-5px); 
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); 
   }
 }

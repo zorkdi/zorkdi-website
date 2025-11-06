@@ -3,6 +3,7 @@
 "use client";
 
 import { useState } from 'react';
+import React from 'react'; // React import ensure kiya
 
 // CMS Components jo humne abhi update kiye hain
 import GlobalCMS from '@/components/AdminForms/GlobalCMS';
@@ -21,10 +22,10 @@ const settingsTabs = [
 ];
 
 const AdminSettingsPage = () => {
-    const [activeTab, setActiveTab] = useState(settingsTabs[0].id);
+    // FIX: Initial active tab ko 'global' rakha
+    const [activeTab, setActiveTab] = useState('global');
 
-    // Current active component ko find karna
-    const ActiveComponent = settingsTabs.find(tab => tab.id === activeTab)?.component || GlobalCMS;
+    // FIX: ActiveComponent ko nikal diya, ab hum sabko render karenge
 
     return (
         <div className={settingsStyles.settingsContainer}>
@@ -38,7 +39,7 @@ const AdminSettingsPage = () => {
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        // NAYA: Active tab ke liye styling classes use kiye
+                        // FIX: Active tab ke liye styling classes use kiye
                         className={`${adminStyles.primaryButton} ${tab.id === activeTab ? adminStyles.activeFilter : ''}`}
                         style={{ 
                             padding: '0.6rem 1.2rem', 
@@ -54,9 +55,24 @@ const AdminSettingsPage = () => {
                 ))}
             </div>
 
-            {/* --- Dynamic Content Area --- */}
+            {/* --- Dynamic Content Area (CRITICAL FIX: Render all components, hide using display) --- */}
             <div className={settingsStyles.settingGroup}>
-                <ActiveComponent />
+                
+                {/* Global CMS */}
+                <div style={{ display: activeTab === 'global' ? 'block' : 'none' }}>
+                    <GlobalCMS />
+                </div>
+                
+                {/* About CMS */}
+                <div style={{ display: activeTab === 'about' ? 'block' : 'none' }}>
+                    <AboutCMS />
+                </div>
+                
+                {/* Services CMS */}
+                <div style={{ display: activeTab === 'services' ? 'block' : 'none' }}>
+                    <ServicesCMS />
+                </div>
+
             </div>
         </div>
     );

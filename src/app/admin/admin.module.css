@@ -16,8 +16,8 @@
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
-  /* NAYA: Mobile properties */
-  transition: transform 0.3s ease-in-out;
+  /* CRITICAL FIX: Smooth transition for mobile sidebar and general use */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease; 
 }
 
 .sidebar h2 {
@@ -43,14 +43,17 @@
     text-decoration: none;
     border-radius: 8px; /* Zyaada rounded */
     margin-bottom: 0.5rem;
-    transition: background-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+    /* CRITICAL FIX: Smooth transition for hover */
+    transition: all 0.25s ease;
 }
 
 .sidebar nav li a:hover,
-.sidebar nav li a.activeLink { /* NAYA: Active link style */
+.sidebar nav li a.activeLink { 
     background-color: var(--color-dark-navy);
     opacity: 1;
     color: var(--color-neon-light);
+    /* NAYA: Subtle glow on active/hover */
+    box-shadow: 0 0 5px rgba(0, 245, 200, 0.2);
 }
 
 .mainContent {
@@ -81,9 +84,9 @@
     border-radius: 8px;
     text-decoration: none;
     font-weight: 700;
-    /* NAYA: Neon glow effect */
     box-shadow: 0 0 10px rgba(0, 245, 200, 0.5);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* CRITICAL FIX: Faster/Smoother Button Transition */
+    transition: all 0.2s ease-out; 
 }
 
 .primaryButton:hover {
@@ -98,6 +101,8 @@
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    /* NAYA: Transition for any dynamic changes */
+    transition: background-color 0.3s ease;
 }
 
 .dataTable {
@@ -249,7 +254,7 @@
     font-weight: 600;
     font-size: 1rem;
     margin-top: 2rem;
-    transition: background-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+    transition: all 0.25s ease;
 }
 
 .logoutButton:hover {
@@ -275,7 +280,13 @@
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    /* CRITICAL FIX: Add hover/lift effect for UI/UX */
+    transition: all 0.3s ease;
+}
+
+.statCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
 }
 
 /* NAYA: Unread/Critical card highlight */
@@ -336,7 +347,7 @@
     text-decoration: none;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    transition: all 0.2s ease-out;
 }
 
 .dangerButton:hover {
@@ -348,6 +359,7 @@
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
 }
 
 .accessDeniedContainer {
@@ -455,6 +467,12 @@
         left: 1.5rem; /* FIX: Left side se open button */
         z-index: 999;
         font-size: 1.5rem;
+        color: var(--color-neon-green); /* Button color */
+        background-color: var(--color-deep-blue); /* Button background */
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        box-shadow: 0 0 10px rgba(0, 245, 200, 0.5);
     }
 
     .adminLayout {

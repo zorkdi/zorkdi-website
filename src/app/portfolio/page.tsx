@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { db } from '@/firebase';
-import { collection, query, onSnapshot, orderBy } from 'firebase/firestore'; // FIX: Timestamp import removed
+import { collection, query, onSnapshot, orderBy } from 'firebase/firestore'; 
 
 import styles from './portfolio.module.css';
 
@@ -107,12 +107,14 @@ const PortfolioPage = () => {
                                         alt={item.title}
                                         fill
                                         sizes="(max-width: 768px) 100vw, 33vw"
-                                        className={styles.portfolioImage}
+                                        // FIX: styles.portfolioImage class ko hata diya,
+                                        // kyunki woh CSS mein defined nahi hai.
                                     />
                                 ) : (
-                                    <span className={styles.imagePlaceholderText}>
+                                    // FIX: Span ko div mein change kiya, taaki woh container ke andar theek se center ho
+                                    <div className={styles.imagePlaceholderText}>
                                         Image Placeholder
-                                    </span>
+                                    </div>
                                 )}
                             </div>
                             <div className={styles.portfolioItemInfo}>

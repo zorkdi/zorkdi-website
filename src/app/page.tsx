@@ -4,7 +4,8 @@
 
 import Link from 'next/link';
 import styles from './page.module.css';
-import { FaLaptopCode, FaMobileAlt, FaDraftingCompass, FaRegLightbulb, FaUserShield, FaRocket, FaSpinner, FaNewspaper, FaChartLine, FaDesktop } from "react-icons/fa";
+// FIX: FaSpinner ko remove kiya kyunki ab woh unused hai
+import { FaLaptopCode, FaMobileAlt, FaDraftingCompass, FaRegLightbulb, FaUserShield, FaRocket, FaNewspaper, FaChartLine, FaDesktop } from "react-icons/fa";
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs, Timestamp } from 'firebase/firestore'; 
 import { db } from '@/firebase';
@@ -19,9 +20,7 @@ const WhyUsIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
 
 // --- Interfaces ---
 interface ServiceOffering { id: string; title: string; description: string; offerings: string[]; }
-// FIX: HeroButtonText field ServicesContent mein add kiya. websiteTitle aur websiteTagline ko nikal diya.
 interface ServicesContent { heroHeadline: string; heroSubheadline: string; heroButtonText: string; services: ServiceOffering[]; }
-// FIX: createdAt: any ko createdAt: Timestamp | null kiya
 interface BlogPreview { id: string; title: string; slug: string; coverImageURL: string; summary: string; createdAt: Timestamp | null; }
 
 // Portfolio Interface
@@ -33,20 +32,11 @@ interface PortfolioPreview {
     content: string; 
 }
 
-// Global Settings Interface (Background ke liye) - REMOVED AS LAYOUT.TSX HANDLES IT
-// interface GlobalSettings {
-//     heroBackgroundURL: string;
-//     defaultHeroBackground: string; 
-// }
-
-
-// --- Fallback Data ---
+// --- Fallback Data (Instant Rendering Ke Liye) ---
 const fallbackServiceData: ServicesContent = {
-    // REMOVED: websiteTitle: "ZORK DI - Custom Tech Solutions",
-    // REMOVED: websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
     heroHeadline: "Our Digital Engineering Services",
     heroSubheadline: "Transforming complex ideas into clean, high-performance, and scalable software solutions.",
-    heroButtonText: "Explore Our Services", // FIX: Fallback value set ki
+    heroButtonText: "Explore Our Services", 
     services: [
         { id: '1', title: 'Custom Web Apps', description: 'Building fast, secure, and resilient web applications using modern frameworks like Next.js and React.', offerings: [] },
         { id: '2', title: 'Mobile App Development', description: 'Creating engaging native and cross-platform mobile experiences for iOS and Android devices.', offerings: [] },
@@ -54,7 +44,6 @@ const fallbackServiceData: ServicesContent = {
     ],
 };
 const fallbackBlogPosts: BlogPreview[] = [
-    // FIX: createdAt: null set kiya as per new interface
     { id: 'dummy1', title: 'No Blog Posts Found', slug: '#', coverImageURL: '', summary: 'The latest tech insights will appear here once you publish your first blog post from the admin panel.', createdAt: null },
 ];
 const fallbackPortfolio: PortfolioPreview[] = [
@@ -63,7 +52,7 @@ const fallbackPortfolio: PortfolioPreview[] = [
     { id: 'p3', title: 'SaaS Management Portal', category: 'Custom Software', coverImageURL: '', content: 'A short description of the project.' },
 ];
 
-// FIX: Icon Map ko maintain rakha
+// Icon mapping (Service icons ke liye)
 const iconMap: { [key: string]: React.ElementType } = {
     'Web App': FaLaptopCode,
     'Mobile App': FaMobileAlt,
@@ -108,7 +97,6 @@ const fetchBlogPosts = async (): Promise<BlogPreview[]> => {
                 slug: data.slug,
                 coverImageURL: data.coverImageURL || '',
                 summary: data.summary || data.content?.substring(0, 80).replace(/<\/?[^>]+(>|$)/g, "") + '...',
-                // FIX: data.createdAt ab correctly mapped ho jayega as Timestamp | null
                 createdAt: data.createdAt || null, 
             } as BlogPreview;
         });
@@ -149,52 +137,33 @@ const fetchPortfolioProjects = async (): Promise<PortfolioPreview[]> => {
 
 
 const HomePage = () => {
+    // Initial state ko fallback data se set kiya. isLoading state removed.
     const [serviceContent, setServiceContent] = useState<ServicesContent>(fallbackServiceData);
     const [blogPosts, setBlogPosts] = useState<BlogPreview[]>(fallbackBlogPosts); 
     const [portfolioProjects, setPortfolioProjects] = useState<PortfolioPreview[]>(fallbackPortfolio); 
-    const [isLoading, setIsLoading] = useState(true);
-    // REMOVED: globalSettings state, since fetching is moved to layout.tsx
-    // const [globalSettings, setGlobalSettings] = useState<GlobalSettings | null>(null); 
-
-
-    // Fetch Services and Blog/Portfolio Content
+    
+    // Fetch Services and Blog/Portfolio Content (Runs instantly on client-side)
     useEffect(() => {
         const fetchData = async () => {
             try {
                 // Fetch Content
-                // globalSettings fetch removed from Promise.all
                 const [fetchedServices, fetchedPosts, fetchedProjects] = await Promise.all([
                     fetchServiceContent(), 
                     fetchBlogPosts(), 
                     fetchPortfolioProjects()
                 ]);
                 
+                // Data fetch hone par sirf state update hogi. UI turant load ho chuka hai.
                 setServiceContent(fetchedServices);
                 setBlogPosts(fetchedPosts);
                 setPortfolioProjects(fetchedProjects); 
-                // setGlobalSettings(settings); // State update removed
-
             } catch (error) {
-                console.error("Error fetching homepage content:", error);
-            } finally {
-                setIsLoading(false);
-            }
+                console.error("Error fetching homepage content in client useEffect:", error);
+            } 
         };
         fetchData();
     }, []);
     
-    
-    // --- Render Logic ---
-    if (isLoading) {
-        // FIX: Loading state CSS ko inline rakha
-        return (
-            <main className={styles.main} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <FaSpinner style={{ fontSize: '3rem', color: 'var(--color-neon-green)', animation: 'spin 1s linear infinite' }} />
-                <h1 style={{ marginLeft: '1rem', color: 'var(--color-neon-green)', marginTop: '1rem' }}>Loading...</h1>
-                <p style={{ marginTop: '0.5rem', opacity: 0.8 }}>Please wait while we fetch the content.</p>
-            </main>
-        );
-    }
     
     return (
         <main className={styles.main}>
@@ -202,11 +171,7 @@ const HomePage = () => {
             <div className={styles.heroSpacer}>
                  <section 
                     className={styles.heroFixedContent}
-                    // REMOVED: Redundant inline style, CSS variable is now applied via page.module.css
-                    // style={{ backgroundImage: 'var(--hero-bg-image)' }} 
                  >
-                    {/* CRITICAL FIX: Hero Content aur Positioning */}
-                    {/* NAYA CHANGE: Content ko separate Z-index wrapper mein daala */}
                     <div className={styles.heroContentWrapper}> 
                         <AnimationWrapper delay={0.1}>
                             <h1 className={styles.heroHeadline}>{serviceContent.heroHeadline}</h1>
@@ -215,7 +180,6 @@ const HomePage = () => {
                             <p className={styles.heroSubheadline}>{serviceContent.heroSubheadline}</p>
                         </AnimationWrapper>
                         <AnimationWrapper delay={0.3}>
-                            {/* FIX: Hero Button Text CMS se control kiya */}
                             <Link href="/services" className={styles.heroButton}>{serviceContent.heroButtonText}</Link>
                         </AnimationWrapper>
                     </div>

@@ -8,7 +8,9 @@ import Script from "next/script";
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import { AuthProvider } from "../context/AuthContext";
-import FloatingChatButton from "../components/FloatingChatButton/FloatingChatButton"; 
+import FloatingChatButton from "../components/FloatingChatButton/FloatingChatButton";
+// NAYA: VisitorTracker ko import kiya
+import VisitorTracker from "../components/VisitorTracker/VisitorTracker";
 
 // Firebase imports for metadata and marketing settings fetch
 import { doc, getDoc } from 'firebase/firestore';
@@ -25,8 +27,8 @@ interface GlobalSettings {
   websiteTagline: string;
   googleAnalyticsId?: string; 
   googleSearchConsoleId?: string; 
-  heroBackgroundURL?: string; // NAYA: Hero Background URL field add kiya
-  defaultHeroBackground?: string; // NAYA: Default/CSS texture field add kiya
+  heroBackgroundURL?: string; 
+  defaultHeroBackground?: string; 
 }
 
 // Default/Fallback settings
@@ -66,7 +68,6 @@ async function getGlobalSettings(): Promise<GlobalSettings> {
 export async function generateMetadata(): Promise<Metadata> {
     const globalSettings = await getGlobalSettings();
     
-    // FIX: Verification meta tag ko correct Next.js Metadata format mein set karna
     const verificationMeta = globalSettings.googleSearchConsoleId 
         ? { google: globalSettings.googleSearchConsoleId } 
         : {};
@@ -88,21 +89,16 @@ export default async function RootLayout({
   const globalSettings = await getGlobalSettings();
   const gaId = globalSettings.googleAnalyticsId;
   
-  // NAYA LOGIC: Hero Background URL ko determine karna
   const heroBackground = globalSettings.heroBackgroundURL 
-    ? `url('${globalSettings.heroBackgroundURL}')` // CMS URL
-    : globalSettings.defaultHeroBackground; // CSS Texture Fallback
+    ? `url('${globalSettings.heroBackgroundURL}')` 
+    : globalSettings.defaultHeroBackground; 
     
-  // CSS variable define karna jise hum globals.css mein use karenge
   const customCssVars = {
       '--hero-bg-image': heroBackground,
   };
 
   return (
     <html lang="en">
-      {/* Head mein GSC meta tag "generateMetadata" se automatic aa jayega */}
-      
-      {/* Google Analytics Script (GA4) */}
       {gaId && gaId !== 'G-XXXXXXXXXX' && (
         <>
           <Script 
@@ -120,14 +116,14 @@ export default async function RootLayout({
         </>
       )}
 
-      {/* NAYA: customCssVars ko body tag par apply kiya */}
       <body className={poppins.className} style={customCssVars as React.CSSProperties}>
         <AuthProvider>
+          {/* NAYA: VisitorTracker ko yahan add kiya, sabse pehle */}
+          <VisitorTracker />
+          
           <Header />
           {children}
           <Footer />
-          
-          {/* Floating Chat Button */}
           <FloatingChatButton />
         </AuthProvider>
       </body>

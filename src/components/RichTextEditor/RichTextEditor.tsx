@@ -62,7 +62,6 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
                 setUploading(false);
                 setUploadError('');
                 
-                // CRITICAL FIX: Inline styling REMOVED. Ab CSS control karegi.
                 const imageHTML = `<p><img 
                     src="${finalImageURL}" 
                     alt="Uploaded Content Image" 
@@ -89,7 +88,8 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
         skin: 'oxide-dark', 
         content_css: 'dark', 
         
-        tinymceScriptURL: 'https://cdn.tiny.cloud/1/' + TINYMCE_API_KEY + '/tinymce/6/tinymce.min.js',
+        // CRITICAL FIX: tinymceScriptURL ko hata diya taaki woh invalid key ke saath load na ho.
+        // tinymceScriptURL: 'https://cdn.tiny.cloud/1/' + TINYMCE_API_KEY + '/tinymce/6/tinymce.min.js',
 
         images_upload_handler: imageUploadHandler,
         image_title: true,
@@ -117,16 +117,17 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
             {uploadError && <p style={{ color: '#ff4757', textAlign: 'center', padding: '0.5rem' }}>{uploadError}</p>}
 
             <Editor
-                apiKey={TINYMCE_API_KEY === 'no-api-key-found' ? undefined : TINYMCE_API_KEY} 
+                apiKey={TINYMCE_API_KEY === 'hwfafxaz75m2t8p036w972tsxsgrt6z4n9hzs6wvt8yswc8k' ? undefined : TINYMCE_API_KEY} 
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onInit={(_evt: any, editor: any) => editorRef.current = editor} 
                 initialValue={content}
                 onEditorChange={(newContent: string) => onChange(newContent)} 
                 init={config}
             />
-             {TINYMCE_API_KEY === 'no-api-key-found' && (
-                <div style={{color: 'red', textAlign: 'center', marginTop: '10px'}}>
-                    CRITICAL: Please set NEXT_PUBLIC_TINYMCE_API_KEY in your .env.local file.
+             {/* CRITICAL WARNING MESSAGE (Agar key set nahi hai toh warning aayegi) */}
+             {TINYMCE_API_KEY === 'hwfafxaz75m2t8p036w972tsxsgrt6z4n9hzs6wvt8yswc8k' && (
+                <div style={{color: '#ffc966', backgroundColor: 'rgba(255, 165, 0, 0.1)', padding: '1rem', borderRadius: '8px', textAlign: 'center', marginTop: '10px', border: '1px solid #ffc966'}}>
+                    ⚠️ **WARNING:** TinyMCE API Key is missing. Editor may not function correctly. Please set **NEXT_PUBLIC_TINYMCE_API_KEY** in your environment variables.
                 </div>
             )}
         </div>
