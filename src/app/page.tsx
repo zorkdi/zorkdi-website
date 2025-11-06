@@ -4,14 +4,17 @@
 
 import Link from 'next/link';
 import styles from './page.module.css';
-// FIX: FaSpinner ko remove kiya kyunki ab woh unused hai
-import { FaLaptopCode, FaMobileAlt, FaDraftingCompass, FaRegLightbulb, FaUserShield, FaRocket, FaNewspaper, FaChartLine, FaDesktop } from "react-icons/fa";
+// FIX 1: Ratings ke liye FaStar aur FaQuoteLeft icons ko add kiya
+import { FaLaptopCode, FaMobileAlt, FaDraftingCompass, FaRegLightbulb, FaUserShield, FaRocket, FaNewspaper, FaChartLine, FaDesktop, FaStar, FaQuoteLeft } from "react-icons/fa";
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
-import { doc, getDoc, collection, query, orderBy, limit, getDocs, Timestamp } from 'firebase/firestore'; 
+// Firestore imports mein 'where' add kiya reviews filtering ke liye
+import { doc, getDoc, collection, query, orderBy, limit, getDocs, Timestamp, where } from 'firebase/firestore';
 import { db } from '@/firebase';
 import Image from 'next/image'; 
 
 import React, { useState, useEffect } from 'react';
+// FIX 2: ReviewModal ko import kiya
+import ReviewModal from '@/components/ReviewModal/ReviewModal';
 
 // Helper Components ko define kiya
 const ServiceIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
@@ -31,6 +34,34 @@ interface PortfolioPreview {
     coverImageURL: string; 
     content: string; 
 }
+
+// NAYA: Review Interface
+interface Review {
+    id: string;
+    userName: string;
+    rating: number;
+    comment: string;
+    createdAt: Timestamp;
+}
+
+// NAYA: Function to render Star Rating
+const StarRating = ({ rating }: { rating: number }) => {
+    const totalStars = 5;
+    const filledStars = Math.round(rating);
+    const stars = [];
+
+    for (let i = 1; i <= totalStars; i++) {
+        stars.push(
+            <FaStar 
+                key={i} 
+                style={{ color: i <= filledStars ? 'var(--color-neon-green)' : '#444', marginRight: '3px' }} 
+            />
+        );
+    }
+
+    return <div style={{ display: 'flex', fontSize: '1.1rem' }}>{stars}</div>;
+};
+
 
 // --- Fallback Data (Instant Rendering Ke Liye) ---
 const fallbackServiceData: ServicesContent = {
@@ -120,11 +151,14 @@ const fetchPortfolioProjects = async (): Promise<PortfolioPreview[]> => {
 
         return querySnapshot.docs.map(doc => {
             const data = doc.data();
+            // FIX: Portfolio content ko clean kiya taaki glitch na ho (Glitch Fix)
+            const cleanContent = data.content ? data.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').substring(0, 80) + '...' : 'Project description is missing.';
+
             return {
                 id: doc.id,
                 title: data.title,
                 category: data.category,
-                content: data.content?.substring(0, 80).replace(/<\/?[^>]+(>|$)/g, "") + '...' || 'Project description is missing.',
+                content: cleanContent, 
                 coverImageURL: data.coverImageURL || '',
             } as PortfolioPreview;
         });
@@ -135,6 +169,45 @@ const fetchPortfolioProjects = async (): Promise<PortfolioPreview[]> => {
     }
 };
 
+// NAYA FUNCTION: Reviews fetch karna AUR Overall Stats Calculate karna
+const fetchLatestReviewsAndStats = async (): Promise<{ reviews: Review[], avgRating: number, totalCount: number }> => {
+    try {
+        const reviewsRef = collection(db, 'reviews');
+        // Pehle saare approved reviews fetch karo stats ke liye
+        const qAllApproved = query(reviewsRef, where('status', '==', 'approved'));
+        const snapshotAll = await getDocs(qAllApproved);
+        
+        const totalCount = snapshotAll.size;
+        let avgRating = 0;
+        
+        if (totalCount > 0) {
+            const totalRating = snapshotAll.docs.reduce((sum, doc) => sum + (doc.data().rating || 0), 0);
+            avgRating = totalRating / totalCount;
+        }
+
+        // Fir top 3 reviews fetch karo display ke liye
+        const qLatest = query(qAllApproved, orderBy('createdAt', 'desc'), limit(3));
+        const snapshotLatest = await getDocs(qLatest);
+        
+        const latestReviews = snapshotLatest.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                userName: data.userName || 'Anonymous',
+                rating: data.rating || 5,
+                comment: data.comment || 'Excellent service!',
+                createdAt: data.createdAt as Timestamp,
+            } as Review;
+        });
+        
+        return { reviews: latestReviews, avgRating, totalCount };
+
+    } catch (error) {
+        console.error("Error fetching latest reviews and stats:", error);
+        return { reviews: [], avgRating: 0, totalCount: 0 }; 
+    }
+};
+
 
 const HomePage = () => {
     // Initial state ko fallback data se set kiya. isLoading state removed.
@@ -142,27 +215,72 @@ const HomePage = () => {
     const [blogPosts, setBlogPosts] = useState<BlogPreview[]>(fallbackBlogPosts); 
     const [portfolioProjects, setPortfolioProjects] = useState<PortfolioPreview[]>(fallbackPortfolio); 
     
+    // NAYA STATE: Reviews aur Stats ke liye
+    const [latestReviews, setLatestReviews] = useState<Review[]>([]);
+    const [totalReviewsCount, setTotalReviewsCount] = useState(0); // NAYA STATE
+    const [averageRating, setAverageRating] = useState(0); // NAYA STATE
+
+    const [isLoading, setIsLoading] = useState(true); // Loading state add kiya
+
+    // NAYA STATE: Review Modal ko manage karne ke liye
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    
+    // Handlers for Review Modal
+    const openReviewModal = () => {
+        setIsReviewModalOpen(true);
+    };
+
+    const closeReviewModal = () => {
+        setIsReviewModalOpen(false);
+        // Review submit hone ke baad latest reviews ko refresh karein
+        fetchData(); 
+    };
+
     // Fetch Services and Blog/Portfolio Content (Runs instantly on client-side)
+    const fetchData = async () => {
+        setIsLoading(true); // Loading true kiya
+        try {
+            // Promise.all mein reviews aur stats ek saath fetch kiye
+            const [fetchedServices, fetchedPosts, fetchedProjects, statsResult] = await Promise.all([
+                fetchServiceContent(), 
+                fetchBlogPosts(), 
+                fetchPortfolioProjects(),
+                fetchLatestReviewsAndStats() // NAYA: Reviews aur Stats fetch kiye
+            ]);
+            
+            // Data fetch hone par sirf state update hogi.
+            setServiceContent(fetchedServices);
+            setBlogPosts(fetchedPosts);
+            setPortfolioProjects(fetchedProjects); 
+            
+            // Stats aur Latest Reviews ko set kiya
+            setLatestReviews(statsResult.reviews); 
+            setAverageRating(statsResult.avgRating); // NAYA: Average rating set kiya
+            setTotalReviewsCount(statsResult.totalCount); // NAYA: Total count set kiya
+
+        } catch (error) {
+            console.error("Error fetching homepage content in client useEffect:", error);
+        } finally {
+            setIsLoading(false); // Loading false kiya
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // Fetch Content
-                const [fetchedServices, fetchedPosts, fetchedProjects] = await Promise.all([
-                    fetchServiceContent(), 
-                    fetchBlogPosts(), 
-                    fetchPortfolioProjects()
-                ]);
-                
-                // Data fetch hone par sirf state update hogi. UI turant load ho chuka hai.
-                setServiceContent(fetchedServices);
-                setBlogPosts(fetchedPosts);
-                setPortfolioProjects(fetchedProjects); 
-            } catch (error) {
-                console.error("Error fetching homepage content in client useEffect:", error);
-            } 
-        };
         fetchData();
-    }, []);
+    }, []); // dependency array empty rakha
+
+
+    // Helper: StarRating ko call karte hain average rating se
+    const renderOverallStars = (rating: number) => {
+        const totalStars = 5;
+        const roundedRating = Math.round(rating);
+        return [...Array(totalStars)].map((_, i) => (
+            <FaStar 
+                key={i} 
+                style={{ color: i < roundedRating ? 'var(--color-neon-green)' : '#444', marginRight: '3px', fontSize: '2rem' }} 
+            />
+        ));
+    };
     
     
     return (
@@ -180,7 +298,13 @@ const HomePage = () => {
                             <p className={styles.heroSubheadline}>{serviceContent.heroSubheadline}</p>
                         </AnimationWrapper>
                         <AnimationWrapper delay={0.3}>
-                            <Link href="/services" className={styles.heroButton}>{serviceContent.heroButtonText}</Link>
+                            {/* FIX: Hero Button par specific PrimaryButton class lagaya */}
+                            <Link 
+                                href="/services" 
+                                className={`${styles.heroButton} ${styles.heroPrimaryButton}`} 
+                            >
+                                {serviceContent.heroButtonText}
+                            </Link>
                         </AnimationWrapper>
                     </div>
                 </section>
@@ -274,10 +398,74 @@ const HomePage = () => {
                 </div>
             </section>
             
-            {/* Testimonials Section (Future CMS control ke liye structure rakha) */}
+            {/* NAYA FEATURE: Testimonials Section (Ratings/Reviews Display and Rate Button) */}
             <section className={styles.testimonialsSection}>
-                <h2 className={styles.sectionTitle}>Client Success Stories</h2>
-                <p style={{ opacity: 0.7, fontSize: '1.2rem' }}>We turn complex challenges into simple, elegant digital products. See what our clients say.</p>
+                <h2 className={styles.sectionTitle}>Client Testimonials</h2>
+                {/* FIX 4: Subtitle ko sectionSubtitle class diya */}
+                <p className={styles.sectionSubtitle} style={{ opacity: 0.7, fontSize: '1.2rem', marginBottom: '3rem' }}>We turn complex challenges into simple, elegant digital products. See what our clients say.</p>
+                
+                {isLoading ? (
+                    <div style={{ textAlign: 'center', padding: '2rem' }}>Loading testimonials...</div>
+                ) : (
+                    <>
+                        {/* 1. Overall Rating (DYNAMIC) */}
+                         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                            <div style={{ display: 'inline-flex', gap: '5px', color: 'var(--color-neon-green)' }}>
+                                {renderOverallStars(averageRating)} {/* DYNAMIC STARS */}
+                            </div>
+                            {/* FIX: Overall rating ka dynamic value */}
+                            <p style={{ fontSize: '1.5rem', fontWeight: 600, marginTop: '0.5rem' }}>{averageRating.toFixed(1)} / 5.0 Rating</p>
+                            <p style={{ opacity: 0.7 }}>Based on {totalReviewsCount} client reviews</p>
+                        </div>
+                        
+                        {/* 2. Review Cards */}
+                        {latestReviews.length > 0 ? (
+                            <div className={styles.whyUsGrid} style={{ marginTop: '3rem', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+                                {latestReviews.map((review, index) => (
+                                    <AnimationWrapper key={review.id} delay={index * 0.1}>
+                                        <div className={styles.whyUsItem} style={{ textAlign: 'left', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+                                            <FaQuoteLeft style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', fontSize: '2rem', opacity: 0.1, color: 'var(--color-neon-green)' }} />
+                                            
+                                            <p style={{ fontStyle: 'italic', marginBottom: '1rem', flexGrow: 1 }}>
+                                                {/* FIX 6: Unescaped quotes error fix - Outer quotes removed */}
+                                                {review.comment}
+                                            </p>
+                                            
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '1rem' }}>
+                                                <div style={{ fontWeight: 600, color: 'var(--color-off-white)' }}>- {review.userName}</div>
+                                                <StarRating rating={review.rating} />
+                                            </div>
+                                        </div>
+                                    </AnimationWrapper>
+                                ))}
+                            </div>
+                        ) : (
+                             <p style={{ textAlign: 'center', marginTop: '2rem', opacity: 0.8 }}>No approved testimonials yet. Be the first to rate us!</p>
+                        )}
+                        
+                        {/* 3. Action Buttons */}
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '3rem' }}>
+                            
+                            {/* NAYA BUTTON: Rate Your Rating */}
+                            <button 
+                                onClick={openReviewModal} 
+                                className={styles.heroButton} 
+                                style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: '10px'
+                                }}
+                            >
+                                <FaStar /> Rate Your Experience
+                            </button>
+                            
+                            {/* FIX 5: View All Reviews button ko secondary class diya */}
+                            <Link href="/reviews" className={`${styles.heroButton} ${styles.secondary}`} style={{ display: 'flex', alignItems: 'center' }}>
+                                View All Reviews
+                            </Link>
+                        </div>
+                    </>
+                )}
             </section>
             
             {/* Blog Section (DYNAMIC) */}
@@ -320,7 +508,7 @@ const HomePage = () => {
                                     </div>
                                     <div style={{ padding: '0 1.2rem', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                                         <p style={{ opacity: 0.7, fontSize: '0.85rem', marginTop: '1.2rem', color: 'var(--color-neon-green)' }}>
-                                            {/* FIX: Timestamp object se date string generate karna */}
+                                            {/* Date formatting code is correct */}
                                             {post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Draft'}
                                         </p>
                                         <h3>{post.title}</h3>
@@ -334,6 +522,12 @@ const HomePage = () => {
                 
                 <Link href="/blog" className={styles.heroButton} style={{ marginTop: '3rem' }}>Read All Insights</Link>
             </section>
+
+            {/* Review Modal component */}
+            <ReviewModal 
+                isOpen={isReviewModalOpen} 
+                onClose={closeReviewModal} 
+            />
         </main>
     );
 };

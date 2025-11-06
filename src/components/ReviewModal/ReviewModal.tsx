@@ -40,20 +40,32 @@ const ReviewModal = ({ isOpen, onClose, projectId, projectTitle, allowComment = 
 
         setIsSubmitting(true);
         try {
-            await addDoc(collection(db, 'reviews'), {
-                // FIX: user ki jagah currentUser use kiya
+            // NAYA: Data object ko pehle banao
+            const reviewData = {
+                // User details AuthContext se
                 userId: currentUser.uid,
-                userName: currentUser.displayName || 'Anonymous User',
+                // displayName ya email ko use kiya agar displayName nahi hai
+                userName: currentUser.displayName || currentUser.email || 'Registered User', 
                 userImage: currentUser.photoURL || '',
+                
                 rating: rating,
-                comment: allowComment ? comment : '', // Agar comment allowed nahi hai to empty string
+                comment: allowComment ? comment : '',
+                
+                // Project details (optional for General Review)
                 projectId: projectId || null,
-                projectTitle: projectTitle || 'General Rating',
-                type: allowComment ? 'full_review' : 'rating_only', // Type bhi save karte hain
+                // FIX: Agar projectId nahi hai, toh General Website Review title set kiya
+                projectTitle: projectId ? projectTitle || 'Project Review' : 'General Website Review', 
+                
+                // Type ko refine kiya: Agar comment allowed hai, toh full review, otherwise rating_only
+                type: allowComment ? 'full_review' : 'rating_only', 
                 createdAt: serverTimestamp(),
-                status: 'approved'
-            });
-            alert(allowComment ? "Thank you for your review!" : "Thank you for your rating!");
+                // Shuru mein hamesha approved (admin review ke liye baad mein badal sakte hain)
+                status: 'approved' 
+            };
+            
+            await addDoc(collection(db, 'reviews'), reviewData);
+            
+            alert(allowComment ? "Thank you for your review! It will be visible shortly." : "Thank you for your rating!");
             onClose();
             setRating(0);
             setComment('');
@@ -65,7 +77,7 @@ const ReviewModal = ({ isOpen, onClose, projectId, projectTitle, allowComment = 
         }
     };
 
-    // Inline Styles
+    // Inline Styles (Unchanged)
     const modalOverlayStyle: React.CSSProperties = {
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
         backgroundColor: 'rgba(0, 0, 0, 0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -86,7 +98,10 @@ const ReviewModal = ({ isOpen, onClose, projectId, projectTitle, allowComment = 
                 </button>
                 
                 <h2 style={{ color: 'var(--color-neon-green)', marginBottom: '1.5rem', textAlign: 'center' }}>
-                    {allowComment ? (projectTitle ? `Review: ${projectTitle}` : 'Write a Review') : 'Rate Us'}
+                    {/* FIX: projectTitle ke optional hone par General Review title set kiya */}
+                    {allowComment 
+                        ? (projectTitle ? `Review: ${projectTitle}` : 'Write a General Review') 
+                        : 'Rate Us'}
                 </h2>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

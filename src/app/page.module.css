@@ -97,6 +97,7 @@
   line-height: 1.6; 
 }
 
+/* Button Styles - Base/Primary Button ki Base Styling */
 .heroButton {
   margin-top: 0; 
   padding: 1rem 3rem; 
@@ -106,21 +107,91 @@
   border-radius: 10px;
   font-size: 1.1rem;
   box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.3s ease, color 0.3s ease; /* Transition time kam kiya for faster click feedback */
+  border: none; /* Default border set to none */
 }
 
-.heroButton:hover {
+
+/* NAYA CLASS: Dedicated Hero Button Style for Max Impact (Composes removed) */
+.heroPrimaryButton {
+    /* Base styles copy kiye */
+    margin-top: 0; 
+    padding: 1rem 3rem; 
+    background-color: var(--color-neon-green);
+    color: var(--color-dark-navy);
+    font-weight: 700; 
+    border-radius: 10px;
+    font-size: 1.1rem;
+    
+    /* Animation and Glow */
+    box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.3s ease, color 0.3s ease;
+    border: none;
+    
+    /* NAYA: Hero Button par subtle pulse animation */
+    animation: subtlePulse 3s infinite ease-in-out; 
+}
+
+/* NAYA FIX: Hero Button Hover (Strong Glow) */
+.heroPrimaryButton:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 245, 200, 0.8);
+  /* Strongest Glow */
+  box-shadow: 0 0 35px rgba(0, 245, 200, 0.9), 0 0 5px rgba(0, 245, 200, 0.4); 
+  animation: none; 
 }
 
-/* Universal Section Title */
+/* NAYA FIX: Hero Button Active/Press State */
+.heroPrimaryButton:active {
+    transform: translateY(0) scale(0.98); 
+    box-shadow: 0 0 5px rgba(0, 245, 200, 0.5); 
+    animation: none;
+}
+
+
+/* Secondary Button Style (Rate Your Experience aur View All Reviews mein use hoga) */
+.heroButton.secondary {
+    /* Secondary button se animation hataya */
+    animation: none; 
+    background: transparent;
+    border: 2px solid var(--color-secondary-accent);
+    color: var(--color-secondary-accent);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.4); 
+}
+
+/* Secondary Button hover state */
+.heroButton.secondary:hover {
+    background-color: var(--color-secondary-accent); 
+    color: var(--color-dark-navy); 
+    box-shadow: 0 0 35px rgba(139, 92, 246, 0.9);
+    transform: translateY(-5px);
+}
+
+/* Secondary Button Press state */
+.heroButton.secondary:active {
+    transform: translateY(0) scale(0.98);
+    background-color: var(--color-secondary-accent);
+    color: var(--color-dark-navy);
+    box-shadow: 0 0 5px rgba(139, 92, 246, 0.5); 
+}
+
+
+/* Universal Section Title - Glitch Fix */
 .sectionTitle {
   font-size: 3rem; 
   font-weight: 700;
-  margin-bottom: 4rem; 
+  margin-bottom: 0.5rem; 
   color: var(--color-neon-light);
-  text-shadow: 0 0 3px rgba(0, 245, 200, 0.3);
+  text-shadow: 0 0 5px rgba(0, 245, 200, 0.6); 
+}
+
+/* Section Subtitle - Visibility Fix */
+.sectionSubtitle {
+    font-size: 1.2rem;
+    opacity: 0.85; 
+    max-width: 800px;
+    margin: 0 auto 3rem; 
+    line-height: 1.6;
+    color: var(--color-off-white);
 }
 
 /* Services Section */
@@ -321,7 +392,7 @@
   line-height: 1.7;
 }
 
-/* Testimonials Section (Structure maintained for now) */
+/* Testimonials Section */
 .testimonialsSection {
   width: 100%;
   background-color: var(--color-deep-blue);
@@ -368,8 +439,6 @@
   /* FIX 1: Heading font size kam kiya */
   .heroHeadline {
     font-size: 2.5rem;
-    /* white-space: nowrap property hata diya gaya hai */
-    
     /* CRITICAL FIX 4: Mobile par Text Alignment Center kiya */
     text-align: center; 
   }
@@ -442,4 +511,20 @@
       grid-template-columns: 1fr;
       gap: 1.5rem;
   }
+}
+
+/* --- NAYA: Subtle Pulse Keyframes --- */
+@keyframes subtlePulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
+    }
+    50% {
+        transform: scale(1.015);
+        box-shadow: 0 0 30px rgba(0, 245, 200, 0.8), 0 0 5px rgba(0, 245, 200, 0.4);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
+    }
 }

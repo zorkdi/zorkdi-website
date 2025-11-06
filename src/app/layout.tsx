@@ -8,7 +8,9 @@ import Script from "next/script";
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import { AuthProvider } from "../context/AuthContext";
-import FloatingChatButton from "../components/FloatingChatButton/FloatingChatButton";
+// FIX 1: FloatingChatButton ko hata diya
+// FIX 2: FloatingActionButtons ko import kiya
+import FloatingActionButtons from "../components/FloatingActionButtons/FloatingActionButtons"; 
 // NAYA: VisitorTracker ko import kiya
 import VisitorTracker from "../components/VisitorTracker/VisitorTracker";
 
@@ -124,7 +126,8 @@ export default async function RootLayout({
           <Header />
           {children}
           <Footer />
-          <FloatingChatButton />
+          {/* FIX 3: FloatingActionButtons ko load kiya */}
+          <FloatingActionButtons />
         </AuthProvider>
       </body>
     </html>
