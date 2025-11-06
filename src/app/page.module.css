@@ -216,6 +216,7 @@
   text-align: left;
 }
 
+/* FIX 1: Service Card Premium Look */
 .serviceCard {
   background-color: var(--color-glass-dark);
   backdrop-filter: blur(8px);
@@ -223,20 +224,31 @@
   padding: 3rem; 
   border-radius: 16px;
   border: 1px solid var(--color-glass-light);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+  /* FIX 1: Deep shadow and subtle neon border glow */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 5px rgba(0, 245, 200, 0.2); 
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* FIX 2: Hover State - Stronger Floating Glow */
 .serviceCard:hover {
   transform: translateY(-15px); 
-  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5), var(--shadow-neon); 
+  /* FIX 2: Multiple layers of glow for 3D/Floating feel */
+  box-shadow: 
+    0 15px 50px rgba(0, 0, 0, 0.9), /* Deep vertical shadow */
+    0 0 25px var(--color-neon-green), /* Bright neon glow */
+    0 0 5px var(--color-neon-light); /* Lighter central glow */
 }
 
+/* FIX 3: Icon Polish */
 .serviceIcon {
   font-size: 3rem; 
   margin-bottom: 1.5rem;
-  color: var(--color-neon-green);
+  /* FIX 3: Primary neon color diya */
+  color: var(--color-neon-green); 
+  /* FIX 3: Strong text shadow for glow */
+  text-shadow: 0 0 10px rgba(0, 245, 200, 0.8), 0 0 3px var(--color-neon-light);
 }
+
 
 .serviceCard h3 {
   font-size: 1.8rem; 
@@ -357,6 +369,7 @@
   margin-top: 4rem;
 }
 
+/* WhyUsItem styles ko Service Card jaisa hi rakha hai for consistency */
 .whyUsItem {
   background-color: var(--color-glass-dark);
   backdrop-filter: blur(8px);
@@ -364,21 +377,27 @@
   padding: 3rem;
   border-radius: 16px;
   border: 1px solid var(--color-glass-light);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+  /* FIX 4: WhyUsItem base shadow ko bhi deep kiya */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 5px rgba(139, 92, 246, 0.2); 
   transition: transform 0.3s ease;
   text-align: center;
 }
 
 .whyUsItem:hover {
   transform: translateY(-15px);
-  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5), 0 0 10px var(--color-secondary-accent);
+  /* FIX 5: WhyUsItem hover glow ko bhi strong kiya (Secondary color mein) */
+  box-shadow: 
+    0 15px 50px rgba(0, 0, 0, 0.9), 
+    0 0 25px var(--color-secondary-accent),
+    0 0 5px rgba(139, 92, 246, 0.6);
 }
 
 .whyUsIcon {
   font-size: 3rem;
   margin-bottom: 1.5rem;
+  /* FIX 6: Secondary color icon glow */
   color: var(--color-secondary-accent); 
-  text-shadow: 0 0 5px rgba(139, 92, 246, 0.6);
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.8), 0 0 3px var(--color-secondary-accent);
 }
 
 .whyUsItem h3 {
