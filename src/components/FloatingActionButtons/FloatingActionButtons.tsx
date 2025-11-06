@@ -14,7 +14,9 @@ const FloatingActionButtons = () => {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
     // Agar user logged in hai aur uske paas displayName hai, toh woh review de sakta hai.
+    // FIX 1: Hum Chat button ke liye bhi yahi currentUser check use karenge.
     const showReviewButton = currentUser && currentUser.displayName;
+    const showChatButton = currentUser !== null; // Sirf logged-in users ko dikhana hai
 
     const openReviewModal = () => {
         if (!currentUser) {
@@ -31,7 +33,7 @@ const FloatingActionButtons = () => {
 
     return (
         <>
-            {/* Review Button - Sirf logged-in users ko dikhega */}
+            {/* Review Button - Sirf logged-in users ko dikhega (Jo Review de sakte hain) */}
             {showReviewButton && (
                 <button 
                     onClick={openReviewModal} 
@@ -50,12 +52,14 @@ const FloatingActionButtons = () => {
                 </button>
             )}
 
-            {/* Chat Button - Hamesha visible rahega */}
-            <Link href={currentUser ? "/chat" : "/login"} passHref>
-                <div className="floatingChatButton" style={{ zIndex: 999 }}>
-                    <FaCommentAlt />
-                </div>
-            </Link>
+            {/* FIX 2: Chat Button - Sirf tab visible rahega jab currentUser logged in ho */}
+            {showChatButton && (
+                <Link href="/chat" passHref> 
+                    <div className="floatingChatButton" style={{ zIndex: 999 }}>
+                        <FaCommentAlt />
+                    </div>
+                </Link>
+            )}
 
             {/* Review Modal - General Review ke liye (projectId nahi diya) */}
             <ReviewModal

@@ -23,6 +23,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* FIX: Mobile height set karne ke liye desktop par bhi min-height de diya */
+  min-height: 70px; 
 }
 
 .logo a {
@@ -264,54 +266,140 @@
     color: var(--color-neon-green);
 }
 
+/* FIX 4: Mobile menu ke andar wala CTA ab use nahi ho raha hai */
 .mobileCta {
+    /* Isko mobile menu ke CTA button ke liye use kiya gaya hai */
     padding: 0.8rem 2rem;
     background-color: var(--color-neon-green);
     color: var(--color-dark-navy) !important;
     border-radius: 8px;
+    display: block; /* FIX: Mobile menu mein dikhega */
 }
 
+/* NAYA CLASS: Mobile view mein Start Project button jo Header mein bahar dikhega (AB HATA DIYA) */
+.mobileCtaButtonVisible {
+    /* FIX 5: Is class ko ab HIDE karna hai */
+    display: none !important; 
+}
+
+
 @media (max-width: 768px) {
-  /* Hide all desktop links/buttons */
-  .desktopNav, .primaryCtaButton, .secondaryCtaButton {
+  /* Hide desktop-only CTAs */
+  .desktopNav, 
+  .primaryCtaButton, /* Desktop CTA hide kiya */
+  .secondaryCtaButton {
     display: none;
+  }
+  
+  /* FIX 6: Mobile CTA Button Visible ko hide kiya */
+  .mobileCtaButtonVisible {
+      display: none !important;
   }
   
   .container {
     padding: 0 1.5rem;
+    position: relative;
+    min-height: 70px;
+    justify-content: initial; 
   }
   
-  .rightControls {
-    /* FIX: Mobile par gap kam kiya aur alignment theek kiya */
-    gap: 1rem; 
-    /* NAYA: Profile menu mobile par dikhana hai */
-    display: flex; 
-    align-items: center;
-    /* FIX: Hamburger button aur profile icon ko right mein rakhne ke liye */
-    margin-left: auto;
+  /* FIX 2: Logo ko center mein adjust karne aur overlap se bachane ke liye */
+  .logo {
+    position: absolute;
+    /* CRITICAL FIX 1: Logo ko center se left ki taraf shift kiya */
+    left: 40%; 
+    top: 50%; 
+    transform: translate(-50%, -50%);
+    z-index: 2; 
+    
+    /* CRITICAL FIX 2: Overlap se bachne ke liye Logo ki max-width set ki */
+    max-width: 40%; 
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
-
-  /* Hamburger button hamesha dikhega */
+  
+  /* Hamburger Button (Left Corner) */
   .hamburgerButton {
-    display: block;
-    /* FIX: Hamburger aur profile icon ke beech ki spacing */
-    margin-left: 0.5rem;
+    display: block !important; 
+    position: absolute;
+    left: 1.5rem; 
+    top: 50%; 
+    transform: translateY(-50%);
+    z-index: 3;
+    margin: 0;
   }
   
-  /* Profile Icon ka size theek kiya */
-  .profileIcon {
-    font-size: 1.75rem;
-  }
-  .profileImage {
-      width: 35px;
-      height: 35px;
+  /* FIX 7: rightControls ko adjust kiya (Ab sirf Profile Icon hai) */
+  .rightControls {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    
+    /* FIX 8: CTA remove hone ke baad gap zero kiya */
+    gap: 0; 
+    display: flex;
+    align-items: center;
   }
 
-  /* Profile Dropdown position fix (Hamburger ke paas) */
+  /* Profile Dropdown position fix (Profile icon ke neeche) */
   .profileDropdown {
-      right: 50px; /* Hamburger button se thoda andar */
+      right: 0; 
       left: unset;
-      top: 100%; /* Header ke bilkul neeche */
-      transform: translateY(10px); /* Thoda gap diya header se */
+      top: 100%; 
+      transform: translateY(10px); 
   }
+  
+  /* Logo image size mobile par */
+  .logoImage {
+      height: 40px; 
+      width: auto;
+  }
+  
+  /* Logo text container mobile par */
+  .brandName {
+      font-size: 1.2rem;
+  }
+  .brandTagline {
+      font-size: 0.6rem;
+  }
+
+}
+
+/* NAYA FIX: Compact Desktop/Tablet View (Manual Desktop Mode Fix) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* Container padding kam kiya */
+    .container {
+        padding: 0 1rem;
+        gap: 0.5rem;
+    }
+    
+    /* Nav links ki spacing kam ki */
+    .navLinks {
+        gap: 1rem;
+    }
+    
+    /* Nav links font size kam kiya */
+    .navLinks a {
+        font-size: 0.9rem;
+    }
+
+    /* Logo size kam kiya */
+    .logoImage {
+        height: 45px;
+    }
+    .brandName {
+        font-size: 1.4rem;
+    }
+    
+    /* CTA buttons ka padding kam kiya */
+    .rightControls {
+        gap: 0.8rem;
+    }
+    .primaryCtaButton, .secondaryCtaButton {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
 }
