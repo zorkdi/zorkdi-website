@@ -16,6 +16,19 @@ import React, { useState, useEffect } from 'react';
 // FIX 2: ReviewModal ko import kiya
 import ReviewModal from '@/components/ReviewModal/ReviewModal';
 
+// NAYA: Imports for components moved from layout.tsx
+import VisitorTracker from "@/components/VisitorTracker/VisitorTracker";
+import AnimatedBackground from "@/components/AnimatedBackground/AnimatedBackground";
+// NAYA ADDITION: TrustBar component import kiya
+import TrustBar from "@/components/TrustBar/TrustBar";
+// NAYA ADDITION: TestimonialSlider component import kiya
+import TestimonialSlider from "@/components/TestimonialSlider/TestimonialSlider";
+// NAYA ADDITION: CallToActionBar component import kiya
+import CallToActionBar from "@/components/CallToActionBar/CallToActionBar";
+// NAYA ADDITION: FounderNote component import kiya
+import FounderNote from "@/components/FounderNote/FounderNote";
+
+
 // Helper Components ko define kiya
 const ServiceIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
 const WhyUsIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
@@ -43,6 +56,7 @@ interface Review {
     comment: string;
     createdAt: Timestamp;
 }
+
 
 // NAYA: Function to render Star Rating
 const StarRating = ({ rating }: { rating: number }) => {
@@ -152,7 +166,7 @@ const fetchPortfolioProjects = async (): Promise<PortfolioPreview[]> => {
         return querySnapshot.docs.map(doc => {
             const data = doc.data();
             // FIX: Portfolio content ko clean kiya taaki glitch na ho (Glitch Fix)
-            const cleanContent = data.content ? data.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').substring(0, 80) + '...' : 'Project description is missing.';
+            const cleanContent = data.content ? data.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').substring(0, 150) + '...' : 'Project description is missing.'; // Content limit badhaya
 
             return {
                 id: doc.id,
@@ -186,7 +200,7 @@ const fetchLatestReviewsAndStats = async (): Promise<{ reviews: Review[], avgRat
         }
 
         // Fir top 3 reviews fetch karo display ke liye
-        const qLatest = query(qAllApproved, orderBy('createdAt', 'desc'), limit(3));
+        const qLatest = query(qAllApproved, orderBy('createdAt', 'desc'), limit(10)); // LIMIT badhaya for slider
         const snapshotLatest = await getDocs(qLatest);
         
         const latestReviews = snapshotLatest.docs.map(doc => {
@@ -221,6 +235,9 @@ const HomePage = () => {
     const [averageRating, setAverageRating] = useState(0); // NAYA STATE
 
     const [isLoading, setIsLoading] = useState(true); // Loading state add kiya
+    
+    // FIX 1: Hydration Error ke liye isClient state add kiya
+    const [isClient, setIsClient] = useState(false); 
 
     // NAYA STATE: Review Modal ko manage karne ke liye
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -240,6 +257,7 @@ const HomePage = () => {
     const fetchData = async () => {
         setIsLoading(true); // Loading true kiya
         try {
+            
             // Promise.all mein reviews aur stats ek saath fetch kiye
             const [fetchedServices, fetchedPosts, fetchedProjects, statsResult] = await Promise.all([
                 fetchServiceContent(), 
@@ -264,8 +282,10 @@ const HomePage = () => {
             setIsLoading(false); // Loading false kiya
         }
     };
-
+    
     useEffect(() => {
+        // FIX 2: useEffect mein isClient ko true kiya, taaki hydration ke baad AnimatedBackground load ho
+        setIsClient(true); 
         fetchData();
     }, []); // dependency array empty rakha
 
@@ -285,6 +305,10 @@ const HomePage = () => {
     
     return (
         <main className={styles.main}>
+            {/* FIX 3: isClient check kiya AnimatedBackground ko render karne ke liye */}
+            {isClient && <AnimatedBackground />}
+            <VisitorTracker />
+            
             {/* HERO SECTION - IMAGE + OVERLAP FIX */}
             <div className={styles.heroSpacer}>
                  <section 
@@ -303,12 +327,18 @@ const HomePage = () => {
                                 href="/services" 
                                 className={`${styles.heroButton} ${styles.heroPrimaryButton}`} 
                             >
-                                {serviceContent.heroButtonText}
+                                {/* NAYA: Button text ko span mein wrap kiya for z-index control */}
+                                <span className={styles.buttonText}>{serviceContent.heroButtonText}</span>
+                                {/* NAYA: Animated border/glow element */}
+                                <span className={styles.buttonBorderGlow}></span>
                             </Link>
                         </AnimationWrapper>
                     </div>
                 </section>
             </div>
+            
+            {/* Trust Bar Hero Section ke theek neeche */}
+            <TrustBar /> 
 
 
             {/* Services Section (DYNAMIC) */}
@@ -336,11 +366,14 @@ const HomePage = () => {
             </section>
 
             {/* Portfolio Section (DYNAMIC - Featured Work) */}
+            {/* REVERT FIX: Original scrolling card structure wapas laya */}
             <section className={styles.portfolioSection}>
                 <h2 className={styles.sectionTitle} style={{ textAlign: 'center' }}>Featured Work</h2>
+                {/* REVERT FIX: Original portfolioScrollContainer wapas laya */}
                 <div className={styles.portfolioScrollContainer}>
                     {portfolioProjects.map((project, index) => (
                         <AnimationWrapper key={project.id} delay={index * 0.2}>
+                            {/* REVERT FIX: Original portfolioCard class wapas laya */}
                             <Link href={`/portfolio/${project.id}`} className={styles.portfolioCard}>
                                 <div className={styles.portfolioImageWrapper}>
                                     {project.coverImageURL ? (
@@ -366,8 +399,23 @@ const HomePage = () => {
                         </AnimationWrapper>
                     ))}
                 </div>
-                <Link href="/portfolio" className={styles.heroButton} style={{ marginTop: '3rem' }}>View All Projects</Link>
+                {/* FIX 1: View All Projects button ko primary animated button style diya */}
+                <Link 
+                    href="/portfolio" 
+                    className={`${styles.heroButton} ${styles.heroPrimaryButton} ${styles.portfolioCtaButton}`} 
+                >
+                    {/* NAYA: Button text ko span mein wrap kiya for z-index control */}
+                    <span className={styles.buttonText}>View All Projects</span>
+                    {/* NAYA: Animated border/glow element */}
+                    <span className={styles.buttonBorderGlow}></span>
+                </Link>
             </section>
+            
+            {/* NAYA ADDITION: Call To Action Bar (Task 3) */}
+            <CallToActionBar />
+            
+            {/* NAYA ADDITION: Founder's Note Section (About Us Groundwork) */}
+            <FounderNote />
 
             {/* Why Choose Us Section */}
             <section className={styles.whyUsSection}>
@@ -418,30 +466,8 @@ const HomePage = () => {
                             <p style={{ opacity: 0.7 }}>Based on {totalReviewsCount} client reviews</p>
                         </div>
                         
-                        {/* 2. Review Cards */}
-                        {latestReviews.length > 0 ? (
-                            <div className={styles.whyUsGrid} style={{ marginTop: '3rem', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-                                {latestReviews.map((review, index) => (
-                                    <AnimationWrapper key={review.id} delay={index * 0.1}>
-                                        <div className={styles.whyUsItem} style={{ textAlign: 'left', position: 'relative', display: 'flex', flexDirection: 'column' }}>
-                                            <FaQuoteLeft style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', fontSize: '2rem', opacity: 0.1, color: 'var(--color-neon-green)' }} />
-                                            
-                                            <p style={{ fontStyle: 'italic', marginBottom: '1rem', flexGrow: 1 }}>
-                                                {/* FIX 6: Unescaped quotes error fix - Outer quotes removed */}
-                                                {review.comment}
-                                            </p>
-                                            
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '1rem' }}>
-                                                <div style={{ fontWeight: 600, color: 'var(--color-off-white)' }}>- {review.userName}</div>
-                                                <StarRating rating={review.rating} />
-                                            </div>
-                                        </div>
-                                    </AnimationWrapper>
-                                ))}
-                            </div>
-                        ) : (
-                             <p style={{ textAlign: 'center', marginTop: '2rem', opacity: 0.8 }}>No approved testimonials yet. Be the first to rate us!</p>
-                        )}
+                        {/* FIX 6: Existing Review Cards Grid ko TestimonialSlider se REPLACE kiya */}
+                        <TestimonialSlider reviews={latestReviews} />
                         
                         {/* 3. Action Buttons */}
                         <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '3rem' }}>
@@ -449,7 +475,8 @@ const HomePage = () => {
                             {/* NAYA BUTTON: Rate Your Rating */}
                             <button 
                                 onClick={openReviewModal} 
-                                className={styles.heroButton} 
+                                // CLASS CHANGE KIYA GAYA (pichla task)
+                                className={`${styles.heroButton} ${styles.primaryOutline}`} 
                                 style={{ 
                                     display: 'flex', 
                                     alignItems: 'center', 
@@ -520,7 +547,15 @@ const HomePage = () => {
                     </div>
                 )}
                 
-                <Link href="/blog" className={styles.heroButton} style={{ marginTop: '3rem' }}>Read All Insights</Link>
+                {/* === YAHAN CHANGE KIYA GAYA HAI === */}
+                <Link 
+                    href="/blog" 
+                    // CHANGE: Class ko '.primaryOutline' mein badla
+                    className={`${styles.heroButton} ${styles.primaryOutline}`} 
+                    style={{ marginTop: '3rem' }}
+                >
+                    Read All Insights
+                </Link>
             </section>
 
             {/* Review Modal component */}

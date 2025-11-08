@@ -9,8 +9,6 @@ import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import { AuthProvider } from "../context/AuthContext";
 import FloatingActionButtons from "../components/FloatingActionButtons/FloatingActionButtons"; 
-import VisitorTracker from "../components/VisitorTracker/VisitorTracker";
-import AnimatedBackground from "../components/AnimatedBackground/AnimatedBackground"; 
 
 // Firebase imports for metadata and marketing settings fetch
 import { doc, getDoc } from 'firebase/firestore';
@@ -31,24 +29,25 @@ interface GlobalSettings {
   defaultHeroBackground?: string; 
 }
 
-// Default/Fallback settings
-// FIX: Inner single quotes ko escape kiya (\') taaki TypeScript string ko correctly parse kare
-const defaultHeroURL = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'matrix\' values=\'1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.08 0\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")';
-
+// Default/Fallback settings (FIX: Hero URL yahan se hata diya gaya hai)
 const defaultSettings: GlobalSettings = {
     websiteTitle: "ZORK DI - Custom Tech Solutions",
     websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
     googleAnalyticsId: "G-XXXXXXXXXX", 
     googleSearchConsoleId: "", 
     heroBackgroundURL: "", 
-    defaultHeroBackground: defaultHeroURL,
+    defaultHeroBackground: "", // defaultHeroBackground ko empty rakha
 };
 
 // Function to fetch ALL Global Settings from Firestore
 async function getGlobalSettings(): Promise<GlobalSettings> {
+    // FIX 1: Next.js caching options (cacheOptions) ko remove kiya
+    // const cacheOptions = { next: { revalidate: 3600 } }; // REMOVED
+    
     try {
         const docRef = doc(db, 'cms', 'global_settings');
-        const docSnap = await getDoc(docRef);
+        // FIX 2: getDoc se cacheOptions argument ko hata diya
+        const docSnap = await getDoc(docRef); 
 
         if (docSnap.exists()) {
             const data = docSnap.data();
@@ -90,10 +89,14 @@ export default async function RootLayout({
   const globalSettings = await getGlobalSettings();
   const gaId = globalSettings.googleAnalyticsId;
   
+  // FIX 3: Hero Background URL ko CSS variable mein inject kiya
+  // agar URL hai, toh usko `url('...')` format mein set karo, agar nahi hai toh empty string set karo
   const heroBackground = globalSettings.heroBackgroundURL 
     ? `url('${globalSettings.heroBackgroundURL}')` 
-    : globalSettings.defaultHeroBackground; 
+    : ''; // Empty string means CSS variable will fall back to `globals.css` value
     
+  // Agar heroBackground empty string hai, toh yeh variable browser ko nahi bheja jayega, 
+  // aur `globals.css` ki default value kaam karegi.
   const customCssVars = {
       '--hero-bg-image': heroBackground,
   };
@@ -117,11 +120,10 @@ export default async function RootLayout({
         </>
       )}
 
-      <body className={poppins.className} style={customCssVars as React.CSSProperties}>
+      {/* FIX 4: Body tag par CSS variable inject kiya, jisse Hero Background set ho jaye */}
+      {/* Agar heroBackground empty string hai, toh yeh style prop mein nahi jayega, aur globals.css ki default value apply ho jayegi. */}
+      <body className={poppins.className} style={heroBackground ? (customCssVars as React.CSSProperties) : undefined}>
         <AuthProvider>
-          {/* NAYA: Animated Background ko Header se pehle render kiya (z-index: -1 se yeh peeche rahega) */}
-          <AnimatedBackground />
-          <VisitorTracker />
           
           <Header />
           {children}

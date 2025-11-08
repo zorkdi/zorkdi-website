@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import styles from './admin.module.css';
 import { 
-    FaTachometerAlt, FaFeatherAlt, FaUsers, FaTasks, FaCog, FaChartLine, FaSignOutAlt, FaEnvelope // NAYA: FaEnvelope import kiya
+    FaTachometerAlt, FaFeatherAlt, FaUsers, FaTasks, FaCog, FaChartLine, FaSignOutAlt, FaEnvelope, FaUserTie, FaBuilding // NAYA: FaBuilding import kiya
 } from 'react-icons/fa';
 import { CgClose } from 'react-icons/cg';
 import { useState, useEffect } from 'react';
@@ -22,7 +22,10 @@ const navLinks = [
     { name: 'Portfolio', href: '/admin/portfolio', icon: FaChartLine },
     { name: 'Project Requests', href: '/admin/projects', icon: FaTasks },
     { name: 'Client Chat', href: '/admin/chat', icon: FaUsers },
-    { name: 'Client Inbox', href: '/admin/mail', icon: FaEnvelope }, // NAYA: Client Inbox link add kiya
+    { name: 'Client Inbox', href: '/admin/mail', icon: FaEnvelope },
+    { name: 'Founder Profile', href: '/admin/founder', icon: FaUserTie },
+    // NAYA: Trust Settings link add kiya
+    { name: 'Trust Settings', href: '/admin/trust', icon: FaBuilding },
     { name: 'Settings', href: '/admin/settings', icon: FaCog },
 ];
 
@@ -114,6 +117,7 @@ export default function AdminLayout({
                 <nav>
                     <ul>
                         {navLinks.map((link) => {
+                            // FIX: Active link check mein startsWith ko better kiya taaki /admin/founder/edit par bhi link active rahe
                             const isActive = pathname === link.href || (link.href !== '/admin' && pathname.startsWith(link.href));
                             return (
                                 <li key={link.name}>

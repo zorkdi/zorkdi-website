@@ -22,11 +22,15 @@
 
 /* NAYA FIX: Ek invisible spacer div Hero Section ke liye */
 .heroSpacer {
-    width: 100%;
-    height: 100vh; /* CRITICAL: Isko 100vh height denge */
+    /* FIX 8: Width ko 100vw kiya taaki yeh viewport ki poori width width le */
+    width: 100vw; 
+    height: 100vh; 
     flex-shrink: 0;
     position: relative;
     z-index: 4; 
+    /* FIX 9: Hero spacer ko center mein rakka jab main container limited ho */
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
 }
 
 /* CRITICAL FIX: Hero Content aur Background Container */
@@ -43,15 +47,16 @@
     padding: 2rem;
     z-index: 2; 
 
-    /* CRITICAL FIX: Hero Background Image ko yahan CSS Variable se load karna */
+    /* FIX: Simple Parallax effect ke liye background-attachment: fixed use kiya */
     background-image: var(--hero-bg-image); 
+    background-attachment: fixed; /* Parallax effect ke liye essential */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     transition: background-image 0.5s ease;
 
-    /* Dynamic Overlay Layer (TCS/NVIDIA style dark overlay for text visibility) */
-    box-shadow: inset 0 0 0 2000px rgba(26, 26, 46, 0.7); 
+    /* Dynamic Overlay Layer (Overlay ko thoda halka kiya taaki background dikhe) */
+    box-shadow: inset 0 0 0 2000px rgba(26, 26, 46, 0.65); 
 }
 
 /* NAYA CLASS: Hero Content ko Services Section ke upar rakhne ke liye */
@@ -76,25 +81,31 @@
 
 /* --- Hero Element Styles (FINAL TEXT SIZE AND SPACING) --- */
 .heroHeadline {
-  /* FIX: Heading font size chota kiya (3.2rem) */
-  font-size: 3.2rem; 
-  font-weight: 700;
+  /* CHANGE 1: Heading font size ko aur bada kiya for impact (4.2rem) */
+  font-size: 4.2rem; 
+  font-weight: 800; /* Font weight badhaya */
   line-height: 1.1; 
-  max-width: 100%;
+  max-width: 1000px; /* Max width badhaya */
   color: var(--color-neon-green); 
-  text-shadow: 0 0 8px rgba(0, 245, 200, 0.6), 0 0 15px rgba(0, 245, 200, 0.3); 
+  /* CHANGE 2: Stronger Text Glow */
+  text-shadow: 0 0 10px rgba(0, 245, 200, 0.8), 0 0 20px rgba(0, 245, 200, 0.4); 
   margin-bottom: 2rem; 
-  /* white-space: nowrap ko hata diya gaya hai */
+  
+  /* --- NAYA: Glitch Effect (Task 3) --- */
+  position: relative;
+  /* Animation lagaya */
+  animation: glitch-flicker 3s infinite linear alternate;
 }
 
 .heroSubheadline {
-  font-size: 1.75rem; 
+  /* CHANGE 3: Font size badhaya (2rem) */
+  font-size: 2rem; 
   margin-top: 0; 
   margin-bottom: 3rem; 
-  max-width: 700px;
+  max-width: 800px;
   opacity: 1.0; 
   font-weight: 500;
-  line-height: 1.6; 
+  line-height: 1.5; /* Line height thik kiya */
 }
 
 /* Button Styles - Base/Primary Button ki Base Styling */
@@ -107,44 +118,124 @@
   border-radius: 10px;
   font-size: 1.1rem;
   box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.3s ease, color 0.3s ease; /* Transition time kam kiya for faster click feedback */
-  border: none; /* Default border set to none */
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.3s ease, color 0.3s ease; 
+  border: none; 
+  
+  /* FIX 58: Header CTA spacing ke liye margin diya (Yeh sirf Header ke liye tha, yahan isko kam karte hain) */
+  margin-left: 0.5rem; /* Margin kam kiya */
 }
 
 
 /* NAYA CLASS: Dedicated Hero Button Style for Max Impact (Composes removed) */
 .heroPrimaryButton {
-    /* Base styles copy kiye */
+    /* Base properties from Hero Button style */
     margin-top: 0; 
-    padding: 1rem 3rem; 
-    background-color: var(--color-neon-green);
-    color: var(--color-dark-navy);
     font-weight: 700; 
-    border-radius: 10px;
     font-size: 1.1rem;
+    
+    /* FIX 1: Hero Button se clip-path hataya aur rounded corners use kiye */
+    border-radius: 10px; /* Rounded corners ensure no cutting */
     
     /* Animation and Glow */
     box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
-    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.3s ease, color 0.3s ease;
-    border: none;
+    /* FIX: Faster Neon Pulse Animation */
+    animation: neonPulse 2.5s infinite ease-in-out; 
     
-    /* NAYA: Hero Button par subtle pulse animation */
-    animation: subtlePulse 3s infinite ease-in-out; 
+    /* --- CRITICAL FIX: Animated Button Styling (Hero Primary Button) --- */
+    position: relative;
+    overflow: hidden; 
+    z-index: 1;
+    padding: 0; 
+    border: none;
+    background-color: transparent; 
+    display: inline-flex; 
+
+    /* Transition update */
+    transition: transform 0.1s ease, box-shadow 0.1s ease, color 0.4s ease, background-color 0.4s ease, border-radius 0.3s ease;
+    
+    /* CRITICAL FIX 102: Hardware Acceleration for Smoothness */
+    will-change: transform, box-shadow; /* Browser ko bataya ki yeh properties change honge */
+    transform: translateZ(0); /* GPU Acceleration enable kiya */
 }
 
-/* NAYA FIX: Hero Button Hover (Strong Glow) */
+/* NAYA FIX: Hero Button Hover (Strong Glow & Scale Up) */
 .heroPrimaryButton:hover {
-  transform: translateY(-5px);
+  transform: scale(1.05); 
   /* Strongest Glow */
-  box-shadow: 0 0 35px rgba(0, 245, 200, 0.9), 0 0 5px rgba(0, 245, 200, 0.4); 
-  animation: none; 
+  box-shadow: 
+    0 0 45px rgba(0, 245, 200, 1.0), 
+    0 0 10px rgba(0, 245, 200, 0.6); 
+  animation: none;
+  
+  /* NAYA: Color change for glow effect */
+  color: var(--color-deep-blue);
 }
 
-/* NAYA FIX: Hero Button Active/Press State */
+/* NAYA FIX: Hero Button Active/Press State (Feedback) */
 .heroPrimaryButton:active {
-    transform: translateY(0) scale(0.98); 
+    transform: scale(1.03); 
     box-shadow: 0 0 5px rgba(0, 245, 200, 0.5); 
     animation: none;
+}
+
+/* Inner Text Span: Yeh hamesha top par rahega */
+.buttonText {
+    position: relative;
+    z-index: 5; 
+    display: block;
+    padding: 1rem 3rem; 
+    background-color: var(--color-neon-green);
+    color: var(--color-dark-navy);
+    transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.3s ease; /* Shadow transition add ki */
+    /* FIX 4: Inner text span ko bhi radius diya aur z-index badhaya */
+    border-radius: 10px;
+}
+
+/* Hover par inner text span ka style change */
+.heroPrimaryButton:hover .buttonText {
+    background-color: var(--color-dark-navy); 
+    color: var(--color-neon-green); 
+    box-shadow: none; 
+}
+
+
+/* Border Glow Element: Yeh button ki asali animation karega */
+.buttonBorderGlow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: 2; /* FIX: Iska z-index buttonText (5) se kam aur button (1) se zyada hona chahiye */
+    content: '';
+    display: block;
+    /* FIX 3: Border Glow ko bhi rounded corners diye */
+    border-radius: 10px;
+    
+    /* Animation ki properties */
+    transform: scaleX(0); 
+    transition: transform 0.6s cubic-bezier(0.86, 0, 0.07, 1); 
+    transform-origin: left;
+    
+    /* Neon glow effect */
+    box-shadow: 
+        0 0 5px var(--color-neon-light),
+        0 0 10px var(--color-neon-light),
+        0 0 20px var(--color-neon-light);
+    
+    background-color: var(--color-neon-green);
+    opacity: 0.8;
+    
+    /* CRITICAL FIX 103: Hardware Acceleration for Smoothness */
+    will-change: transform;
+    transform: translateZ(0) scaleX(0); /* translateZ(0) add kiya */
+}
+
+/* Hover par Border Glow element ko poora stretch karo */
+.heroPrimaryButton:hover .buttonBorderGlow {
+    transform: scaleX(1) translateZ(0); /* translateZ(0) yahan bhi rakha */
+    animation: pulseGlow 1.5s infinite alternate; 
 }
 
 
@@ -155,7 +246,13 @@
     background: transparent;
     border: 2px solid var(--color-secondary-accent);
     color: var(--color-secondary-accent);
+    border-radius: 10px; /* Ensure rounded corners */
     box-shadow: 0 0 10px rgba(139, 92, 246, 0.4); 
+    
+    /* FIX 59: Secondary button ka padding adjust kiya */
+    padding: 0.8rem 1.5rem; 
+    font-size: 1rem;
+    font-weight: 600;
 }
 
 /* Secondary Button hover state */
@@ -174,14 +271,126 @@
     box-shadow: 0 0 5px rgba(139, 92, 246, 0.5); 
 }
 
+/* === YAHAN NAYI CLASS ADD KI HAI === */
+/* NAYA: Primary Outline Button Style (Rate Your Experience) */
+.heroButton.primaryOutline {
+    animation: none; 
+    background: transparent;
+    /* Neon green border */
+    border: 2px solid var(--color-neon-green); 
+    /* Neon green text */
+    color: var(--color-neon-green); 
+    border-radius: 10px;
+    /* Neon green glow */
+    box-shadow: 0 0 10px rgba(0, 245, 200, 0.4); 
+    
+    padding: 0.8rem 1.5rem; 
+    font-size: 1rem;
+    font-weight: 600;
+    
+    /* Transition add ki */
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
 
-/* Universal Section Title - Glitch Fix */
+/* Primary Outline Button hover state */
+.heroButton.primaryOutline:hover {
+    /* Fill with neon green */
+    background-color: var(--color-neon-green); 
+    /* Text dark ho jayega */
+    color: var(--color-dark-navy); 
+    /* Stronger glow */
+    box-shadow: 0 0 35px rgba(0, 245, 200, 0.9);
+    transform: translateY(-5px);
+}
+
+/* Primary Outline Button Press state */
+.heroButton.primaryOutline:active {
+    transform: translateY(0) scale(0.98);
+    background-color: var(--color-neon-green);
+    color: var(--color-dark-navy);
+    box-shadow: 0 0 5px rgba(0, 245, 200, 0.5); 
+}
+
+
+/* Portfolio CTA Button ke liye extra space theek kiya */
+.portfolioCtaButton {
+    margin-left: 0; /* Center align karne ke liye extra margin hataya */
+}
+
+/* --- TRUST BAR FIX (Overlap Issue Solved) --- */
+
+.trustBarSection {
+    /* FIX 10: Width ko 100vw kiya taaki yeh bhi viewport ki poori width le */
+    width: 100vw; 
+    /* FIX 11: Trust Bar ko center mein rakha */
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    
+    margin-top: 0; 
+    position: relative;
+    z-index: 10; 
+    overflow: hidden; 
+    background-color: var(--color-dark-navy); 
+    padding-top: 2rem; 
+}
+
+.trustBarContent {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 3rem 2rem; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.trustBarText {
+    font-size: 0.9rem;
+    font-weight: 600;
+    opacity: 0.5;
+    color: var(--color-off-white);
+    letter-spacing: 2px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* FIX 87: Trust Logo Resize */
+.logoStrip {
+    width: 100%;
+    overflow: hidden;
+    /* Edge fade effect */
+    mask-image: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+}
+
+.logoTrack {
+    display: flex;
+    animation: scrollLogos 25s linear infinite; /* Animation add kiya */
+    width: fit-content; /* Saare logos ko fit karne ke liye */
+}
+
+.logoItem {
+    flex-shrink: 0;
+    /* FIX 97: Logo Item size ko Image tag mein set ki gayi 200x60 ke hisaab se adjust kiya */
+    padding: 0 2.5rem; /* Spacing kam rakhi */
+    height: 60px; /* Image Height */
+    width: 220px; /* Image Width (200) + Extra buffer */
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    transform: none; 
+    opacity: 0.6; 
+}
+
+/* --- Universal Section Title - Glitch Fix */
 .sectionTitle {
-  font-size: 3rem; 
-  font-weight: 700;
+  /* CHANGE: Font size badhaya */
+  font-size: 3.5rem; 
+  font-weight: 800;
   margin-bottom: 0.5rem; 
   color: var(--color-neon-light);
-  text-shadow: 0 0 5px rgba(0, 245, 200, 0.6); 
+  text-shadow: 0 0 8px rgba(0, 245, 200, 0.8); /* Stronger glow */
 }
 
 /* Section Subtitle - Visibility Fix */
@@ -196,11 +405,12 @@
 
 /* Services Section */
 .servicesSection {
-  /* CHANGE: Negative margin diya taaki Hero Section par overlap ho smooth transition ke liye */
-  margin-top: -60px; 
+  /* FIX 5: Margin top ko wapas zero kiya taaki TrustBar ke neeche immediately start ho */
+  margin-top: 0; 
   width: 100%;
   max-width: 1200px;
-  padding: 8rem 2rem; 
+  /* FIX 48: Services section ki vertical padding ko badhaya */
+  padding: 10rem 2rem; 
   text-align: center;
   position: relative; 
   z-index: 10; 
@@ -216,16 +426,21 @@
   text-align: left;
 }
 
-/* FIX 1: Service Card Premium Look */
+/* FIX 1: Service Card Premium Look (Task 2) */
 .serviceCard {
-  background-color: var(--color-glass-dark);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  /* FIX 55: Glass background ko thoda dark aur less transparent kiya */
+  background-color: rgba(22, 33, 62, 0.75); /* 0.6 se 0.75 kiya */
+  backdrop-filter: blur(10px); /* Blur badhaya */
+  -webkit-backdrop-filter: blur(10px);
   padding: 3rem; 
   border-radius: 16px;
   border: 1px solid var(--color-glass-light);
-  /* FIX 1: Deep shadow and subtle neon border glow */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 5px rgba(0, 245, 200, 0.2); 
+  
+  /* NAYA: Stronger 3D Elevation Shadow */
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.9), /* Deep vertical shadow for lift */
+    0 0 5px rgba(0, 245, 200, 0.2); 
+    
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -234,9 +449,9 @@
   transform: translateY(-15px); 
   /* FIX 2: Multiple layers of glow for 3D/Floating feel */
   box-shadow: 
-    0 15px 50px rgba(0, 0, 0, 0.9), /* Deep vertical shadow */
-    0 0 25px var(--color-neon-green), /* Bright neon glow */
-    0 0 5px var(--color-neon-light); /* Lighter central glow */
+    0 20px 60px rgba(0, 0, 0, 1.0), /* Deeper vertical shadow */
+    0 0 30px var(--color-neon-green), /* Brighter neon glow */
+    0 0 10px var(--color-neon-light); /* Lighter central glow */
 }
 
 /* FIX 3: Icon Polish */
@@ -265,13 +480,17 @@
 .portfolioSection {
   width: 100%;
   background-color: var(--color-deep-blue);
-  padding: 8rem 0; 
+  /* FIX 49: Portfolio section ki vertical padding ko badhaya */
+  padding: 10rem 0; 
   text-align: center;
   position: relative; 
 }
 
 /* Portfolio Scroll Container - NAYA */
 .portfolioScrollContainer {
+  /* CRITICAL FIX 98: Transform style property add kiya 3D perspective ke liye */
+  perspective: 1500px;
+  
   display: flex;
   overflow-x: scroll; 
   scroll-snap-type: x mandatory; 
@@ -287,25 +506,47 @@
   display: none;
 }
 
-/* Portfolio Card */
+/* Portfolio Card (ULTRA-PREMIUM LOOK) */
 .portfolioCard {
   flex-shrink: 0; 
   width: 350px; 
   scroll-snap-align: start; 
   
-  background-color: var(--color-dark-navy); 
+  /* FIX 42: Card Background Glassmorphism aur Border add kiya */
+  background-color: rgba(22, 33, 62, 0.95); /* Background aur dark/opaque kiya */
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  
+  /* NAYA FIX 99: Neon Border */
+  border: 1px solid var(--color-neon-green); 
+  
   border-radius: 12px; 
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1); 
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  /* CRITICAL FIX 100: 3D Transition Effects */
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease;
+  transform-style: preserve-3d;
+  
   height: auto; 
   display: flex;
   flex-direction: column;
+  
+  /* FIX 43: Stronger initial elevation for floating effect */
+  box-shadow: 
+    0 15px 50px rgba(0, 0, 0, 1.0), 
+    0 0 15px rgba(0, 245, 200, 0.6); /* Aggressive Shadow */
+  
+  /* NAYA: Subtle floating animation */
+  animation: aggressiveLift 4s infinite alternate ease-in-out;
 }
 
 .portfolioCard:hover {
-  transform: translateY(-8px); 
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6), 0 0 8px var(--color-neon-green); 
+  /* FIX 44: Lift up aur intense glow */
+  transform: translateY(-15px) scale(1.05) rotateX(2deg); /* 3D Lift and Slight Tilt */
+  box-shadow: 
+    0 25px 60px rgba(0, 0, 0, 0.98), 
+    0 0 50px var(--color-neon-green); /* Ultra Intense hover glow */
+  animation: neonGlowLoop 1.5s infinite alternate; /* New Intense Glow Animation */
 }
 
 .portfolioImageWrapper {
@@ -319,29 +560,51 @@
   font-weight: 500;
   color: rgba(255, 255, 255, 0.5);
   overflow: hidden; 
+  
+  /* NAYA FIX 101: Image Wrapper Bottom Border Glow */
+  border-bottom: 2px solid var(--color-neon-light);
+}
+
+.portfolioImageWrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* NAYA: Subtle Static Noise Overlay for Tech Feel */
+    background: var(--hero-bg-image);
+    opacity: 0.1;
+    z-index: 2; 
+    pointer-events: none;
+    background-size: 50px 50px;
+    animation: textureScroll 60s linear infinite; /* Texture ko slow scroll karo */
 }
 
 .portfolioContent {
-    padding: 1.2rem;
+    padding: 1.8rem 1.2rem; /* Padding badhaya */
 }
 
 .portfolioCategory {
-    opacity: 0.7; 
-    font-size: 0.85rem; 
-    color: var(--color-neon-green);
+    opacity: 0.95; 
+    font-size: 1.1rem; /* FIX 45: Category font size badhaya */
+    font-weight: 700;
+    color: var(--color-secondary-accent); /* Secondary color for contrast */
     margin-bottom: 0.5rem;
+    text-shadow: 0 0 5px rgba(139, 92, 246, 0.6);
 }
 
 .portfolioCard h3 {
-  font-size: 1.4rem; 
-  font-weight: 700;
+  font-size: 1.8rem; /* FIX 46: Title font size badhaya */
+  font-weight: 800;
   color: var(--color-off-white);
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .portfolioCard p {
-  opacity: 0.7; 
-  font-size: 0.9rem;
+  opacity: 0.8; 
+  font-size: 1rem; /* FIX 47: Description font size badhaya */
+  line-height: 1.5;
   flex-grow: 1; 
 }
 
@@ -353,11 +616,187 @@
     justify-content: center;
 }
 
+/* --- NAYA SECTION: CTA Bar Styling (Full Width Banner) --- */
+
+.ctaBarSection {
+    width: 100vw; 
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    margin: 4rem 0; 
+    background-color: var(--color-deep-blue); 
+    padding: 5rem 2rem; 
+    position: relative;
+    z-index: 9; 
+    border-radius: 0; 
+    border-top: 1px solid var(--color-secondary-accent); 
+    border-bottom: 1px solid var(--color-secondary-accent); 
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.3); 
+    background-image: none; 
+    color: var(--color-off-white); 
+}
+
+.ctaBarContent {
+    max-width: 1200px; 
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    gap: 2rem;
+}
+
+.ctaTextWrapper {
+    flex: 1; 
+    text-align: center; 
+}
+
+.ctaButtonWrapper {
+    flex-shrink: 0; 
+}
+
+.ctaHeadline {
+    font-size: 2.5rem; 
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    line-height: 1.2; 
+    color: var(--color-neon-green); 
+    text-shadow: 0 0 8px rgba(0, 245, 200, 0.8);
+}
+
+.ctaSubheadline {
+    font-size: 1.2rem; 
+    font-weight: 500;
+    margin-bottom: 0; 
+    opacity: 0.9;
+    color: var(--color-off-white); 
+    max-width: 650px; 
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ctaPrimaryButton {
+    background-color: transparent; 
+    color: var(--color-dark-navy); 
+    font-size: 1rem; 
+    box-shadow: none;
+    animation: none;
+    transition: transform 0.1s ease;
+}
+
+.ctaPrimaryButton .buttonText {
+    background: linear-gradient(145deg, #2a2a2e 0%, #1a1a1e 100%);
+    color: var(--color-neon-green);
+    padding: 0.8rem 2rem; 
+    border: 1px solid var(--color-neon-green);
+    box-shadow: 0 0 15px rgba(0, 245, 200, 0.6);
+    transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.ctaPrimaryButton:hover {
+    transform: scale(1.05);
+    box-shadow: none; 
+    animation: none;
+}
+
+.ctaPrimaryButton:hover .buttonText {
+    background: linear-gradient(145deg, #3a3a3e 0%, #2a2a2e 100%);
+    color: var(--color-neon-light); 
+    box-shadow: 0 0 25px rgba(0, 245, 200, 0.9);
+    border-color: var(--color-neon-light);
+}
+
+
+/* --- NAYA SECTION: Founder's Note Section (Phase 3, Task 1) --- */
+
+.founderNoteSection {
+    width: 100vw; 
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    background-color: var(--color-deep-blue);
+    padding: 8rem 2rem;
+    position: relative;
+    z-index: 8; 
+}
+
+.founderNoteWrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 3rem; 
+    text-align: center;
+}
+
+.founderImageContainer {
+    position: relative;
+    width: 220px; 
+    height: 220px;
+    flex-shrink: 0;
+    transform: none; 
+    border-radius: 50%; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 0 20px var(--color-secondary-accent);
+    border: 3px solid var(--color-secondary-accent); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.founderImage {
+    filter: grayscale(80%) brightness(110%); 
+    transition: filter 0.3s ease;
+    object-fit: cover !important; 
+    border-radius: 50% !important; 
+}
+
+.founderImageContainer:hover .founderImage {
+    filter: grayscale(0%) brightness(100%);
+    transform: none;
+}
+
+.founderContent {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.founderQuote {
+    font-size: 2rem; 
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+    color: var(--color-off-white);
+    text-shadow: 0 0 5px rgba(139, 92, 246, 0.4); 
+    position: relative;
+    padding-left: 20px;
+    border-left: 5px solid var(--color-secondary-accent);
+    font-style: italic;
+}
+
+.founderName {
+    font-size: 1rem; 
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-neon-green);
+}
+
+.founderTitle {
+    opacity: 0.7;
+    font-weight: 400;
+    color: var(--color-off-white);
+}
+
+.founderPhilosophy {
+    font-size: 0.95rem; 
+    opacity: 0.85;
+    line-height: 1.6;
+}
+/* End of Founder's Note Styling */
+
+
 /* Why Choose Us Section */
 .whyUsSection {
+  padding: 10rem 2rem;
   width: 100%;
   max-width: 1200px;
-  padding: 8rem 2rem;
   text-align: center;
   position: relative; 
 }
@@ -369,33 +808,31 @@
   margin-top: 4rem;
 }
 
-/* WhyUsItem styles ko Service Card jaisa hi rakha hai for consistency */
 .whyUsItem {
-  background-color: var(--color-glass-dark);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(22, 33, 62, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 3rem;
   border-radius: 16px;
   border: 1px solid var(--color-glass-light);
-  /* FIX 4: WhyUsItem base shadow ko bhi deep kiya */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 5px rgba(139, 92, 246, 0.2); 
-  transition: transform 0.3s ease;
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.9),
+    0 0 5px rgba(139, 92, 246, 0.2); 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-align: center;
 }
 
 .whyUsItem:hover {
   transform: translateY(-15px);
-  /* FIX 5: WhyUsItem hover glow ko bhi strong kiya (Secondary color mein) */
   box-shadow: 
-    0 15px 50px rgba(0, 0, 0, 0.9), 
-    0 0 25px var(--color-secondary-accent),
-    0 0 5px rgba(139, 92, 246, 0.6);
+    0 20px 60px rgba(0, 0, 0, 1.0), 
+    0 0 30px var(--color-secondary-accent),
+    0 0 10px rgba(139, 92, 246, 0.8);
 }
 
 .whyUsIcon {
   font-size: 3rem;
   margin-bottom: 1.5rem;
-  /* FIX 6: Secondary color icon glow */
   color: var(--color-secondary-accent); 
   text-shadow: 0 0 10px rgba(139, 92, 246, 0.8), 0 0 3px var(--color-secondary-accent);
 }
@@ -415,15 +852,140 @@
 .testimonialsSection {
   width: 100%;
   background-color: var(--color-deep-blue);
-  padding: 6rem 2rem;
+  padding: 10rem 2rem; 
   text-align: center;
 }
+
+/* --- NAYA STYLING: Testimonial Slider (Phase 2, Task 2) --- */
+
+.sliderContainer {
+    position: relative;
+    width: 100vw; /* Full width viewport */
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    overflow: hidden;
+    padding: 0 0 3rem 0; /* Neeche space diya */
+}
+
+.sliderTrackWrapper {
+    padding: 0 4rem; 
+    -ms-overflow-style: none; 
+    scrollbar-width: none;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+}
+.sliderTrackWrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.sliderTrack {
+    display: flex;
+    gap: 2.5rem; /* Cards ke beech space */
+    width: fit-content; 
+    padding-bottom: 1rem; /* Shadow visibility ke liye space */
+}
+
+.testimonialCard {
+    flex-shrink: 0; 
+    width: 350px; /* Card ki fixed width */
+    scroll-snap-align: start; 
+    
+    background-color: var(--color-glass-dark);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 3rem; 
+    border-radius: 16px;
+    border: 1px solid var(--color-glass-light);
+    
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.8), 
+      0 0 5px rgba(0, 245, 200, 0.2); 
+      
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.testimonialCard:hover {
+  transform: translateY(-5px); 
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.9), 0 0 20px var(--color-neon-light);
+}
+
+.quoteIcon {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-size: 2.5rem;
+    opacity: 0.1;
+    color: var(--color-neon-green);
+}
+
+.reviewComment {
+    font-style: italic;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.reviewFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+.reviewerName {
+    font-weight: 600;
+    color: var(--color-off-white);
+}
+
+/* Slider Controls (Chevron Buttons) */
+.sliderControl {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    background-color: var(--color-glass-dark);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid var(--color-neon-green);
+    color: var(--color-neon-green);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    box-shadow: 0 0 10px rgba(0, 245, 200, 0.4);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.sliderControl:hover {
+    background-color: rgba(0, 245, 200, 0.2);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.sliderControl.left {
+    left: 1.5rem;
+}
+
+.sliderControl.right {
+    right: 1.5rem;
+}
+
 
 /* Blog Section */
 .blogSection {
   width: 100%;
   max-width: 1200px;
-  padding: 6rem 2rem;
+  padding: 10rem 2rem; 
   text-align: center;
 }
 
@@ -454,96 +1016,248 @@
 }
 
 /* ===== Mobile Responsive Styles ===== */
+@media (max-width: 1024px) {
+    /* Trust Bar ko thoda adjust kiya for tablets */
+    .logoItem {
+        padding: 0 1.5rem;
+    }
+    
+    .ctaBarSection {
+        padding: 4rem 1.5rem; 
+        margin: 3rem 0;
+    }
+    .ctaBarContent {
+        gap: 1.5rem; 
+    }
+    
+    .ctaSubheadline {
+        margin-bottom: 0; 
+    }
+    .ctaHeadline {
+        font-size: 2rem;
+    }
+    .ctaSubheadline {
+        font-size: 1.1rem;
+    }
+    
+    .servicesSection,
+    .portfolioSection,
+    .whyUsSection,
+    .testimonialsSection,
+    .blogSection {
+        padding-top: 6rem;
+        padding-bottom: 6rem;
+    }
+    
+    /* Founder Note Mobile */
+    .founderNoteWrapper {
+        gap: 2rem; 
+    }
+    .founderImageContainer {
+        width: 200px; 
+        height: 200px;
+        transform: translate(0, 0); 
+    }
+    .founderQuote {
+        font-size: 1.8rem;
+    }
+    
+    /* Portfolio Scroll Mobile Fix */
+    .portfolioScrollContainer {
+        padding: 0 1.5rem;
+        perspective: none; 
+    }
+    
+    .portfolioCard {
+        transform-style: flat;
+        animation: none;
+    }
+    
+    .portfolioCard:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 30px var(--color-neon-green);
+        animation: none;
+    }
+}
+
+
 @media (max-width: 768px) {
-  /* FIX 1: Heading font size kam kiya */
   .heroHeadline {
-    font-size: 2.5rem;
-    /* CRITICAL FIX 4: Mobile par Text Alignment Center kiya */
+    font-size: 3.5rem; 
     text-align: center; 
   }
 
-  /* FIX 2: Subheading font size chota kiya */
   .heroSubheadline {
-    font-size: 1.2rem;
-    
-    /* CRITICAL FIX 5: Mobile par Subheadline Text Alignment Center kiya */
+    font-size: 1.5rem;
     text-align: center; 
-    line-height: 1.5; /* Line spacing theek kiya */
+    line-height: 1.5; 
   }
   
   .sectionTitle {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
   }
   
-  /* Services Section ko sirf top padding se adjust kiya */
-  .servicesSection {
-      padding-top: 4rem;
-      padding-bottom: 4rem;
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
-      margin-top: 0; /* FIX: Mobile par margin top zero rakha */
+  /* Trust Bar Section Mobile */
+  .trustBarSection {
+      margin-top: 0;
+      padding-top: 1rem;
+      margin-left: 0;
+      margin-right: 0;
+  }
+  .trustBarContent {
+      padding: 0 1rem 3rem 1rem;
+  }
+  .logoTrack {
+      animation-duration: 15s; 
+  }
+  .logoItem {
+      padding: 0 1rem;
   }
   
-  /* Portfolio Section ki side padding zero ki taaki full width scroll ho sake */
+    .servicesSection,
+    .portfolioSection,
+    .whyUsSection,
+    .testimonialsSection,
+    .blogSection {
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+    }
+  
   .portfolioSection {
       padding: 4rem 0; 
   }
 
-  .servicesGrid, .whyUsGrid, .blogGrid {
-    gap: 2rem;
+  /* Mobile CTA Bar */
+  .ctaBarSection {
+      padding: 3rem 1.5rem; 
+      margin: 2rem 0;
   }
-
-  /* Mobile par cards ke content ko center karna */
-  .serviceCard,
-  .whyUsItem {
-    text-align: left; 
-    padding: 2rem;
+  .ctaHeadline {
+      font-size: 1.8rem; 
   }
-  
-  .serviceCard:hover,
-  .whyUsItem:hover {
-      transform: translateY(-5px); 
-  }
-
-  /* Portfolio grid mobile par bhi horizontal scroll karega */
-  .portfolioScrollContainer {
-    padding: 0 1.5rem; 
-    gap: 1.5rem;
-  }
-
-  /* Mobile par card ki width kam ki taaki 2 cards fit ho sakein */
-  .portfolioCard {
-    width: 280px; 
-  }
-
-  .portfolioCard:hover {
-    transform: scale(1.02); 
+  .ctaSubheadline {
+      font-size: 1rem;
   }
   
-  .blogSection {
-      padding: 4rem 1.5rem;
+  .ctaPrimaryButton .buttonText {
+    padding: 0.6rem 1.5rem; 
   }
   
-  /* Blog section mobile par vertical rahega */
-  .blogGrid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
+  .ctaPrimaryButton {
+      font-size: 0.9rem;
   }
+  
+  /* Founder Note Mobile */
+    .founderNoteSection {
+        padding: 4rem 1.5rem;
+    }
+    .founderQuote {
+        font-size: 1.5rem;
+    }
 }
 
-/* --- NAYA: Subtle Pulse Keyframes --- */
-@keyframes subtlePulse {
+/* --- Keyframes are same --- */
+@keyframes neonPulse {
     0% {
-        transform: scale(1);
+        transform: scale(1) translateZ(0);
         box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
     }
     50% {
-        transform: scale(1.015);
+        transform: scale(1.015) translateZ(0);
         box-shadow: 0 0 30px rgba(0, 245, 200, 0.8), 0 0 5px rgba(0, 245, 200, 0.4);
     }
     100% {
-        transform: scale(1);
+        transform: scale(1) translateZ(0);
         box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
+    }
+}
+
+@keyframes pulseGlow {
+    0% {
+        opacity: 0.8;
+        transform: scale(1) translateZ(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1.01) translateZ(0);
+    }
+}
+
+@keyframes scrollLogos {
+    from {
+        transform: translateX(0) translateZ(0);
+    }
+    to {
+        transform: translateX(-50%) translateZ(0); 
+    }
+}
+
+@keyframes glitch-flicker {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(0, 245, 200, 0.8), 0 0 20px rgba(0, 245, 200, 0.4); 
+        transform: none;
+        opacity: 1;
+    }
+    10% {
+        text-shadow: 2px 0 10px var(--color-neon-light), -2px 0 10px var(--color-secondary-accent);
+        transform: translate(-1px, 1px) translateZ(0);
+    }
+    20% {
+        text-shadow: -1px 0 10px var(--color-secondary-accent), 1px 0 10px var(--color-neon-light);
+        transform: translate(1px, -1px) translateZ(0);
+        opacity: 0.95;
+    }
+    30% {
+        text-shadow: 4px 0 10px var(--color-neon-light), -4px 0 10px var(--color-secondary-accent);
+        transform: translate(2px, 0) translateZ(0);
+    }
+    90% {
+        opacity: 1;
+    }
+    92% {
+        opacity: 0.98;
+    }
+}
+
+@keyframes aggressiveLift {
+    0% {
+        transform: translateY(0) scale(1) translateZ(0);
+        box-shadow: 
+            0 15px 50px rgba(0, 0, 0, 1.0), 
+            0 0 15px rgba(0, 245, 200, 0.6);
+    }
+    50% {
+        transform: translateY(-5px) scale(1.005) translateZ(0);
+        box-shadow: 
+            0 20px 60px rgba(0, 0, 0, 1.0), 
+            0 0 25px rgba(0, 245, 200, 0.8);
+    }
+    100% {
+        transform: translateY(0) scale(1) translateZ(0);
+        box-shadow: 
+            0 15px 50px rgba(0, 0, 0, 1.0), 
+            0 0 15px rgba(0, 245, 200, 0.6);
+    }
+}
+
+@keyframes neonGlowLoop {
+    0% {
+        box-shadow: 
+            0 25px 60px rgba(0, 0, 0, 0.98), 
+            0 0 40px var(--color-neon-green);
+    }
+    100% {
+        box-shadow: 
+            0 25px 60px rgba(0, 0, 0, 0.98), 
+            0 0 50px var(--color-neon-light);
+    }
+}
+
+@keyframes textureScroll {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 100px 100px;
     }
 }
