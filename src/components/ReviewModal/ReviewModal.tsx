@@ -17,8 +17,9 @@ interface ReviewModalProps {
 }
 
 const ReviewModal = ({ isOpen, onClose, projectId, projectTitle, allowComment = true }: ReviewModalProps) => {
-    // FIX: 'user' ko 'currentUser' se replace kiya
-    const { currentUser } = useAuth(); 
+    // === YAHAN CHANGE KIYA GAYA HAI ===
+    // FIX: 'userData' ko 'userProfile' se replace kiya
+    const { currentUser, userProfile } = useAuth(); 
     const [rating, setRating] = useState(0);
     const [hover, setHover] = useState(0);
     const [comment, setComment] = useState('');
@@ -32,7 +33,6 @@ const ReviewModal = ({ isOpen, onClose, projectId, projectTitle, allowComment = 
             alert("Please select a star rating.");
             return;
         }
-        // FIX: user ki jagah currentUser check kiya
         if (!currentUser) { 
              alert("You must be logged in.");
              return;
@@ -40,12 +40,27 @@ const ReviewModal = ({ isOpen, onClose, projectId, projectTitle, allowComment = 
 
         setIsSubmitting(true);
         try {
+            
+            // === YAHAN CHANGE KIYA GAYA HAI ===
+            // NAYA: userName ko userProfile se banane ki logic
+            let displayName = 'Anonymous User'; // Default fallback
+            if (userProfile && userProfile.fullName) {
+                // Sabse best case: Firestore se poora naam mil gaya
+                displayName = userProfile.fullName;
+            } else if (currentUser.displayName) {
+                // Second best: Firebase auth ka display name (jaise Google se login)
+                displayName = currentUser.displayName;
+            } else if (currentUser.email) {
+                // Sabse kharab case: Email se naam nikalo
+                displayName = currentUser.email.split('@')[0];
+            }
+
             // NAYA: Data object ko pehle banao
             const reviewData = {
                 // User details AuthContext se
                 userId: currentUser.uid,
-                // displayName ya email ko use kiya agar displayName nahi hai
-                userName: currentUser.displayName || currentUser.email || 'Registered User', 
+                // FIX: 'displayName' variable ko yahan use kiya
+                userName: displayName, 
                 userImage: currentUser.photoURL || '',
                 
                 rating: rating,
@@ -53,13 +68,10 @@ const ReviewModal = ({ isOpen, onClose, projectId, projectTitle, allowComment = 
                 
                 // Project details (optional for General Review)
                 projectId: projectId || null,
-                // FIX: Agar projectId nahi hai, toh General Website Review title set kiya
                 projectTitle: projectId ? projectTitle || 'Project Review' : 'General Website Review', 
                 
-                // Type ko refine kiya: Agar comment allowed hai, toh full review, otherwise rating_only
                 type: allowComment ? 'full_review' : 'rating_only', 
                 createdAt: serverTimestamp(),
-                // Shuru mein hamesha approved (admin review ke liye baad mein badal sakte hain)
                 status: 'approved' 
             };
             
@@ -98,7 +110,6 @@ const ReviewModal = ({ isOpen, onClose, projectId, projectTitle, allowComment = 
                 </button>
                 
                 <h2 style={{ color: 'var(--color-neon-green)', marginBottom: '1.5rem', textAlign: 'center' }}>
-                    {/* FIX: projectTitle ke optional hone par General Review title set kiya */}
                     {allowComment 
                         ? (projectTitle ? `Review: ${projectTitle}` : 'Write a General Review') 
                         : 'Rate Us'}
