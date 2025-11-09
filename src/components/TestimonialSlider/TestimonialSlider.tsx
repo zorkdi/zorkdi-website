@@ -5,7 +5,7 @@
 import React, { useRef } from 'react';
 import styles from '../../app/page.module.css';
 import { FaQuoteLeft, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { Timestamp } from 'firebase/firestore'; // === YAHAN CHANGE KIYA GAYA HAI ===
+import { Timestamp } from 'firebase/firestore'; // Timestamp import jo pehle fix kiya tha
 
 // Review Interface (page.tsx se copy kiya)
 interface Review {
@@ -13,7 +13,7 @@ interface Review {
     userName: string;
     rating: number;
     comment: string;
-    createdAt: Timestamp; // === YAHAN CHANGE KIYA GAYA HAI ===
+    createdAt: Timestamp; // Pehle fix kiya tha
 }
 
 interface TestimonialSliderProps {
@@ -40,7 +40,6 @@ const StarRating = ({ rating }: { rating: number }) => {
 
 const TestimonialSlider: React.FC<TestimonialSliderProps> = ({ reviews }) => {
     
-    // NAYA: Scrolling functionality ke liye ref use kiya
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const scroll = (direction: 'left' | 'right') => {
@@ -55,6 +54,21 @@ const TestimonialSlider: React.FC<TestimonialSliderProps> = ({ reviews }) => {
         }
     };
     
+    // === YAHAN NAYA FUNCTION ADD KIYA GAYA HAI ===
+    /**
+     * Formats the username. If it's an email, it shows the part before the @.
+     * @param name The username string from the database.
+     * @returns A display-safe name.
+     */
+    const formatUserName = (name: string) => {
+        if (name && name.includes('@')) {
+            // Agar email hai, toh @ se pehle ka hissa return karo
+            return name.split('@')[0];
+        }
+        // Agar email nahi hai, toh poora naam return karo
+        return name;
+    };
+
     if (reviews.length === 0) {
         return <p style={{ textAlign: 'center', opacity: 0.8 }}>No approved testimonials yet. Be the first to rate us!</p>;
     }
@@ -75,7 +89,7 @@ const TestimonialSlider: React.FC<TestimonialSliderProps> = ({ reviews }) => {
             {/* Scrollable Track */}
             <div className={styles.sliderTrackWrapper}>
                 <div className={styles.sliderTrack} ref={scrollRef}>
-                    {/* === YAHAN CHANGE KIYA GAYA HAI === */}
+                    {/* Unused 'index' hata diya tha (pichla fix) */}
                     {reviews.map((review) => (
                         <div key={review.id} className={styles.testimonialCard}>
                             <FaQuoteLeft className={styles.quoteIcon} />
@@ -85,7 +99,8 @@ const TestimonialSlider: React.FC<TestimonialSliderProps> = ({ reviews }) => {
                             </p>
                             
                             <div className={styles.reviewFooter}>
-                                <div className={styles.reviewerName}>{review.userName}</div>
+                                {/* === YAHAN CHANGE KIYA GAYA HAI === */}
+                                <div className={styles.reviewerName}>{formatUserName(review.userName)}</div>
                                 <StarRating rating={review.rating} />
                             </div>
                         </div>
