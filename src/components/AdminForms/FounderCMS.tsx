@@ -182,7 +182,8 @@ const FounderCMS = () => {
     
     return (
         <form className={formStyles.formSection} onSubmit={handleSubmit}>
-            <h2>Founder's Profile & Vision</h2>
+            {/* === YAHAN CHANGE KIYA GAYA HAI === */}
+            <h2>Founder&apos;s Profile & Vision</h2>
 
             <div className={formStyles.formGrid}>
                 

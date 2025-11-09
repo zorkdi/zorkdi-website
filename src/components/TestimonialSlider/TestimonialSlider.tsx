@@ -5,6 +5,7 @@
 import React, { useRef } from 'react';
 import styles from '../../app/page.module.css';
 import { FaQuoteLeft, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { Timestamp } from 'firebase/firestore'; // === YAHAN CHANGE KIYA GAYA HAI ===
 
 // Review Interface (page.tsx se copy kiya)
 interface Review {
@@ -12,7 +13,7 @@ interface Review {
     userName: string;
     rating: number;
     comment: string;
-    createdAt: any;
+    createdAt: Timestamp; // === YAHAN CHANGE KIYA GAYA HAI ===
 }
 
 interface TestimonialSliderProps {
@@ -74,7 +75,8 @@ const TestimonialSlider: React.FC<TestimonialSliderProps> = ({ reviews }) => {
             {/* Scrollable Track */}
             <div className={styles.sliderTrackWrapper}>
                 <div className={styles.sliderTrack} ref={scrollRef}>
-                    {reviews.map((review, index) => (
+                    {/* === YAHAN CHANGE KIYA GAYA HAI === */}
+                    {reviews.map((review) => (
                         <div key={review.id} className={styles.testimonialCard}>
                             <FaQuoteLeft className={styles.quoteIcon} />
                             

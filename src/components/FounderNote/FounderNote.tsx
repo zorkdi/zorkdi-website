@@ -1,7 +1,7 @@
 // src/components/FounderNote/FounderNote.tsx
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react'; // useCallback add kiya
 import Image from 'next/image';
 import styles from '../../app/page.module.css';
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
@@ -33,7 +33,8 @@ const FounderNote: React.FC = () => {
 
     const DOC_REF = useMemo(() => doc(db, 'cms', 'founder_settings'), []);
 
-    const fetchFounderSettings = async () => {
+    // === YAHAN CHANGE KIYA GAYA HAI (useCallback) ===
+    const fetchFounderSettings = useCallback(async () => {
         try {
             const docSnap = await getDoc(DOC_REF);
 
@@ -49,17 +50,19 @@ const FounderNote: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [DOC_REF]); // DOC_REF ko dependency banaya
 
+    // === YAHAN CHANGE KIYA GAYA HAI (useEffect) ===
     useEffect(() => {
         fetchFounderSettings();
-    }, [DOC_REF]);
+    }, [fetchFounderSettings]); // fetchFounderSettings ko dependency banaya
 
     // Loader ya Fallback UI jab data load ho raha ho
     if (isLoading) {
         return (
              <section className={styles.founderNoteSection} style={{minHeight: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                 <p style={{ opacity: 0.7 }}>Loading Founder's Vision...</p>
+                 {/* === YAHAN CHANGE KIYA GAYA HAI === */}
+                 <p style={{ opacity: 0.7 }}>Loading Founder&apos;s Vision...</p>
              </section>
         );
     }
@@ -94,7 +97,8 @@ const FounderNote: React.FC = () => {
                 <div className={styles.founderContent}>
                     <AnimationWrapper delay={0.2}>
                         <h3 className={styles.founderQuote}>
-                            "{quote}"
+                            {/* === YAHAN CHANGE KIYA GAYA HAI === */}
+                            {quote}
                         </h3>
                     </AnimationWrapper>
                     
