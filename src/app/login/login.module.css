@@ -95,6 +95,7 @@
   /* NAYA: Neon Glow */
   box-shadow: 0 0 15px rgba(0, 245, 200, 0.5);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 1rem; /* Added margin-top to make space for forgot password link */
 }
 
 .submitButton:hover {
@@ -121,4 +122,24 @@
 }
 .signupLink a:hover {
     text-decoration: underline;
+}
+
+/* === YAHAN NAYI CLASS ADD KI HAI === */
+.forgotPasswordLink {
+  display: block;
+  text-align: right;
+  margin-top: -0.5rem; /* Form group ke margin ke upar pull karega */
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.forgotPasswordLink a {
+  color: var(--color-neon-light);
+  opacity: 0.8;
+  text-decoration: none;
+}
+
+.forgotPasswordLink a:hover {
+  opacity: 1;
+  text-decoration: underline;
 }

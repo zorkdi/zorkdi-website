@@ -103,6 +103,11 @@ const LoginPage = () => {
                         />
                     </div>
                     
+                    {/* === YAHAN NAYA LINK ADD KIYA GAYA HAI === */}
+                    <div className={styles.forgotPasswordLink}>
+                        <Link href="/forgot-password">Forgot Password?</Link>
+                    </div>
+                    
                     <button
                         type="submit"
                         className={styles.submitButton}

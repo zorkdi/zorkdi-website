@@ -9,7 +9,6 @@ import Image from 'next/image'; // Already imported
 import styles from './Header.module.css';
 import { CgMenuRight, CgClose } from "react-icons/cg";
 import { FaUserCircle } from "react-icons/fa"; // Default profile icon ke liye
-// FIX 1: loading state ko AuthContext se import kiya
 import { useAuth } from '../../context/AuthContext'; 
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../../firebase';
@@ -18,17 +17,18 @@ import { doc, getDoc } from 'firebase/firestore';
 // Global settings data type
 interface BrandingData {
   websiteTitle: string;
-  websiteTagline: string; // Correct property name
+  websiteTagline: string; 
+  headerLogoURL: string; // Logo ke liye field
 }
 
-// Default/Fallback values (Used during loading or if CMS fails)
+// Default/Fallback values
 const defaultBranding: BrandingData = {
     websiteTitle: "ZORK DI",
     websiteTagline: "Empowering Ideas With Technology",
+    headerLogoURL: "/logo.png", // Default logo
 };
 
 const Header = () => {
-  // FIX 2: authLoading ko useAuth() se import kiya
   const { currentUser, userProfile, loading: authLoading } = useAuth(); 
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -56,6 +56,7 @@ const Header = () => {
                   setBranding({
                       websiteTitle: data.websiteTitle || defaultBranding.websiteTitle,
                       websiteTagline: data.websiteTagline || defaultBranding.websiteTagline,
+                      headerLogoURL: data.headerLogoURL || defaultBranding.headerLogoURL, 
                   });
               }
           } catch (error) {
@@ -116,14 +117,22 @@ const Header = () => {
     }
   };
 
+  // === YAHAN CHANGE KIYA GAYA HAI ===
+  // Nayi logic yeh check karegi ki logoURL valid hai ya nahi
+  const logoSrc = brandingLoading 
+    ? defaultBranding.headerLogoURL // Jab loading ho, default dikhao
+    : (branding.headerLogoURL && branding.headerLogoURL.trim() !== "" // Check karo ki URL khaali toh nahi
+        ? branding.headerLogoURL // Agar valid hai, toh database wala URL use karo
+        : defaultBranding.headerLogoURL); // Agar khaali hai, toh default URL use karo
 
   return (
     <header className={styles.header}>
       <div className={styles.container}>
         <div className={styles.logo}>
           <Link href="/">
+            {/* === YAHAN CHANGE KIYA GAYA HAI === */}
             <Image
-              src="/logo.png"
+              src={logoSrc} // Naya variable yahan use kiya
               alt={`${branding.websiteTitle} Logo`}
               width={55} 
               height={55}
@@ -135,7 +144,6 @@ const Header = () => {
               <span className={styles.brandName}>
                  {brandingLoading ? defaultBranding.websiteTitle : branding.websiteTitle}
               </span>
-              {/* FIX 3: branding.brandTagline ko branding.websiteTagline se replace kiya */}
               <span className={styles.brandTagline}>
                  {brandingLoading ? defaultBranding.websiteTagline : branding.websiteTagline}
               </span>
@@ -143,17 +151,14 @@ const Header = () => {
           </Link>
         </div>
         
-        {/* FIX 4: Hamburger Button ko logo aur desktop nav ke beech me rakha (Mobile Left Corner) */}
         <button 
             className={styles.hamburgerButton} 
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
-            // Hamburger ko default hidden rakha desktop par
             style={{ display: 'none' }} 
         >
             {menuOpen ? <CgClose /> : <CgMenuRight />}
         </button>
-        {/* END FIX 4 */}
 
 
         <nav className={styles.desktopNav}>
@@ -170,11 +175,6 @@ const Header = () => {
           <Link href="/contact" className={styles.secondaryCtaButton}>Contact</Link>
           <Link href="/new-project" className={styles.primaryCtaButton}>Start a Project</Link>
           
-          {/* FIX 5: Mobile-Visible Start Project Button Yahan se Hata Diya */}
-          {/* FIX 5: mobileCtaButtonVisible class use nahi hogi ab */}
-          
-          {/* FIX 6: Profile Menu Container ko authLoading khatam hone par hi render kiya */}
-          {/* Agar auth loading ho raha hai, toh kuch render mat karo hydration mismatch se bachne ke liye */}
           {!authLoading && (
               <>
                   <Link 
@@ -186,7 +186,6 @@ const Header = () => {
               
                   <div className={styles.profileMenuContainer} ref={profileMenuRef}>
                     
-                    {/* Agar logged in hai aur photo hai, toh Image component dikhao */}
                     {currentUser && userProfile?.photoURL ? (
                       <Image 
                         src={userProfile.photoURL} 
@@ -197,7 +196,6 @@ const Header = () => {
                         onClick={() => setProfileMenuOpen(!profileMenuOpen)} 
                       />
                     ) : (
-                        /* Agar logged in nahi hai ya photo nahi hai, toh FaUserCircle icon dikhao */
                       <button 
                         className={styles.profileIcon} 
                         onClick={() => setProfileMenuOpen(!profileMenuOpen)}
@@ -211,7 +209,6 @@ const Header = () => {
                       <div className={styles.profileDropdown}>
                         {currentUser ? (
                           <ul>
-                            {/* Admin link add kiya */}
                             {userProfile?.email === 'admin@zorkdi.com' && (
                                 <li><Link href="/admin" onClick={closeMenus}>Admin Dashboard</Link></li>
                             )}
@@ -230,15 +227,11 @@ const Header = () => {
                   </div>
               </>
           )}
-
-          {/* Hamburger button yahan se remove kar diya gaya hai */}
         </div>
       </div>
 
       {menuOpen && (
-        // Close button mobile menu ke andar add kiya
         <div className={styles.mobileMenu}>
-          {/* Close button ko mobile menu ke right top mein rakha hai */}
           <button 
             className={styles.hamburgerButton} 
             onClick={() => setMenuOpen(false)}
@@ -254,7 +247,6 @@ const Header = () => {
               <li><Link href="/about" onClick={closeMenus}>About Us</Link></li>
               <li><Link href="/blog" onClick={closeMenus}>Blog</Link></li>
               <li><Link href="/contact" onClick={closeMenus}>Contact</Link></li>
-              {/* FIX 7: Start a Project button ko wapas mobile menu mein add kiya */}
               <li><Link href="/new-project" className={styles.mobileCta} onClick={closeMenus}>Start a Project</Link></li> 
             </ul>
           </nav>

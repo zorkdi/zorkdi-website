@@ -2,7 +2,6 @@
 
 "use client";
 
-// FIX: useMemo ko import kiya
 import { useState, useEffect, ChangeEvent, useMemo } from 'react';
 import Image from 'next/image'; 
 // Firebase services
@@ -13,20 +12,20 @@ import { db, storage } from '@/firebase';
 import adminStyles from '@/app/admin/admin.module.css';
 import formStyles from './forms.module.css';
 import newPostStyles from '@/app/admin/blog/new/new-post.module.css'; 
-import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaChartLine, FaSearch, FaTimesCircle } from "react-icons/fa"; 
+import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaChartLine, FaSearch, FaTimesCircle, FaUpload } from "react-icons/fa"; // FaUpload add kiya
 
+// === YAHAN CHANGE KIYA GAYA HAI ===
 // Type for Firestore data structure
 interface GlobalSettings {
   websiteTitle: string; 
   websiteTagline: string; 
+  headerLogoURL: string; // NAYA FIELD LOGO KE LIYE
   
-  // NAYE FIELDS FOR HERO BACKGROUND
-  heroBackgroundURL: string; // The dynamic image URL
-  defaultHeroBackground: string; // Placeholder or default CSS URL
+  heroBackgroundURL: string; 
+  defaultHeroBackground: string; 
   
-  // NAYE FIELDS FOR DIGITAL MARKETING
   googleAnalyticsId: string;
-  googleSearchConsoleId: string; // Verification ID for meta tag
+  googleSearchConsoleId: string; 
 
   contactEmail: string;
   contactPhone: string;
@@ -45,12 +44,11 @@ const defaultHeroURL = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' x
 const initialData: GlobalSettings = {
   websiteTitle: "ZORK DI - Custom Tech Solutions",
   websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
+  headerLogoURL: "/logo.png", // NAYA DEFAULT VALUE
   
-  // NAYE DEFAULT VALUES FOR HERO BACKGROUND
-  heroBackgroundURL: "", // Shuru mein empty rakha
-  defaultHeroBackground: defaultHeroURL, // CSS texture as default fallback
+  heroBackgroundURL: "", 
+  defaultHeroBackground: defaultHeroURL, 
 
-  // NAYE DEFAULT VALUES FOR MARKETING
   googleAnalyticsId: "G-XXXXXXXXXX", 
   googleSearchConsoleId: "",
 
@@ -62,24 +60,29 @@ const initialData: GlobalSettings = {
   socialTwitter: "https://twitter.com/zorkdi",
   socialInstagram: "https://instagram.com/zorkdi",
   socialFacebook: "https://facebook.com/zorkdi",
-  adminUID: "eWCjS5yqHvSuafrJ5IbWlT6Kmyf2", // Default Admin UID
+  adminUID: "eWCjS5yqHvSuafrJ5IbWlT6Kmyf2", 
 };
 
 const GlobalCMS = () => {
   const [content, setContent] = useState<GlobalSettings>(initialData);
   
-  // NAYA: State for image handling
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-  const [currentHeroURL, setCurrentHeroURL] = useState<string>(''); // For tracking Firestore URL
+  // Hero Background Image states
+  const [heroImageFile, setHeroImageFile] = useState<File | null>(null);
+  const [heroImagePreview, setHeroImagePreview] = useState<string | null>(null);
+  const [heroUploadProgress, setHeroUploadProgress] = useState<number | null>(null);
+  const [currentHeroURL, setCurrentHeroURL] = useState<string>(''); 
+
+  // === NAYE STATES HEADER LOGO KE LIYE ===
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoUploadProgress, setLogoUploadProgress] = useState<number | null>(null);
+  const [currentLogoURL, setCurrentLogoURL] = useState<string>('');
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // FIX: DOC_REF ko useMemo se wrap kiya taaki woh stable reference de.
   const DOC_REF = useMemo(() => doc(db, 'cms', 'global_settings'), []);
 
   // --- Data Fetching ---
@@ -91,19 +94,25 @@ const GlobalCMS = () => {
 
         if (docSnap.exists()) {
           const fetchedData = docSnap.data();
-          // Merge kiya taaki naye fields bhi set ho jayein agar Firestore mein nahi hain
           const mergedData = { ...initialData, ...fetchedData } as GlobalSettings;
           
           setContent(mergedData); 
+          
+          // Hero Image states
           setCurrentHeroURL(mergedData.heroBackgroundURL);
-          setImagePreview(mergedData.heroBackgroundURL || '');
+          setHeroImagePreview(mergedData.heroBackgroundURL || '');
+          
+          // Logo Image states
+          setCurrentLogoURL(mergedData.headerLogoURL);
+          setLogoPreview(mergedData.headerLogoURL || '');
 
         } else {
-          // Agar document nahi mila, toh default data ke saath create kar do
           await setDoc(DOC_REF, initialData);
           setContent(initialData);
           setCurrentHeroURL(initialData.heroBackgroundURL);
-          setImagePreview(initialData.heroBackgroundURL);
+          setHeroImagePreview(initialData.heroBackgroundURL);
+          setCurrentLogoURL(initialData.headerLogoURL);
+          setLogoPreview(initialData.headerLogoURL);
         }
       } catch (_err: unknown) {
         console.error("Error fetching Global CMS:", _err);
@@ -113,7 +122,6 @@ const GlobalCMS = () => {
       }
     };
     fetchData();
-    // FIX: DOC_REF ko dependency array mein add kiya
   }, [DOC_REF]); 
 
   // --- Handlers ---
@@ -124,28 +132,87 @@ const GlobalCMS = () => {
     setError('');
   };
   
-  // NAYA: Handle image file selection
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  // Hero Image File Handler
+  const handleHeroFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setImageFile(file);
+      setHeroImageFile(file);
       const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
+      setHeroImagePreview(previewUrl);
     }
   };
   
-  // NAYA: Handle image delete (from CMS view only)
-  const handleImageDelete = () => {
-    // Ye sirf UI se hatata hai aur Final URL ko empty karta hai. Actual Firestore/Storage deletion handleSubmit mein hoga.
+  // Hero Image Delete Handler
+  const handleHeroImageDelete = () => {
     const confirmDelete = window.confirm("Are you sure you want to remove the Hero Background Image?");
     if (confirmDelete) {
-        setImagePreview('');
+        setHeroImagePreview('');
         setCurrentHeroURL(''); 
-        setImageFile(null); // Clear any pending file upload
+        setHeroImageFile(null); 
         setContent(prev => ({...prev, heroBackgroundURL: ''}));
         setSuccess('');
         setError('');
     }
+  };
+
+  // === NAYE HANDLERS LOGO KE LIYE ===
+  const handleLogoFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setLogoFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setLogoPreview(previewUrl);
+    }
+  };
+  
+  const handleLogoDelete = () => {
+    const confirmDelete = window.confirm("Are you sure you want to remove the Header Logo?");
+    if (confirmDelete) {
+        setLogoPreview('');
+        setCurrentLogoURL(''); 
+        setLogoFile(null); 
+        setContent(prev => ({...prev, headerLogoURL: ''}));
+        setSuccess('');
+        setError('');
+    }
+  };
+  
+  // Helper function ek file upload karne ke liye
+  const uploadFile = (file: File, path: string, progressCallback: (progress: number) => void): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const storageRef = ref(storage, path);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+        
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                progressCallback(Math.round(progress));
+            },
+            (uploadError) => {
+                console.error("Upload failed:", uploadError);
+                reject(uploadError);
+            },
+            async () => {
+                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                resolve(downloadURL);
+            }
+        );
+    });
+  };
+  
+  // Helper function ek file delete karne ke liye
+  const deleteFile = async (fileURL: string) => {
+      if (fileURL.includes('firebasestorage.googleapis.com')) {
+           try {
+               const urlPath = fileURL.split('/o/')[1];
+               const filePath = urlPath.split('?')[0];
+               const decodedPath = decodeURIComponent(filePath);
+               const imageRef = ref(storage, decodedPath);
+               await deleteObject(imageRef);
+           } catch (storageError) {
+               console.error("Warning: Failed to delete old storage image.", storageError);
+           }
+      }
   };
 
 
@@ -156,59 +223,51 @@ const GlobalCMS = () => {
     setSuccess('');
 
     try {
-      let finalImageURL = currentHeroURL; // Firestore se aayi hui URL
+      let finalHeroURL = currentHeroURL; 
+      let finalLogoURL = currentLogoURL;
 
-      // 1. Image Upload Logic
-      if (imageFile) {
-        setUploadProgress(0);
-        const storageRef = ref(storage, `cms_images/hero_background_${Date.now()}`);
-        const uploadTask = uploadBytesResumable(storageRef, imageFile);
-
-        await new Promise<void>((resolve, reject) => {
-          uploadTask.on('state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              setUploadProgress(Math.round(progress));
-            },
-            (uploadError) => {
-              console.error("Image upload failed:", uploadError);
-              setError("Image upload failed. Please try again.");
-              reject(uploadError);
-            },
-            async () => {
-              finalImageURL = await getDownloadURL(uploadTask.snapshot.ref);
-              // Agar koi purani image ho toh usko delete karne ki logic yahan aayegi (Optional)
-              resolve();
-            }
-          );
-        });
-      } else if (!imagePreview && currentHeroURL) {
-          // 2. Image Deletion (Agar user ne UI se image delete ki ho)
-          if (currentHeroURL.includes('firebasestorage.googleapis.com')) {
-               try {
-                   const urlPath = currentHeroURL.split('/o/')[1];
-                   const filePath = urlPath.split('?')[0];
-                   const decodedPath = decodeURIComponent(filePath);
-                   const imageRef = ref(storage, decodedPath);
-                   await deleteObject(imageRef);
-                   finalImageURL = ''; // Final URL ko empty set kiya
-                   setCurrentHeroURL('');
-               } catch (storageError) {
-                   console.error("Warning: Failed to delete old storage image.", storageError);
-                   // continue execution, finalImageURL will be cleared in next step
-               }
-          }
-          finalImageURL = ''; // Final URL ko empty set kiya
+      // 1. Hero Image Upload Logic
+      if (heroImageFile) {
+        setHeroUploadProgress(0);
+        finalHeroURL = await uploadFile(
+            heroImageFile, 
+            `cms_images/hero_background_${Date.now()}`,
+            (p) => setHeroUploadProgress(p)
+        );
+      } else if (!heroImagePreview && currentHeroURL) {
+          // Hero Image Deletion
+          await deleteFile(currentHeroURL);
+          finalHeroURL = ''; 
+      }
+      
+      // 2. Logo Image Upload Logic
+      if (logoFile) {
+        setLogoUploadProgress(0);
+        finalLogoURL = await uploadFile(
+            logoFile,
+            `cms_images/header_logo_${Date.now()}`,
+            (p) => setLogoUploadProgress(p)
+        );
+      } else if (!logoPreview && currentLogoURL) {
+          // Logo Image Deletion
+          await deleteFile(currentLogoURL);
+          finalLogoURL = '';
       }
 
 
       // 3. Update Document in Firestore
-      // DOC_REF is used here, no need to redefine
-      await setDoc(DOC_REF, { ...content, heroBackgroundURL: finalImageURL }, { merge: true }); 
+      await setDoc(DOC_REF, { 
+          ...content, 
+          heroBackgroundURL: finalHeroURL,
+          headerLogoURL: finalLogoURL // Naya field save kiya
+      }, { merge: true }); 
 
       // Final state update
-      setCurrentHeroURL(finalImageURL);
-      setImagePreview(finalImageURL || ''); 
+      setCurrentHeroURL(finalHeroURL);
+      setHeroImagePreview(finalHeroURL || ''); 
+      setCurrentLogoURL(finalLogoURL);
+      setLogoPreview(finalLogoURL || '');
+      
       setSuccess('Global Settings updated successfully!');
 
     } catch (err: unknown) {
@@ -216,8 +275,10 @@ const GlobalCMS = () => {
       setError('Failed to save global settings. Check console.');
     } finally {
       setIsSubmitting(false);
-      setUploadProgress(null);
-      setImageFile(null); // Clear file state
+      setHeroUploadProgress(null);
+      setLogoUploadProgress(null);
+      setHeroImageFile(null); 
+      setLogoFile(null);
     }
   };
 
@@ -235,35 +296,70 @@ const GlobalCMS = () => {
         <div className={formStyles.fullWidth}>
             <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--color-neon-light)' }}>Branding & Core Info</h3>
         </div>
+        
+        {/* === NAYA LOGO UPLOADER === */}
+        <div className={formStyles.fullWidth}>
+            <div className={formStyles.formGroup}>
+                <label>Header Logo (Recommended: PNG/SVG)</label>
+                <div className={newPostStyles.imageUploadSection} style={{maxWidth: '300px', padding: '1.5rem'}}>
+                    {logoPreview ? (
+                        <>
+                            <Image
+                              src={logoPreview}
+                              alt="Header Logo Preview"
+                              width={150} height={60} 
+                              style={{ objectFit: 'contain', width: '150px', height: '60px', filter: 'brightness(1.1)'}}
+                            />
+                            <button type="button" onClick={handleLogoDelete} className={adminStyles.dangerButton} style={{marginTop: '1rem', width: 'auto', display: 'flex', alignItems: 'center', gap: '5px'}}>
+                                <FaTimesCircle /> Remove Logo
+                            </button>
+                        </>
+                    ) : (
+                        <span style={{opacity: 0.7, padding: '1rem', display: 'block'}}>No Logo Selected</span>
+                    )}
+                    <input
+                        type="file" id="headerLogo" className={newPostStyles.fileInput}
+                        onChange={handleLogoFileChange} accept="image/png, image/jpeg, image/webp, image/svg+xml"
+                    />
+                    <label htmlFor="headerLogo" className={newPostStyles.uploadButton} style={{marginTop: '1.5rem', display: 'flex', gap: '5px', alignItems: 'center', justifyContent: 'center'}}>
+                        <FaUpload /> {logoPreview ? 'Change Logo' : 'Upload Logo'}
+                    </label>
+                    {logoUploadProgress !== null && logoUploadProgress < 100 && ( 
+                        <p className={newPostStyles.uploadProgress}>Uploading: {logoUploadProgress}%</p>
+                    )}
+                </div>
+            </div>
+        </div>
+
         <div className={formStyles.fullWidth}>
           <div className={formStyles.formGroup}>
-            <label htmlFor="websiteTitle">Website Title (Metadata)</label>
+            <label htmlFor="websiteTitle">Website Title (Metadata & Header)</label>
             <input type="text" id="websiteTitle" name="websiteTitle" value={content.websiteTitle} onChange={handleTextChange} required />
           </div>
         </div>
         <div className={formStyles.fullWidth}>
           <div className={formStyles.formGroup}>
-            <label htmlFor="websiteTagline">Website Tagline / Description (Metadata)</label>
+            <label htmlFor="websiteTagline">Website Tagline / Description (Metadata & Header)</label>
             <textarea id="websiteTagline" name="websiteTagline" value={content.websiteTagline} onChange={handleTextChange} required />
           </div>
         </div>
         
         {/* --- HERO BACKGROUND IMAGE --- */}
         <div className={formStyles.fullWidth}>
-            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-green)' }}>Home Hero Background Image (NVIDIA/TCS style)</h3>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-green)' }}>Home Hero Background Image</h3>
         </div>
         <div className={formStyles.fullWidth}>
              <div className={newPostStyles.imageUploadSection}>
-                {imagePreview ? (
+                {heroImagePreview ? (
                     <>
                         <Image
-                          src={imagePreview}
+                          src={heroImagePreview}
                           alt="Hero Background Preview"
                           width={400} height={250} 
                           className={newPostStyles.imagePreview}
                           style={{ objectFit: 'cover', width: '100%', maxWidth: '400px', height: 'auto', border: '1px solid var(--color-neon-green)'}}
                         />
-                        <button type="button" onClick={handleImageDelete} className={adminStyles.dangerButton} style={{marginTop: '1rem', width: 'auto', display: 'flex', alignItems: 'center', gap: '5px'}}>
+                        <button type="button" onClick={handleHeroImageDelete} className={adminStyles.dangerButton} style={{marginTop: '1rem', width: 'auto', display: 'flex', alignItems: 'center', gap: '5px'}}>
                             <FaTimesCircle /> Remove Image
                         </button>
                     </>
@@ -272,13 +368,13 @@ const GlobalCMS = () => {
                 )}
                 <input
                     type="file" id="heroBackground" className={newPostStyles.fileInput}
-                    onChange={handleFileChange} accept="image/png, image/jpeg, image/webp"
+                    onChange={handleHeroFileChange} accept="image/png, image/jpeg, image/webp"
                 />
                 <label htmlFor="heroBackground" className={newPostStyles.uploadButton} style={{marginTop: '1.5rem'}}>
-                    {imagePreview ? 'Change Image' : 'Upload Hero Background'}
+                    {heroImagePreview ? 'Change Image' : 'Upload Hero Background'}
                 </label>
-                {uploadProgress !== null && uploadProgress < 100 && ( 
-                    <p className={newPostStyles.uploadProgress}>Uploading: {uploadProgress}%</p>
+                {heroUploadProgress !== null && heroUploadProgress < 100 && ( 
+                    <p className={newPostStyles.uploadProgress}>Uploading: {heroUploadProgress}%</p>
                 )}
             </div>
         </div>

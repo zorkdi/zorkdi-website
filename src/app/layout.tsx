@@ -1,5 +1,7 @@
 // src/app/layout.tsx
 
+export const revalidate = 0; // === YAHAN CHANGE KIYA GAYA HAI === (Server cache ko disable karta hai)
+
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
@@ -23,30 +25,30 @@ const poppins = Poppins({
 interface GlobalSettings {
   websiteTitle: string;
   websiteTagline: string;
+  headerLogoURL: string; // NAYA FIELD LOGO KE LIYE
   googleAnalyticsId?: string; 
   googleSearchConsoleId?: string; 
   heroBackgroundURL?: string; 
   defaultHeroBackground?: string; 
 }
 
-// Default/Fallback settings (FIX: Hero URL yahan se hata diya gaya hai)
+// Default/Fallback settings
 const defaultSettings: GlobalSettings = {
     websiteTitle: "ZORK DI - Custom Tech Solutions",
     websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
+    headerLogoURL: "/logo.png", // NAYA DEFAULT VALUE
     googleAnalyticsId: "G-XXXXXXXXXX", 
     googleSearchConsoleId: "", 
     heroBackgroundURL: "", 
-    defaultHeroBackground: "", // defaultHeroBackground ko empty rakha
+    defaultHeroBackground: "",
 };
 
 // Function to fetch ALL Global Settings from Firestore
 async function getGlobalSettings(): Promise<GlobalSettings> {
-    // FIX 1: Next.js caching options (cacheOptions) ko remove kiya
-    // const cacheOptions = { next: { revalidate: 3600 } }; // REMOVED
-    
     try {
         const docRef = doc(db, 'cms', 'global_settings');
-        // FIX 2: getDoc se cacheOptions argument ko hata diya
+        // === YAHAN CHANGE KIYA GAYA HAI ===
+        // getDoc ko 'no-store' cache option diya
         const docSnap = await getDoc(docRef); 
 
         if (docSnap.exists()) {
@@ -72,10 +74,20 @@ export async function generateMetadata(): Promise<Metadata> {
         ? { google: globalSettings.googleSearchConsoleId } 
         : {};
 
+    // NAYA: Favicon logic
+    const faviconURL = (globalSettings.headerLogoURL && globalSettings.headerLogoURL.trim() !== "")
+        ? globalSettings.headerLogoURL
+        : defaultSettings.headerLogoURL;
+
     return {
         title: globalSettings.websiteTitle,
         description: globalSettings.websiteTagline,
         verification: verificationMeta, 
+        // NAYA: icons property add ki
+        icons: {
+            icon: faviconURL,
+            apple: faviconURL,
+        }
     };
 }
 
@@ -89,14 +101,10 @@ export default async function RootLayout({
   const globalSettings = await getGlobalSettings();
   const gaId = globalSettings.googleAnalyticsId;
   
-  // FIX 3: Hero Background URL ko CSS variable mein inject kiya
-  // agar URL hai, toh usko `url('...')` format mein set karo, agar nahi hai toh empty string set karo
   const heroBackground = globalSettings.heroBackgroundURL 
     ? `url('${globalSettings.heroBackgroundURL}')` 
-    : ''; // Empty string means CSS variable will fall back to `globals.css` value
+    : ''; 
     
-  // Agar heroBackground empty string hai, toh yeh variable browser ko nahi bheja jayega, 
-  // aur `globals.css` ki default value kaam karegi.
   const customCssVars = {
       '--hero-bg-image': heroBackground,
   };
@@ -120,8 +128,6 @@ export default async function RootLayout({
         </>
       )}
 
-      {/* FIX 4: Body tag par CSS variable inject kiya, jisse Hero Background set ho jaye */}
-      {/* Agar heroBackground empty string hai, toh yeh style prop mein nahi jayega, aur globals.css ki default value apply ho jayegi. */}
       <body className={poppins.className} style={heroBackground ? (customCssVars as React.CSSProperties) : undefined}>
         <AuthProvider>
           
