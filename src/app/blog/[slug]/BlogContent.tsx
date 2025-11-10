@@ -1,19 +1,16 @@
 // src/app/blog/[slug]/BlogContent.tsx
 
-"use client"; // CRITICAL: Yeh client component hai
+"use client"; 
 
 import Image from 'next/image';
 import { db } from '@/firebase';
-// === YAHAN CHANGE KIYA GAYA HAI ===
 import { Timestamp, collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore'; 
-import styles from '@/app/blog/[slug]/blog-detail.module.css'; // Is file ko hum agle step mein update karenge
+import styles from '@/app/blog/[slug]/blog-detail.module.css'; 
 import { useEffect, useState } from 'react'; 
 import React from 'react';
 import { FaCalendarAlt, FaTag, FaSpinner } from 'react-icons/fa'; 
 import Link from 'next/link';
-import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper'; // AnimationWrapper import kiya
-
-// === YAHAN CHANGE KIYA GAYA HAI ===
+import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper'; 
 
 // Naya Interface Content Block ke liye
 interface ContentBlock {
@@ -28,11 +25,10 @@ interface ContentBlock {
 interface BlogPost {
   title: string;
   category: string;
-  // content: string; // <-- Hata diya
-  contentBlocks: ContentBlock[]; // <-- Add kiya
+  contentBlocks: ContentBlock[]; // 'content' ko 'contentBlocks' se badla
   coverImageURL: string;
   createdAt: Timestamp | null;
-  isPublished: boolean; // Yeh bhi check kar sakte hain
+  isPublished: boolean; 
 }
 
 // Props interface
@@ -42,7 +38,6 @@ interface BlogContentProps {
 
 // Helper function jo text ko paragraphs mein badlega
 const renderTextWithParagraphs = (text: string) => {
-    // Har line break ko <p> tag se replace karo
     return text.split('\n').filter(p => p.trim() !== '').map((paragraph, index) => (
         <p key={index}>{paragraph}</p>
     ));
@@ -62,14 +57,12 @@ const BlogContent = ({ slug }: BlogContentProps) => {
         const q = query(
             blogCollectionRef, 
             where('slug', '==', postSlug), 
-            // where('isPublished', '==', true), // Isko enable kar sakte hain production mein
             limit(1)
         );
 
         const querySnapshot = await getDocs(q); 
         
         if (querySnapshot.empty) {
-            // Slug se nahi mila, toh ID se try karo (fallback)
             try {
                 const docRef = doc(db, 'blog', postSlug);
                 const docSnap = await getDoc(docRef);
@@ -86,7 +79,6 @@ const BlogContent = ({ slug }: BlogContentProps) => {
             return null; // Dono se nahi mila
         }
 
-        // Post milne par
         const docSnap = querySnapshot.docs[0];
         return {
             ...docSnap.data(),
@@ -130,8 +122,8 @@ const BlogContent = ({ slug }: BlogContentProps) => {
         ); 
     }
 
-    // Agar post nahi mila
     if (!post) {
+        // Custom 404 UI
         return (
             <main className={styles.main} style={{textAlign: 'center', minHeight: '80vh', paddingTop: '10rem'}}>
                 <h1 style={{color: '#ff4757', fontSize: '3rem'}}>404 - Post Not Found</h1>
@@ -143,8 +135,6 @@ const BlogContent = ({ slug }: BlogContentProps) => {
         );
     }
     
-    // === YAHAN POORA RENDER LOGIC BADAL GAYA HAI ===
-
     return (
         <main className={styles.main}>
           <article>
@@ -177,7 +167,6 @@ const BlogContent = ({ slug }: BlogContentProps) => {
 
             {/* Naya Content Blocks Renderer */}
             <div className={styles.postContent}>
-                {/* Loop over contentBlocks */}
                 {(post.contentBlocks || []).map((block, index) => {
                     
                     const hasText = block.text && block.text.trim() !== '';
@@ -211,22 +200,22 @@ const BlogContent = ({ slug }: BlogContentProps) => {
                         </div>
                     );
 
-                    // Layout ke hisaab se render karna
-                    let layoutClass = '';
+                    // === YAHAN CHANGE KIYA GAYA HAI ===
+                    // Ab hum 'className' ko 'div' par laga rahe hain
+                    // Aur element order ko change kar rahe hain
+                    
                     switch (block.layout) {
                         case 'text-left-image-right':
-                            layoutClass = styles.layoutImageRight;
                             return (
-                                <div key={block.id} className={`${styles.layoutRow} ${layoutClass}`}>
+                                <div key={block.id} className={styles.layoutRow}>
                                     {textContent}
                                     {imageContent}
                                 </div>
                             );
                         
                         case 'image-left-text-right':
-                            layoutClass = styles.layoutImageLeft;
                             return (
-                                <div key={block.id} className={`${styles.layoutRow} ${layoutClass}`}>
+                                <div key={block.id} className={styles.layoutRow}>
                                     {imageContent}
                                     {textContent}
                                 </div>

@@ -138,7 +138,7 @@ const PortfolioContent = ({ id }: PortfolioContentProps) => {
             {/* Naya Content Blocks Renderer */}
             <div className={styles.projectContent}>
                 {/* Loop over contentBlocks */}
-                {(item.contentBlocks || []).map((block, index) => { // 'index' add kiya delay ke liye
+                {(item.contentBlocks || []).map((block, index) => {
                     
                     const hasText = block.text && block.text.trim() !== '';
                     const hasImage = block.imageURL && block.imageURL.trim() !== '';
@@ -170,23 +170,23 @@ const PortfolioContent = ({ id }: PortfolioContentProps) => {
                             </AnimationWrapper>
                         </div>
                     );
+                    
+                    // === YAHAN CHANGE KIYA GAYA HAI ===
+                    // Ab hum 'className' ko 'div' par laga rahe hain
+                    // Aur element order ko change kar rahe hain
 
-                    // === YAHAN CHANGE KIYA GAYA HAI (className ab DIV par hai) ===
-                    let layoutClass = '';
                     switch (block.layout) {
                         case 'text-left-image-right':
-                            layoutClass = styles.layoutImageRight;
                             return (
-                                <div key={block.id} className={`${styles.layoutRow} ${layoutClass}`}>
+                                <div key={block.id} className={styles.layoutRow}>
                                     {textContent}
                                     {imageContent}
                                 </div>
                             );
                         
                         case 'image-left-text-right':
-                            layoutClass = styles.layoutImageLeft;
                             return (
-                                <div key={block.id} className={`${styles.layoutRow} ${layoutClass}`}>
+                                <div key={block.id} className={styles.layoutRow}>
                                     {imageContent}
                                     {textContent}
                                 </div>
