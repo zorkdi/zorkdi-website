@@ -1,25 +1,24 @@
 /* src/app/admin/portfolio/new/portfolio-form.module.css */
 
-/* CRITICAL CHANGE: Reverting to single column, focused flow */
+/* Main form wrapper */
 .formWrapper {
-    display: flex; /* Use flex for vertical stacking */
+    display: flex;
     flex-direction: column;
     gap: 2rem;
-    padding-bottom: 4rem; /* Bottom padding for space below buttons */
+    padding-bottom: 4rem;
 }
 
-/* Metadata and Image Section Wrapper */
+/* Metadata column (left side) */
 .metadataColumn {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    /* Sticky for desktop view (Google Docs sidebar feel) */
     position: sticky;
     top: 2rem; 
     height: fit-content;
-    padding-bottom: 2rem;
 }
 
+/* Base card style for metadata sections */
 .metadataSection {
     background-color: var(--color-deep-blue);
     padding: 2rem;
@@ -28,24 +27,19 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Single column form layout within the metadata card */
-.metadataGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
-    gap: 1.5rem;
-}
-
-/* Content Editor (Takes full width below metadata) */
-.contentColumn {
-    /* No specific background, relies on the full page dark color */
-    background-color: var(--color-dark-navy);
-    padding-top: 1rem;
+/* Section header style */
+.sectionHeader {
+    color: var(--color-neon-green);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(0, 245, 200, 0.3);
 }
 
 
-/* Image Upload Section */
+/* Cover Image Upload Section */
 .imageUploadSection {
-    /* Cover image upload will be a prominent block in the metadata section */
     border: 2px dashed var(--color-neon-green); 
     border-radius: 8px;
     padding: 2rem; 
@@ -54,16 +48,17 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 1rem;
 }
 
 .imagePreview {
     width: 100%;
     max-width: 450px; 
     height: auto;
-    aspect-ratio: 16 / 9; /* Wider ratio for impact */
+    aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: 4px;
-    margin: 0 auto 1.5rem auto;
+    margin: 0 auto;
     border: 1px solid var(--color-neon-green); 
 }
 
@@ -72,7 +67,10 @@
 }
 
 .uploadButton {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     padding: 0.75rem 1.5rem;
     background-color: var(--color-neon-green);
     color: var(--color-dark-navy);
@@ -99,11 +97,11 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 0; 
+    gap: 0.5rem;
 }
 
 .formGroup label {
     font-weight: 600;
-    margin-bottom: 0.5rem;
     opacity: 0.9;
     color: var(--color-off-white);
 }
@@ -117,56 +115,81 @@
     box-shadow: 0 0 5px var(--color-neon-light);
 }
 
-/* CRITICAL FIX: Content Image Uploader Styling */
-.contentImageUploader {
-    background-color: var(--color-dark-navy); /* Dark background */
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid rgba(139, 92, 246, 0.3); /* Secondary accent border */
+
+/* --- NAYE STYLES (PLAN C) --- */
+
+/* Content Editor (Right Column) */
+.contentColumn {
+    background-color: var(--color-dark-navy);
+    padding-top: 1rem;
+}
+
+/* Container for all blocks */
+.contentBlocksContainer {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
-.uploadedURLContainer {
-    padding: 1rem;
-    background-color: rgba(0, 245, 200, 0.1);
-    border-radius: 6px;
-    border: 1px solid var(--color-neon-green);
+/* Styling for one content block */
+.contentBlock {
+    background-color: var(--color-deep-blue);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-
-/* CRITICAL FIX: Content Editor Height */
-.contentColumn textarea {
-    min-height: 600px;
-    /* Custom styling jo forms.module.css se inherit nahi ho rahi */
-    background-color: var(--color-dark-navy); 
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--color-off-white);
-    font-size: 1rem;
-    padding: 1rem;
-    border-radius: 6px;
+.blockHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 0.8rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-
-/* Error/Success messages */
-.errorMessage, .successMessage {
-    padding: 1rem;
-    border-radius: 6px;
-    margin-top: 1.5rem;
-    text-align: center;
+.blockHeader h4 {
+    margin: 0;
+    color: var(--color-neon-light);
     font-weight: 600;
 }
 
-/* Action Buttons ko form ke neeche poori width mein dikhana (Ye adminStyles se override ho jayenge) */
-.actionButtonsContainer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: 2rem;
+/* Grid inside the block */
+.blockGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 2/3 text, 1/3 media */
+    gap: 1.5rem;
+    padding: 1.5rem;
 }
+
+.blockTextFields {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.blockMediaFields {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.blockImageUpload {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: var(--color-dark-navy);
+    border: 1px dashed var(--color-secondary-accent);
+}
+
+/* Textarea inside a block */
+.blockGrid textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
 
 /* Mobile Responsive */
 @media (max-width: 992px) {
@@ -176,7 +199,9 @@
     .imagePreview {
         max-width: 100%;
     }
-    .contentColumn textarea {
-        min-height: 400px;
+    
+    /* Block grid ko stack karo */
+    .blockGrid {
+        grid-template-columns: 1fr;
     }
 }

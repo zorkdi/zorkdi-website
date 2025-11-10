@@ -1,36 +1,8 @@
 // src/app/portfolio/[id]/page.tsx
 
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import { db } from '@/firebase';
-import { doc, getDoc, Timestamp } from 'firebase/firestore';
-import styles from './portfolio-detail.module.css'; //
-
-// Define Portfolio Item structure
-interface PortfolioItem {
-  title: string;
-  category: string;
-  content: string; // This will be HTML
-  coverImageURL: string;
-  createdAt?: Timestamp;
-}
-
-// Fetch data function (runs on server)
-async function getPortfolioItem(id: string): Promise<PortfolioItem | null> {
-  try {
-    const docRef = doc(db, 'portfolio', id);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      return docSnap.data() as PortfolioItem;
-    } else {
-      return null; // Not found
-    }
-  } catch (error) {
-    console.error("Error fetching portfolio item:", error);
-    return null; // Return null on error
-  }
-}
+// === YAHAN CHANGE KIYA GAYA HAI ===
+// Server component ab 'PortfolioContent' client component ko import karega
+import PortfolioContent from './PortfolioContent'; 
 
 // Page component props
 interface PortfolioDetailPageProps {
@@ -40,55 +12,19 @@ interface PortfolioDetailPageProps {
 }
 
 // The Page Component (Server Component)
+// Yeh ab bahut simple hai
 const PortfolioDetailPage = async (props: PortfolioDetailPageProps) => {
-  // FIX: Next.js 14+ or Turbopack often requires explicit awaiting of the
-  // props object (which includes dynamic segments like params) to resolve 
-  // the "params should be awaited" error.
-  const awaitedProps = await props;
-  const { id } = awaitedProps.params;
+  
+  // FIX: Next.js 15+ ke liye params ko aise await karna hai.
+  // Isse aapka build error fix ho jayega.
+  const { id } = await props.params;
 
-  const item = await getPortfolioItem(id);
-
-  // If item not found, show 404 page
-  if (!item) {
-    notFound();
-  }
-
-  // --- CRITICAL FIX: ImageRow class ko replace karna taaki CSS apply ho ---
-  // Yeh logic PortfolioContent.tsx se uthaya gaya hai aur yahan implement kiya ja raha hai
-  // taaki Server Component mein image row ki styling sahi ho
-  const contentWithImageRowStyles = item!.content.replace(/<div class="ImageRow"/g, `<div class="ImageRow ${styles.imageRow}"`);
-
-
+  // Server component ab koi HTML render nahi karega.
+  // Yeh bas client component 'PortfolioContent' ko render karega
+  // aur 'id' ko prop ke taur par pass kar dega.
+  // 'PortfolioContent' component data fetch karne ka kaam khud karega.
   return (
-    <main className={styles.main}>
-      <article>
-        {/* Cover Image */}
-        <div className={styles.coverImageContainer}>
-          {item!.coverImageURL && (
-            <Image
-              src={item!.coverImageURL}
-              alt={item!.title}
-              fill
-              style={{ objectFit: 'cover' }}
-              priority // Load cover image faster
-              sizes="(max-width: 768px) 100vw, 900px" // Adjust sizes
-            />
-          )}
-        </div>
-
-        {/* Title and Category */}
-        <h1 className={styles.projectTitle}>{item!.title}</h1>
-        <p className={styles.projectCategory}>{item!.category}</p>
-
-        {/* Formatted Content (Rendered from HTML) */}
-        <div
-          className={styles.projectContent}
-          // IMPORTANT FIX: Ab contentWithImageRowStyles ko render kar rahe hain
-          dangerouslySetInnerHTML={{ __html: contentWithImageRowStyles }} 
-        />
-      </article>
-    </main>
+    <PortfolioContent id={id} />
   );
 };
 

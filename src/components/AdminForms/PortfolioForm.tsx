@@ -5,7 +5,6 @@
 import { useState, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-// import dynamic from 'next/dynamic'; <-- Removed TinyMCE imports
 
 // Firebase services
 import { db, storage } from '@/firebase';
@@ -13,20 +12,33 @@ import {
   collection, addDoc, serverTimestamp, doc, getDoc, updateDoc, Timestamp, deleteDoc
 } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'; 
-import { FaUpload, FaCopy, FaCheck } from 'react-icons/fa'; // NAYA: Icons for upload/copy
+import { FaUpload, FaTrash, FaPlus } from 'react-icons/fa'; // Icons update kiye
 
 // Styles
 import adminStyles from '@/app/admin/admin.module.css'; 
 import formCommonStyles from '../AdminForms/forms.module.css'; 
 import formStyles from '@/app/admin/portfolio/new/portfolio-form.module.css'; 
 
-// Define the structure for portfolio data from Firestore
+// Naya Interface Content Block ke liye
+interface ContentBlock {
+  id: string; // Local ID (e.g., Date.now())
+  headline: string;
+  text: string;
+  imageURL: string; // Firestore mein save hoga
+  layout: 'text-left-image-right' | 'image-left-text-right' | 'text-only' | 'image-only';
+  
+  // Local state ke liye
+  file?: File | null; // Nayi image upload ke liye
+  uploadProgress?: number | null; // Is block ka upload progress
+}
+
+// Portfolio Data structure update kiya
 interface PortfolioData {
   title: string;
   category: string;
-  content: string;
+  contentBlocks: ContentBlock[]; // <-- Add kiya
   coverImageURL: string;
-  createdAt?: Timestamp; // Optional existing timestamp
+  createdAt?: Timestamp; 
 }
 
 // Props for the component
@@ -42,20 +54,14 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
   const [formData, setFormData] = useState<PortfolioData>({
     title: '',
     category: 'Web App', // Default category
-    content: '', // Simple string content now
+    contentBlocks: [], // <-- Change kiya
     coverImageURL: '',
   });
 
   // State for cover image handling
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-
-  // NAYA: State for content image handling
-  const [contentImageFile, setContentImageFile] = useState<File | null>(null);
-  const [contentUploadProgress, setContentUploadProgress] = useState<number | null>(null);
-  const [uploadedContentURL, setUploadedContentURL] = useState<string | null>(null);
-  const [isURLCopied, setIsURLCopied] = useState(false);
+  const [coverUploadProgress, setCoverUploadProgress] = useState<number | null>(null);
 
   const [isLoading, setIsLoading] = useState(isEditMode);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,7 +79,11 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             const data = docSnap.data() as PortfolioData;
-            setFormData(data);
+            setFormData({
+                ...data,
+                // Ensure contentBlocks hamesha ek array ho
+                contentBlocks: data.contentBlocks || [] 
+            });
             setImagePreview(data.coverImageURL);
           } else {
             setError('Portfolio item not found.');
@@ -111,11 +121,26 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
                 const imageRef = ref(storage, decodedPath);
                 await deleteObject(imageRef);
              } catch (storageError) {
-                 console.error("Warning: Failed to delete cover image from storage. Continuing with document deletion.", storageError);
+                 console.error("Warning: Failed to delete cover image.", storageError);
              }
         }
+        
+        // 2. Delete Content Block Images from Storage
+        for (const block of formData.contentBlocks) {
+            if (block.imageURL && block.imageURL.includes('firebasestorage.googleapis.com')) {
+                try {
+                    const urlPath = block.imageURL.split('/o/')[1];
+                    const filePath = urlPath.split('?')[0];
+                    const decodedPath = decodeURIComponent(filePath);
+                    const imageRef = ref(storage, decodedPath);
+                    await deleteObject(imageRef);
+                } catch (storageError) {
+                    console.error(`Warning: Failed to delete content image ${block.imageURL}.`, storageError);
+                }
+            }
+        }
 
-        // 2. Delete Document from Firestore
+        // 3. Delete Document from Firestore
         const docRef = doc(db, 'portfolio', postId);
         await deleteDoc(docRef);
         
@@ -132,7 +157,7 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
 
 
   // Handle standard input/select changes
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => { 
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => { 
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -147,112 +172,161 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
     }
   };
   
-  // NAYA: Handle content image file selection
-  const handleContentFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  // === NAYE FUNCTIONS CONTENT BLOCKS KE LIYE ===
+
+  // Naya block add karna
+  const handleAddBlock = () => {
+    const newBlock: ContentBlock = {
+        id: Date.now().toString(),
+        headline: '',
+        text: '',
+        imageURL: '',
+        layout: 'text-left-image-right', // Default layout
+        file: null,
+        uploadProgress: null,
+    };
+    setFormData(prev => ({
+        ...prev,
+        contentBlocks: [...prev.contentBlocks, newBlock]
+    }));
+  };
+
+  // Block ko remove karna
+  const handleRemoveBlock = (id: string) => {
+    if (confirm('Are you sure you want to remove this content section?')) {
+        setFormData(prev => ({
+            ...prev,
+            contentBlocks: prev.contentBlocks.filter(block => block.id !== id)
+        }));
+    }
+  };
+
+  // Block ke text inputs ko change karna
+  const handleBlockChange = (id: string, field: 'headline' | 'text' | 'layout', value: string) => {
+    setFormData(prev => ({
+        ...prev,
+        contentBlocks: prev.contentBlocks.map(block =>
+            block.id === id ? { ...block, [field]: value } : block
+        )
+    }));
+  };
+
+  // Block ki image file ko change karna
+  const handleBlockFileChange = (id: string, e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-        setContentImageFile(e.target.files[0]);
-        setUploadedContentURL(null); // Clear previous URL
-        setIsURLCopied(false);
+      const file = e.target.files[0];
+      setFormData(prev => ({
+          ...prev,
+          contentBlocks: prev.contentBlocks.map(block =>
+              block.id === id ? { ...block, file: file, imageURL: URL.createObjectURL(file) } : block // imageURL ko preview ke liye update kiya
+          )
+      }));
     }
   };
-
-  // NAYA: Function to upload content image
-  const handleContentImageUpload = async () => {
-    if (!contentImageFile) {
-        setError('Please select an image file to upload for content.');
-        return;
-    }
-
-    setContentUploadProgress(0);
-    setError('');
-
-    try {
-        const storageRef = ref(storage, `portfolio_content/${Date.now()}_${contentImageFile.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, contentImageFile);
+  
+  // Block ki image ko hatana
+  const handleRemoveBlockImage = (id: string) => {
+     setFormData(prev => ({
+          ...prev,
+          contentBlocks: prev.contentBlocks.map(block =>
+              block.id === id ? { ...block, file: null, imageURL: '' } : block
+          )
+      }));
+  };
+  
+  // Helper function ek file upload karne ke liye
+  const uploadFile = (file: File, path: string, progressCallback: (progress: number) => void): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const storageRef = ref(storage, path);
+        const uploadTask = uploadBytesResumable(storageRef, file);
         
-        await new Promise<void>((resolve, reject) => {
-            uploadTask.on('state_changed',
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    setContentUploadProgress(Math.round(progress));
-                },
-                (uploadError) => {
-                    console.error("Content image upload failed:", uploadError);
-                    setError("Content image upload failed. Please try again.");
-                    reject(uploadError);
-                },
-                async () => {
-                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                    setUploadedContentURL(downloadURL);
-                    setContentUploadProgress(null);
-                    setContentImageFile(null);
-                    resolve();
-                }
-            );
-        });
-
-    } catch (_err: unknown) { // FIX: Line 194: 'err' was defined but not used. Changed to '_err'.
-        // Error already set inside the state_changed observer
-        setContentUploadProgress(null);
-    }
-  };
-
-  // NAYA: Function to copy URL to clipboard
-  const copyURLToClipboard = (url: string) => {
-    navigator.clipboard.writeText(url);
-    setIsURLCopied(true);
-    setTimeout(() => setIsURLCopied(false), 2000); // Reset button after 2 seconds
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                progressCallback(Math.round(progress));
+            },
+            (uploadError) => {
+                console.error("Upload failed:", uploadError);
+                reject(uploadError);
+            },
+            async () => {
+                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                resolve(downloadURL);
+            }
+        );
+    });
   };
 
 
   // Handle form submission (Save or Update)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.content || formData.content.trim() === '' || (!imageFile && !isEditMode && !formData.coverImageURL)) {
-      setError('Please fill in title, content, and select a cover image.');
+    if (!formData.title || (!imageFile && !isEditMode && !formData.coverImageURL)) {
+      setError('Please fill in title and select a cover image.');
       return;
     }
 
     setIsSubmitting(true);
     setError('');
-    setUploadProgress(null);
+    setCoverUploadProgress(null);
 
     try {
-      let finalImageURL = formData.coverImageURL;
+      let finalCoverImageURL = formData.coverImageURL;
 
+      // 1. Cover Image Upload
       if (imageFile) {
-        setUploadProgress(0);
-        const storageRef = ref(storage, `portfolio_covers/${Date.now()}_${imageFile.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, imageFile);
-
-        await new Promise<void>((resolve, reject) => {
-          uploadTask.on('state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              setUploadProgress(Math.round(progress));
-            },
-            (uploadError) => {
-              console.error("Cover image upload failed:", uploadError);
-              setError("Cover image upload failed. Please try again.");
-              reject(uploadError);
-            },
-            async () => {
-              finalImageURL = await getDownloadURL(uploadTask.snapshot.ref);
-              resolve();
-            }
-          );
-        });
-      } else if (!isEditMode && !finalImageURL) {
+        setCoverUploadProgress(0);
+        finalCoverImageURL = await uploadFile(
+            imageFile, 
+            `portfolio_covers/${Date.now()}_${imageFile.name}`,
+            (progress) => setCoverUploadProgress(progress)
+        );
+      } else if (!isEditMode && !finalCoverImageURL) {
          setError('Cover image is required.');
          setIsSubmitting(false);
          return;
       }
+      
+      // 2. Content Blocks Images Upload
+      const uploadedBlocks: ContentBlock[] = [];
 
+      for (const block of formData.contentBlocks) {
+          let finalBlockImageURL = block.imageURL;
+
+          // Agar nayi file hai, toh upload karo
+          if (block.file) {
+              finalBlockImageURL = await uploadFile(
+                  block.file,
+                  `portfolio_content/${Date.now()}_${block.file.name}`,
+                  (progress) => {
+                      // Update specific block's progress
+                      setFormData(prev => ({
+                          ...prev,
+                          contentBlocks: prev.contentBlocks.map(b => 
+                              b.id === block.id ? { ...b, uploadProgress: progress } : b
+                          )
+                      }));
+                  }
+              );
+          }
+          
+          // Naye block ko clean karke add karo (file aur progress hata do)
+          uploadedBlocks.push({
+            id: block.id,
+            headline: block.headline,
+            text: block.text,
+            layout: block.layout,
+            imageURL: finalBlockImageURL, // Naya ya purana URL
+          });
+      }
+
+
+      // 3. Firestore Data Save
       const postData = {
           title: formData.title,
           category: formData.category,
-          content: formData.content, // Simple string content
-          coverImageURL: finalImageURL,
+          coverImageURL: finalCoverImageURL,
+          contentBlocks: uploadedBlocks, // Naya blocks array
       };
 
       if (isEditMode && postId) {
@@ -270,10 +344,8 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
       router.push('/admin/portfolio');
 
     } catch (error: unknown) { 
-      if (error !== "Cover image upload failed. Please try again.") {
-         console.error("Failed to save project data. Check console.", error);
-         setError("Failed to save project data. Check console.");
-      }
+       console.error("Failed to save project data. Check console.", error);
+       setError("Failed to save project data. Check console.");
     } finally {
       setIsSubmitting(false);
     }
@@ -282,155 +354,198 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
   // Define Page Title
   const pageTitle = isEditMode ? 'Edit Portfolio Project' : 'Create New Portfolio Project';
 
-  // Render Loading state (System Integration)
   if (isLoading) {
     return (
       <div>
-          <div className={adminStyles.pageHeader}>
-              <h1>{pageTitle}</h1>
-          </div>
+          <div className={adminStyles.pageHeader}><h1>{pageTitle}</h1></div>
           <div className={adminStyles.loading} style={{ minHeight: '50vh', padding: '10rem 3rem' }}>
               Loading form...
           </div>
       </div>
     );
   }
-   // Render Error state (System Integration)
   if (error && !isSubmitting && !isDeleting && !isEditMode) {
     return (
         <div>
-            <div className={adminStyles.pageHeader}>
-                <h1>{pageTitle}</h1>
-            </div>
+            <div className={adminStyles.pageHeader}><h1>{pageTitle}</h1></div>
             <div className={adminStyles.errorMessage} style={{ padding: '2rem' }}>{error}</div>
         </div>
     );
   }
 
-  // Render the form (The "Whole System")
+  // Render the form
   return (
     <form onSubmit={handleSubmit}>
-      {/* 1. Page Header (Integrated Header) */}
-      <div className={adminStyles.pageHeader}>
-        <h1>{pageTitle}</h1>
-      </div>
+      <div className={adminStyles.pageHeader}><h1>{pageTitle}</h1></div>
       
-      {/* 2. Two-Column Editor Structure */}
       <div className={formStyles.formWrapper}>
         
-        {/* === LEFT COLUMN: METADATA, COVER IMAGE & CONTENT UPLOADER === */}
+        {/* === COLUMN 1: METADATA & COVER IMAGE === */}
         <div className={formStyles.metadataColumn}>
           
-          {/* Cover Image Upload */}
-          <div className={formStyles.formGroup}>
-            <label htmlFor="coverImage">Cover Image *</label>
-            <div className={formStyles.imageUploadSection}>
-              {imagePreview ? (
-                <Image
-                  src={imagePreview}
-                  alt="Cover preview"
-                  width={350} height={219} 
-                  className={formStyles.imagePreview}
-                  style={{ width: '100%', height: 'auto', maxHeight: '250px' }} 
-                />
-              ) : (
-                <span style={{opacity: 0.7, padding: '1rem', display: 'block'}}>{isEditMode ? 'Click Change Image to upload' : 'No Image Selected'}</span>
-              )}
-              <input
-                type="file" id="coverImage" className={formStyles.fileInput}
-                onChange={handleFileChange} accept="image/png, image/jpeg"
-                required={!isEditMode && !formData.coverImageURL} 
-              />
-              <label htmlFor="coverImage" className={formStyles.uploadButton}>
-                {imagePreview ? 'Change Image' : 'Choose Image'}
-              </label>
-              {uploadProgress !== null && uploadProgress < 100 && ( 
-                <p className={formStyles.uploadProgress}>Uploading: {uploadProgress}%</p>
-              )}
-            </div>
+          {/* Metadata Section */}
+          <div className={formStyles.metadataSection}>
+              <h3 className={formStyles.sectionHeader}>1. Project Details</h3>
+              {/* Project Title and Category */}
+              <div className={formStyles.formGroup}>
+                <label htmlFor="title">Project Title *</label>
+                <input type="text" id="title" name="title" value={formData.title} onChange={handleInputChange} required />
+              </div>
+              <div className={formStyles.formGroup}>
+                <label htmlFor="category">Category *</label>
+                <select id="category" name="category" value={formData.category} onChange={handleInputChange} required >
+                  <option>Web App</option>
+                  <option>Mobile App</option>
+                  <option>Finance Solution</option>
+                  <option>Custom Software</option>
+                  <option>UI/UX Design</option>
+                </select>
+              </div>
           </div>
 
-          {/* Project Title and Category */}
-          <div className={formStyles.formGroup}>
-            <label htmlFor="title">Project Title *</label>
-            <input type="text" id="title" name="title" value={formData.title} onChange={handleInputChange} required />
-          </div>
-
-          <div className={formStyles.formGroup}>
-            <label htmlFor="category">Category *</label>
-            <select id="category" name="category" value={formData.category} onChange={handleInputChange} required >
-              <option>Web App</option>
-              <option>Mobile App</option>
-              <option>Finance Solution</option>
-              <option>Custom Software</option>
-              <option>UI/UX Design</option>
-            </select>
-          </div>
-          
-          {/* NAYA FEATURE: Content Image Uploader */}
-          <div className={formStyles.contentImageUploader}>
-             <h3 style={{color: 'var(--color-neon-light)', fontSize: '1.2rem', marginBottom: '1rem'}}>Upload Content Images</h3>
-             <p style={{marginBottom: '1rem', opacity: 0.8, fontSize: '0.9rem'}}>Upload images here and paste the URL/HTML into the description.</p>
-
-             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', width: '100%' }}>
+          {/* Cover Image Upload Section */}
+          <div className={formStyles.metadataSection}>
+              <h3 className={formStyles.sectionHeader}>2. Cover Image *</h3>
+              <div className={formStyles.imageUploadSection}>
+                {imagePreview ? (
+                  <Image
+                    src={imagePreview}
+                    alt="Cover preview"
+                    width={350} height={219} 
+                    className={formStyles.imagePreview}
+                    style={{ width: '100%', height: 'auto', maxHeight: '250px' }} 
+                  />
+                ) : (
+                  <span style={{opacity: 0.7, padding: '1rem', display: 'block'}}>{isEditMode ? 'No Cover Image' : 'No Image Selected'}</span>
+                )}
                 <input
-                    type="file" id="contentImage" className={formStyles.fileInput}
-                    onChange={handleContentFileChange} accept="image/png, image/jpeg, image/webp"
-                    style={{ flexGrow: 1 }}
+                  type="file" id="coverImage" className={formStyles.fileInput}
+                  onChange={handleFileChange} accept="image/png, image/jpeg, image/webp"
                 />
-                <label htmlFor="contentImage" className={formStyles.uploadButton} style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    {contentImageFile ? 'Selected' : 'Select Image'}
+                <label htmlFor="coverImage" className={formStyles.uploadButton}>
+                  <FaUpload /> {imagePreview ? 'Change Image' : 'Choose Image'}
                 </label>
-                 <button 
-                    type="button" 
-                    onClick={handleContentImageUpload} 
-                    className={adminStyles.primaryButton} 
-                    disabled={!contentImageFile || contentUploadProgress !== null}
-                    style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '5px' }}
-                >
-                    {contentUploadProgress !== null ? `${contentUploadProgress}%` : <><FaUpload /> Upload</>}
-                </button>
-            </div>
-            
-            {/* Display Uploaded URL/Progress */}
-            {contentUploadProgress !== null && contentUploadProgress < 100 && ( 
-                <p className={formStyles.uploadProgress} style={{marginTop: '1rem'}}>Uploading: {contentUploadProgress}%</p>
-            )}
-            
-            {uploadedContentURL && (
-                <div className={formStyles.uploadedURLContainer}>
-                    <p>Image URL Ready:</p>
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                        <input type="text" value={uploadedContentURL} readOnly style={{ padding: '5px', fontSize: '0.85rem' }} />
-                        <button type="button" onClick={() => copyURLToClipboard(uploadedContentURL)} className={adminStyles.primaryButton} style={{ padding: '0.6rem', width: 'auto', minWidth: '80px' }}>
-                            {isURLCopied ? <FaCheck /> : <FaCopy />} Copy
-                        </button>
-                    </div>
-                    <p style={{opacity: 0.8, marginTop: '5px'}}>Paste this URL into your content using the &lt;img&gt; tag or Markdown.</p>
-                </div>
-            )}
-
+                {/* === YAHAN CHANGE KIYA GAYA HAI === */}
+                {typeof coverUploadProgress === 'number' && coverUploadProgress < 100 && ( 
+                  <p className={formStyles.uploadProgress}>Uploading Cover: {coverUploadProgress}%</p>
+                )}
+              </div>
           </div>
-          
         </div>
         
-        {/* === RIGHT COLUMN: CONTENT TEXTAREA === */}
+        {/* === COLUMN 2: CONTENT BLOCKS === */}
         <div className={formStyles.contentColumn}>
-          {/* Description (Simple Textarea) */}
-          <div className={formCommonStyles.fullWidth}>
-            <div className={formStyles.formGroup}>
-              <label htmlFor="content">Description (HTML / Markdown Supported)</label>
-              <textarea 
-                  id="content"
-                  name="content"
-                  value={formData.content}
-                  onChange={handleInputChange} 
-                  required
-                  rows={20} 
-                  placeholder="Enter detailed description, use HTML tags for formatting (e.g., <h2>, <ul>, <blockquote>), or basic Markdown."
-              />
-            </div>
+          <h3 className={formStyles.sectionHeader}>3. Project Content</h3>
+          <p style={{opacity: 0.8, marginBottom: '1.5rem', fontSize: '0.9rem'}}>Add content sections to build your portfolio page. You can re-order them (future feature) or remove them.</p>
+
+          {/* Render all content blocks */}
+          <div className={formStyles.contentBlocksContainer}>
+            {formData.contentBlocks.map((block, index) => (
+              <div key={block.id} className={formStyles.contentBlock}>
+                <div className={formStyles.blockHeader}>
+                    <h4>Section #{index + 1}</h4>
+                    <button 
+                        type="button" 
+                        onClick={() => handleRemoveBlock(block.id)} 
+                        className={adminStyles.dangerButton}
+                        style={{padding: '0.5rem 0.8rem'}}
+                    >
+                        <FaTrash /> Remove
+                    </button>
+                </div>
+
+                {/* Block Form */}
+                <div className={formStyles.blockGrid}>
+                    {/* Left Side: Text */}
+                    <div className={formStyles.blockTextFields}>
+                        <div className={formCommonStyles.formGroup}>
+                          <label htmlFor={`headline-${block.id}`}>Headline (Optional)</label>
+                          <input 
+                            type="text" 
+                            id={`headline-${block.id}`}
+                            value={block.headline}
+                            onChange={(e) => handleBlockChange(block.id, 'headline', e.target.value)}
+                            placeholder="e.g., Our Solution: A Custom Ecosystem"
+                          />
+                        </div>
+                        <div className={formCommonStyles.formGroup}>
+                          <label htmlFor={`text-${block.id}`}>Details *</label>
+                          <textarea 
+                            id={`text-${block.id}`}
+                            value={block.text}
+                            onChange={(e) => handleBlockChange(block.id, 'text', e.target.value)}
+                            required
+                            rows={6}
+                            placeholder="Details for this section..."
+                          />
+                        </div>
+                    </div>
+                    
+                    {/* Right Side: Image & Layout */}
+                    <div className={formStyles.blockMediaFields}>
+                        <div className={formCommonStyles.formGroup}>
+                            <label htmlFor={`layout-${block.id}`}>Layout Style</label>
+                            <select 
+                                id={`layout-${block.id}`}
+                                value={block.layout}
+                                onChange={(e) => handleBlockChange(block.id, 'layout', e.target.value)}
+                            >
+                                <option value="text-left-image-right">Text Left / Image Right</option>
+                                <option value="image-left-text-right">Image Left / Text Right</option>
+                                <option value="text-only">Text Only (Full Width)</option>
+                                <option value="image-only">Image Only (Full Width)</option>
+                            </select>
+                        </div>
+                        
+                        <div className={formCommonStyles.formGroup}>
+                            <label htmlFor={`image-${block.id}`}>Section Image (Optional)</label>
+                            <div className={formStyles.blockImageUpload}>
+                                {block.imageURL && (
+                                    <Image 
+                                        src={block.imageURL} 
+                                        alt="Content preview" 
+                                        width={150} 
+                                        height={100} 
+                                        style={{width: '100%', height: 'auto', objectFit: 'cover', borderRadius: '4px'}}
+                                    />
+                                )}
+                                <input 
+                                    type="file" 
+                                    id={`image-${block.id}`} 
+                                    className={formStyles.fileInput}
+                                    onChange={(e) => handleBlockFileChange(block.id, e)}
+                                    accept="image/png, image/jpeg, image/webp"
+                                />
+                                <label htmlFor={`image-${block.id}`} className={formStyles.uploadButton} style={{width: '100%', textAlign: 'center'}}>
+                                    <FaUpload /> {block.imageURL ? 'Change Image' : 'Upload Image'}
+                                </label>
+                                {block.imageURL && (
+                                    <button type="button" onClick={() => handleRemoveBlockImage(block.id)} className={adminStyles.dangerButton} style={{width: '100%'}}>
+                                        Clear Image
+                                    </button>
+                                )}
+                                {/* === YAHAN CHANGE KIYA GAYA HAI === */}
+                                {typeof block.uploadProgress === 'number' && block.uploadProgress < 100 && (
+                                    <p className={formStyles.uploadProgress}>Uploading: {block.uploadProgress}%</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            ))}
           </div>
+          
+          {/* Add New Block Button */}
+          <button 
+            type="button" 
+            onClick={handleAddBlock}
+            className={adminStyles.secondaryButton} 
+            style={{width: '100%', marginTop: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px'}}
+          >
+            <FaPlus /> Add New Section
+          </button>
+          
         </div>
       </div>
 

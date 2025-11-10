@@ -1,20 +1,29 @@
 // src/app/portfolio/[id]/PortfolioContent.tsx
 
-"use client"; // CRITICAL: Yeh client component hai
+"use client"; 
 
-// FIX: notFound ko hata diya
 import Image from 'next/image';
 import { db } from '@/firebase';
 import { doc, getDoc, Timestamp } from 'firebase/firestore';
-import styles from './portfolio-detail.module.css';
+import styles from './portfolio-detail.module.css'; 
 import { useEffect, useState } from 'react'; 
 import React from 'react';
+import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper'; 
 
-// Define Portfolio Item structure
+// Naya Interface Content Block ke liye
+interface ContentBlock {
+  id: string;
+  headline: string;
+  text: string;
+  imageURL: string;
+  layout: 'text-left-image-right' | 'image-left-text-right' | 'text-only' | 'image-only';
+}
+
+// Portfolio Item structure update kiya
 interface PortfolioItem {
   title: string;
   category: string;
-  content: string; // This will be HTML
+  contentBlocks: ContentBlock[]; // 'content' ko 'contentBlocks' se badla
   coverImageURL: string;
   createdAt?: Timestamp;
 }
@@ -23,6 +32,15 @@ interface PortfolioItem {
 interface PortfolioContentProps {
   id: string; // ID jo Server Component se aayegi
 }
+
+// Helper function jo text ko paragraphs mein badlega
+const renderTextWithParagraphs = (text: string) => {
+    // Har line break ko <p> tag se replace karo
+    return text.split('\n').filter(p => p.trim() !== '').map((paragraph, index) => (
+        <p key={index}>{paragraph}</p>
+    ));
+};
+
 
 // Client Component
 const PortfolioContent = ({ id }: PortfolioContentProps) => {
@@ -36,6 +54,7 @@ const PortfolioContent = ({ id }: PortfolioContentProps) => {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
+          // Data ko naye structure ke hisaab se type cast kiya
           return docSnap.data() as PortfolioItem;
         } else {
           return null;
@@ -47,7 +66,6 @@ const PortfolioContent = ({ id }: PortfolioContentProps) => {
     }
 
     useEffect(() => {
-        // Fix: Client side par fetching karne se Next.js error nahi aayega
         if (id) {
             getPortfolioItem(id).then(fetchedItem => {
                 if (!fetchedItem) {
@@ -57,7 +75,6 @@ const PortfolioContent = ({ id }: PortfolioContentProps) => {
                 }
                 setIsLoading(false);
             })
-            // .catch() block hata diya, kyonki error already console.error mein logged hai
         } else {
             setIsLoading(false);
         }
@@ -78,7 +95,6 @@ const PortfolioContent = ({ id }: PortfolioContentProps) => {
                         borderRadius: '50%',
                         animation: 'spin 1s ease-in-out infinite'
                     }} />
-                    {/* CSS for spin animation global CSS mein hona chahiye */}
                 </div>
             </main>
         ); 
@@ -86,8 +102,6 @@ const PortfolioContent = ({ id }: PortfolioContentProps) => {
 
     // Agar item nahi mila
     if (!item) {
-        // notFound() hook ko client component mein use nahi kar sakte,
-        // isliye hum custom 404 UI dikhaenge
         return (
             <main className={styles.main} style={{textAlign: 'center', minHeight: '80vh', paddingTop: '10rem'}}>
                 <h1 style={{color: '#ff4757'}}>404 - Project Not Found</h1>
@@ -96,38 +110,105 @@ const PortfolioContent = ({ id }: PortfolioContentProps) => {
         );
     }
     
-    // ImageRow class ko replace karne ke liye, taaki CSS apply ho.
-    // NOTE: Agar aapne pichle baar portfolio-detail.module.css ko replace kar diya hai,
-    // toh images aur typography ab theek dikhne chahiye.
-    const contentWithImageRow = item.content.replace(/<div class="ImageRow"/g, `<div class="ImageRow ${styles.imageRow}"`);
-
-
     return (
         <main className={styles.main}>
           <article>
             {/* Cover Image */}
-            <div className={styles.coverImageContainer}>
-              {item.coverImageURL && (
-                <Image
-                  src={item.coverImageURL}
-                  alt={item.title}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  priority 
-                  sizes="(max-width: 768px) 100vw, 900px" 
-                />
-              )}
-            </div>
+            <AnimationWrapper>
+                <div className={styles.coverImageContainer}>
+                  {item.coverImageURL && (
+                    <Image
+                      src={item.coverImageURL}
+                      alt={item.title}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      priority 
+                      sizes="(max-width: 768px) 100vw, 900px" 
+                    />
+                  )}
+                </div>
+            </AnimationWrapper>
 
             {/* Title and Category */}
-            <h1 className={styles.projectTitle}>{item.title}</h1>
-            <p className={styles.projectCategory}>{item.category}</p>
+            <AnimationWrapper>
+                <h1 className={styles.projectTitle}>{item.title}</h1>
+                <p className={styles.projectCategory}>{item.category}</p>
+            </AnimationWrapper>
 
-            {/* Formatted Content (Rendered from HTML) */}
-            <div
-              className={styles.projectContent} 
-              dangerouslySetInnerHTML={{ __html: contentWithImageRow }} 
-            />
+            {/* Naya Content Blocks Renderer */}
+            <div className={styles.projectContent}>
+                {/* Loop over contentBlocks */}
+                {(item.contentBlocks || []).map((block, index) => { // 'index' add kiya delay ke liye
+                    
+                    const hasText = block.text && block.text.trim() !== '';
+                    const hasImage = block.imageURL && block.imageURL.trim() !== '';
+                    const hasHeadline = block.headline && block.headline.trim() !== '';
+
+                    // Block ke text content ko render karna
+                    const textContent = (
+                        <div className={styles.textBlock}>
+                            <AnimationWrapper delay={index * 0.1}>
+                                {hasHeadline && <h2>{block.headline}</h2>}
+                                {hasText && renderTextWithParagraphs(block.text)}
+                            </AnimationWrapper>
+                        </div>
+                    );
+                    
+                    // Block ke image content ko render karna
+                    const imageContent = (
+                        <div className={styles.imageBlock}>
+                            <AnimationWrapper delay={index * 0.1 + 0.1}>
+                                {hasImage && (
+                                    <Image 
+                                        src={block.imageURL} 
+                                        alt={block.headline || 'Portfolio Content Image'} 
+                                        width={500} 
+                                        height={300} 
+                                        style={{width: '100%', height: 'auto', borderRadius: '8px'}}
+                                    />
+                                )}
+                            </AnimationWrapper>
+                        </div>
+                    );
+
+                    // === YAHAN CHANGE KIYA GAYA HAI (className ab DIV par hai) ===
+                    let layoutClass = '';
+                    switch (block.layout) {
+                        case 'text-left-image-right':
+                            layoutClass = styles.layoutImageRight;
+                            return (
+                                <div key={block.id} className={`${styles.layoutRow} ${layoutClass}`}>
+                                    {textContent}
+                                    {imageContent}
+                                </div>
+                            );
+                        
+                        case 'image-left-text-right':
+                            layoutClass = styles.layoutImageLeft;
+                            return (
+                                <div key={block.id} className={`${styles.layoutRow} ${layoutClass}`}>
+                                    {imageContent}
+                                    {textContent}
+                                </div>
+                            );
+                        
+                        case 'image-only':
+                            return (
+                                <div key={block.id} className={styles.layoutFullWidthImage}>
+                                    {imageContent}
+                                </div>
+                            );
+                            
+                        case 'text-only':
+                        default:
+                             return (
+                                <div key={block.id} className={styles.layoutFullWidthText}>
+                                    {textContent}
+                                </div>
+                            );
+                    }
+                })}
+            </div>
           </article>
         </main>
     );

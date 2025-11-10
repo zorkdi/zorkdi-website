@@ -5,8 +5,6 @@
   max-width: 950px; 
   margin: 0 auto;
   padding: 5rem 2rem;
-  
-  /* CRITICAL FIX: Removed card/floating styles to make it full page */
   background-color: unset; 
   backdrop-filter: unset; 
   border-radius: unset; 
@@ -20,7 +18,6 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   position: relative;
-  /* UI/UX Tweak: Sharper corners */
   border-radius: 6px; 
   overflow: hidden;
   margin-bottom: 3rem;
@@ -35,7 +32,6 @@
   line-height: 1.1;
   margin-bottom: 0.5rem;
   color: var(--color-off-white);
-  /* UI/UX Tweak: Strong Glow */
   text-shadow: 0 0 10px rgba(0, 245, 200, 0.4); 
 }
 
@@ -49,150 +45,113 @@
   display: inline-block;
 }
 
-/* NAYA: Rich Text Content Styling */
+/* --- YAHAN SE NAYE STYLES (PLAN C) --- */
+
+/* Yeh .projectContent ab blocks ka main container hai */
 .projectContent {
   font-size: 1.15rem;
   line-height: 1.8;
   opacity: 0.95; 
+  display: flex;
+  flex-direction: column;
+  gap: 3rem; /* Har content block ke beech space */
 }
 
-.projectContent p {
-  margin-bottom: 1.5rem;
+/* 1. Layout Row: Yeh main container hai text aur image ke liye */
+.layoutRow {
+    display: flex;
+    flex-wrap: nowrap; /* Desktop par wrap nahi hoga */
+    gap: 2.5rem;
+    align-items: flex-start; /* Vertically top par align karega */
 }
 
-.projectContent h1,
-.projectContent h2,
-.projectContent h3 {
-  margin-top: 3rem;
+/* 2. Text Block: Yeh text ka container hai */
+.textBlock {
+    flex: 1; /* Space lega */
+    min-width: 50%; /* Aadha space lega */
+}
+
+/* 3. Image Block: Yeh image ka container hai */
+.imageBlock {
+    flex: 1;
+    min-width: 40%; /* Chhota space lega */
+    max-width: 50%;
+}
+
+/* 4. Text/Image Alignment */
+.layoutImageRight {
+    flex-direction: row; /* Text left, Image right */
+}
+.layoutImageLeft {
+    flex-direction: row-reverse; /* Image left, Text right */
+}
+
+/* === YAHAN CHANGE KIYA GAYA HAI === */
+/* 5. Full Width Blocks */
+/* .layoutFullWidthText {} <-- Yeh khaali tha, isko hata diya hai */
+
+.layoutFullWidthImage {
+    /* Image block ko center karo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.layoutFullWidthImage .imageBlock {
+    min-width: 80%;
+    max-width: 100%;
+}
+
+
+/* 6. Content Styling (Inside Blocks) */
+.textBlock h2 {
+  margin-top: 0; /* Pehla element hai isliye margin top 0 */
   margin-bottom: 1.2rem;
   line-height: 1.3;
   font-weight: 700;
+  font-size: 1.8em;
   color: var(--color-off-white); 
   text-shadow: 0 0 5px rgba(139, 92, 246, 0.4);
 }
-.projectContent h1 { font-size: 2.5em; }
-.projectContent h2 { font-size: 1.8em; }
-.projectContent h3 { font-size: 1.5em; }
 
-.projectContent ul,
-.projectContent ol {
-  padding-left: 2rem;
-  margin-bottom: 2rem;
-  opacity: 0.95;
-}
-
-/* UI/UX Tweak: High-Tech Blockquote/Callout Box (Still needs distinction) */
-.projectContent blockquote {
-  /* Neon Left Border */
-  border-left: 5px solid var(--color-neon-green); 
-  margin-left: 0;
-  padding: 2rem; 
-  /* Minimal dark background to stand out from body texture */
-  background-color: var(--color-deep-blue); 
-  border-radius: 4px; /* Less rounded for sharp tech look */
-  color: var(--color-off-white);
-  font-style: italic;
+.textBlock p {
+  margin-bottom: 1.5rem;
   font-size: 1.1rem;
-  margin: 3rem 0;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4); 
+  line-height: 1.8;
+  opacity: 0.9;
+}
+/* Aakhri paragraph se margin hata do */
+.textBlock p:last-child {
+    margin-bottom: 0;
 }
 
-/* FIX: Styles for single images within content */
-.projectContent img { 
-    display: block !important;
-    max-width: 90% !important; 
-    width: auto !important; 
-    max-height: 700px !important; 
-    height: auto !important; 
-    object-fit: contain;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    margin-top: 3rem !important;
-    margin-bottom: 3rem !important;
-    border-radius: 8px !important; 
-    cursor: pointer !important;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1); 
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5); 
-}
-
-.projectContent img:hover {
-    transform: scale(1.03); 
-    box-shadow: 0 0 20px rgba(0, 245, 200, 0.6); 
-}
-
-
-/* --- Styles for Image Row --- */
-.imageRow {
-    display: flex !important; 
-    flex-wrap: wrap;
-    gap: 2rem; 
-    margin: 3rem 0;
-    justify-content: center;
-    align-items: center; 
-}
-
-/* NAYA: Target images INSIDE the row, even if wrapped in <p> */
-.imageRow img,
-.imageRow p img {
-    flex: 1;
-    min-width: 250px; 
-    max-width: 45% !important; 
+.imageBlock img {
+    width: 100%;
     height: auto;
-    max-height: 450px !important; 
-    object-fit: contain;
-    border-radius: 8px; 
-    margin: 0 !important;
-    cursor: pointer;
-    transition: transform 0.3s ease;
+    border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease;
+}
+.imageBlock img:hover {
+    transform: scale(1.03);
 }
 
-.imageRow img:hover {
-    transform: scale(1.05); 
-}
-.imageRow p {
-    margin: 0 !important;
-    flex: 1; 
-    min-width: 250px; 
-    max-width: 45%; 
-    display: flex; 
-    justify-content: center;
-}
 
 /* Media Queries */
-@media (max-width: 600px) {
-    .layoutBox {
-        flex-direction: column;
-        padding: 1rem;
-    }
-    .projectContent img {
-        max-width: 95% !important;
-        max-height: 500px !important;
-    }
-    .imageRow {
-        flex-direction: column;
-        align-items: center;
-        gap: 1.5rem;
-    }
-    .imageRow img,
-    .imageRow p img {
-        min-width: unset;
-        max-width: 95% !important; 
-    }
-     .imageRow p {
-        min-width: unset;
-        max-width: 95% !important; 
-        width: 100%; 
-    }
+@media (max-width: 768px) {
     .main {
-        /* Mobile par default padding */
         padding: 2rem 1.5rem;
     }
-}
-@media (max-width: 768px) {
     .projectTitle {
         font-size: 2.5rem;
+    }
+    
+    /* Mobile par layout-row ko stack karo */
+    .layoutRow {
+        flex-direction: column !important; /* Force column layout */
+    }
+    .textBlock, .imageBlock {
+        min-width: 100%;
+        max-width: 100%;
     }
 }
