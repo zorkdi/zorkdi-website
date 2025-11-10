@@ -4,10 +4,12 @@
 
 import styles from './admin.module.css';
 import Link from 'next/link';
-import { FaUsers, FaTasks, FaFeatherAlt, FaChartLine, FaEnvelope } from 'react-icons/fa'; // NAYA: FaEnvelope import kiya
+// === YAHAN CHANGE KIYA GAYA HAI ===
+// FaChartLine ko main import list mein add kiya
+import { FaUsers, FaTasks, FaFeatherAlt, FaChartLine, FaEnvelope } from 'react-icons/fa'; 
 import { useAuth } from '@/context/AuthContext';
-// Dummy data ke liye naya import
-// NAYA: Abhi dummy hook use kar rahe hain, isko baad mein actual data fetching se replace kar sakte hain.
+
+// NAYA: Abhi dummy hook use kar rahe hain
 const useDashboardStats = () => ({
     stats: [
         { title: 'New Project Requests', value: 3, icon: FaTasks, link: '/admin/projects', unread: true },
@@ -69,6 +71,26 @@ const AdminDashboardPage = () => {
                       </div>
                   </Link>
               ))}
+          </div>
+      </section>
+      
+      {/* === YAHAN NAYA SECTION ADD KIYA GAYA HAI === */}
+      <section className={styles.welcomeMessage} style={{ marginTop: '3rem', borderTop: '1px solid var(--color-glass-light)' }}>
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--color-neon-light)' }}>
+              <FaChartLine /> Website Analytics
+          </h2>
+          <p>
+              Aapka Google Analytics setup ho gaya hai. Yahan click karke aap apne daily, monthly, aur total visitors ki poori report ek naye tab mein dekh sakte hain.
+          </p>
+          <div className={styles.actionButtonsContainer}>
+              <Link 
+                href="https://analytics.google.com/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className={styles.primaryButton}
+              >
+                  View Full Analytics Report
+              </Link>
           </div>
       </section>
       

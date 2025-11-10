@@ -1,0 +1,202 @@
+/* src/app/admin/portfolio/portfolio-list.module.css */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-glass-light);
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-off-white);
+  margin: 0;
+}
+
+.newPostButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-neon-green);
+  color: var(--color-dark-navy);
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 10px rgba(0, 245, 200, 0.5);
+}
+
+.newPostButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(0, 245, 200, 0.7);
+}
+
+.loading,
+.noPosts {
+  text-align: center;
+  padding: 4rem 2rem;
+  font-size: 1.2rem;
+  opacity: 0.7;
+  background-color: var(--color-deep-blue);
+  border: 1px solid var(--color-glass-light);
+  border-radius: 12px;
+}
+
+/* Table Styling */
+.tableContainer {
+  width: 100%;
+  background-color: var(--color-deep-blue);
+  border-radius: 12px;
+  border: 1px solid var(--color-glass-light);
+  overflow: hidden; /* Zaroori hai border-radius ke liye */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dataTable th,
+.dataTable td {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-glass-light);
+}
+
+.dataTable th {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: var(--color-neon-green);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.dataTable tr:last-child td {
+  border-bottom: none;
+}
+
+.dataTable tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.coverImage {
+  width: 100px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--color-glass-light);
+}
+
+.actionsCell {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Edit and Delete Buttons */
+.editButton,
+.deleteButton {
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.editButton {
+  background-color: var(--color-secondary-accent);
+  color: var(--color-dark-navy);
+}
+.editButton:hover {
+  background-color: #a17bf0; /* Thoda light purple */
+  transform: scale(1.05);
+}
+
+.deleteButton {
+  background-color: #ff4757;
+  color: var(--color-off-white);
+}
+.deleteButton:hover {
+  background-color: #ff6b81; /* Thoda light red */
+  transform: scale(1.05);
+}
+
+.deleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+  .newPostButton {
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* Mobile par table ajeeb dikhta hai, isko simple list banate hain */
+  .tableContainer {
+    border: none;
+    background: none;
+    box-shadow: none;
+  }
+
+  .dataTable thead {
+    display: none; /* Table header hide karo */
+  }
+
+  .dataTable tr {
+    display: block;
+    background-color: var(--color-deep-blue);
+    border: 1px solid var(--color-glass-light);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+  }
+
+  .dataTable td {
+    display: block;
+    text-align: right; /* Value ko right align karo */
+    padding-left: 50%; /* Label ke liye jagah banao */
+    position: relative;
+    border-bottom: 1px solid var(--color-glass-light);
+  }
+
+  .dataTable td:last-child {
+    border-bottom: none;
+  }
+
+  /* Mobile par label add karo */
+  .dataTable td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1.5rem;
+    width: 45%;
+    padding-right: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-neon-green);
+    opacity: 0.8;
+  }
+
+  .coverImage {
+    width: 100px;
+    height: 60px;
+  }
+
+  .actionsCell {
+    justify-content: flex-end; /* Buttons ko right align karo */
+  }
+}
