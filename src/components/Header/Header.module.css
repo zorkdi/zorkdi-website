@@ -5,13 +5,11 @@
   top: 0;
   width: 100%;
   z-index: 1000;
-  /* NAYA: Glassmorphism effect */
   background-color: var(--color-glass-dark);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-glass-light);
   padding: 0.5rem 0; 
-  /* NAYA: Neon shadow effect for depth */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
@@ -23,7 +21,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* FIX: Mobile height set karne ke liye desktop par bhi min-height de diya */
   min-height: 70px; 
 }
 
@@ -33,14 +30,12 @@
   gap: 0.8rem;
   text-decoration: none;
   color: var(--color-off-white);
-  /* NAYA: Logo par thoda neon glow */
   text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
 .logoImage {
   height: 55px; 
   width: auto;
-  /* NAYA: Logo image ko thoda futuristic look */
   filter: drop-shadow(0 0 5px var(--color-neon-light));
 }
 
@@ -84,7 +79,6 @@
   transition: opacity 0.2s ease, color 0.2s ease;
 }
 
-/* NAYA: Futuristic active/hover indicator */
 .navLinks a::after {
     content: '';
     position: absolute;
@@ -107,7 +101,6 @@
 }
 
 .rightControls {
-  /* NAYA: Flex-end alignment for better spacing in general */
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -120,7 +113,6 @@
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  /* NAYA: Neon Glow on CTA */
   box-shadow: 0 0 10px rgba(0, 245, 200, 0.6);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -145,7 +137,6 @@
 
 .profileMenuContainer {
   position: relative;
-  /* NAYA: Profile menu ko mobile par bhi display rakhne ke liye */
   display: flex;
   align-items: center;
 }
@@ -158,7 +149,6 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  /* NAYA: Subtle neon glow on icon */
   text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
@@ -171,7 +161,6 @@
   cursor: pointer;
   transition: transform 0.2s ease;
 }
-/* NAYA: Image par hover effect */
 .profileImage:hover {
   transform: scale(1.05);
 }
@@ -180,18 +169,15 @@
   position: absolute;
   top: 150%;
   right: 0;
-  /* FIX: Background ko thoda zyaada solid banaya (less transparent) */
-  background-color: var(--color-deep-blue); /* #16213E */
-  backdrop-filter: blur(5px); /* FIX: Blur ko kam kiya */
+  background-color: var(--color-deep-blue); 
+  backdrop-filter: blur(5px); 
   -webkit-backdrop-filter: blur(5px);
   border: 1px solid var(--color-glass-light);
   border-radius: 8px;
   padding: 0.5rem;
   width: 180px;
   z-index: 1001;
-  /* NAYA: Depth effect */
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-  /* FIX: Opacity issue solve karne ke liye, humne background solid kar diya hai */
   opacity: 1; 
 }
 
@@ -217,7 +203,7 @@
 }
 
 .profileDropdown a:hover, .profileDropdown button:hover {
-  background-color: var(--color-dark-navy); /* Hover par thoda aur dark */
+  background-color: var(--color-dark-navy); 
   color: var(--color-neon-light);
 }
 
@@ -228,7 +214,6 @@
   color: var(--color-neon-green);
   font-size: 2rem;
   cursor: pointer;
-  /* NAYA: Hamburger icon ko thoda neon glow */
   text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
@@ -266,32 +251,26 @@
     color: var(--color-neon-green);
 }
 
-/* FIX 4: Mobile menu ke andar wala CTA ab use nahi ho raha hai */
 .mobileCta {
-    /* Isko mobile menu ke CTA button ke liye use kiya gaya hai */
     padding: 0.8rem 2rem;
     background-color: var(--color-neon-green);
     color: var(--color-dark-navy) !important;
     border-radius: 8px;
-    display: block; /* FIX: Mobile menu mein dikhega */
+    display: block; 
 }
 
-/* NAYA CLASS: Mobile view mein Start Project button jo Header mein bahar dikhega (AB HATA DIYA) */
 .mobileCtaButtonVisible {
-    /* FIX 5: Is class ko ab HIDE karna hai */
     display: none !important; 
 }
 
 
 @media (max-width: 768px) {
-  /* Hide desktop-only CTAs */
   .desktopNav, 
-  .primaryCtaButton, /* Desktop CTA hide kiya */
+  .primaryCtaButton, 
   .secondaryCtaButton {
     display: none;
   }
   
-  /* FIX 6: Mobile CTA Button Visible ko hide kiya */
   .mobileCtaButtonVisible {
       display: none !important;
   }
@@ -303,23 +282,27 @@
     justify-content: initial; 
   }
   
-  /* FIX 2: Logo ko center mein adjust karne aur overlap se bachane ke liye */
   .logo {
     position: absolute;
-    /* CRITICAL FIX 1: Logo ko center se left ki taraf shift kiya */
     left: 40%; 
     top: 50%; 
     transform: translate(-50%, -50%);
     z-index: 2; 
-    
-    /* CRITICAL FIX 2: Overlap se bachne ke liye Logo ki max-width set ki */
     max-width: 40%; 
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
   
-  /* Hamburger Button (Left Corner) */
+  /* === YAHAN CHANGE KIYA GAYA HAI === */
+  .logoTextContainer {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    overflow: hidden; /* Naya rule: Taaki tagline iske andar hi clip/scroll ho */
+  }
+  /* === END CHANGE === */
+  
   .hamburgerButton {
     display: block !important; 
     position: absolute;
@@ -330,21 +313,17 @@
     margin: 0;
   }
   
-  /* FIX 7: rightControls ko adjust kiya (Ab sirf Profile Icon hai) */
   .rightControls {
     position: absolute;
     right: 1.5rem;
     top: 50%;
     transform: translateY(-50%);
     z-index: 3;
-    
-    /* FIX 8: CTA remove hone ke baad gap zero kiya */
     gap: 0; 
     display: flex;
     align-items: center;
   }
 
-  /* Profile Dropdown position fix (Profile icon ke neeche) */
   .profileDropdown {
       right: 0; 
       left: unset;
@@ -352,41 +331,44 @@
       transform: translateY(10px); 
   }
   
-  /* Logo image size mobile par */
   .logoImage {
       height: 40px; 
       width: auto;
   }
   
-  /* Logo text container mobile par */
   .brandName {
       font-size: 1.2rem;
   }
+
+  /* === YAHAN CHANGE KIYA GAYA HAI === */
   .brandTagline {
-      font-size: 0.6rem;
+      font-size: 0.7rem; /* Size 0.6 se 0.7 kiya */
+      /* display: none; <-- Hata diya */
+      
+      /* Naya Marquee/Scroll effect */
+      display: inline-block;
+      white-space: nowrap;
+      animation: scrollLeft 10s linear infinite;
+      padding-left: 100%; /* Shuru mein gap dene ke liye */
   }
+  /* === END CHANGE === */
 
 }
 
-/* NAYA FIX: Compact Desktop/Tablet View (Manual Desktop Mode Fix) */
 @media (min-width: 769px) and (max-width: 1024px) {
-    /* Container padding kam kiya */
     .container {
         padding: 0 1rem;
         gap: 0.5rem;
     }
     
-    /* Nav links ki spacing kam ki */
     .navLinks {
         gap: 1rem;
     }
     
-    /* Nav links font size kam kiya */
     .navLinks a {
         font-size: 0.9rem;
     }
 
-    /* Logo size kam kiya */
     .logoImage {
         height: 45px;
     }
@@ -394,7 +376,6 @@
         font-size: 1.4rem;
     }
     
-    /* CTA buttons ka padding kam kiya */
     .rightControls {
         gap: 0.8rem;
     }
@@ -402,4 +383,15 @@
         padding: 0.5rem 1rem;
         font-size: 0.9rem;
     }
+}
+
+/* === YAHAN NAYA KEYFRAME ADD HUA HAI === */
+/* Scrolling text animation */
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-150%); /* Text ko poora left se bahar nikalne ke liye */
+  }
 }
