@@ -1,24 +1,27 @@
-/* Custom Color Variables for Futuristic/Neo-Brutalist Tech Theme */
+/* NAYA: Google Font "Inter" import kiya */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Custom Color Variables for Ultra-Premium Tech Theme */
 :root {
-  /* Base Colors */
-  --color-dark-navy: #1A1A2E; /* Primary Background */
-  --color-deep-blue: #16213E; /* Secondary Background / Card Base */
+  /* CHANGE 1: Base Colors ko aur dark/premium kiya */
+  --color-dark-navy: #0A0B0F; /* Primary Background (Near-Black) */
+  --color-deep-blue: #10121A; /* Secondary Background / Card Base (Slightly lighter than bg) */
   --color-off-white: #EFEFEF; /* Primary Text */
   
-  /* Accent Colors */
+  /* Accent Colors (Yeh waise hi rahenge) */
   --color-neon-green: #00F5C8; /* Primary Accent */
   --color-neon-light: #2dffc9; /* Lighter Neon for Glow */
   --color-secondary-accent: #8b5cf6; /* Secondary, Deep Purple/Violet Accent */
   
-  /* Glass/Transparency */
-  --color-glass-dark: rgba(22, 33, 62, 0.6);
+  /* CHANGE 2: Glass ko naye dark theme se match kiya */
+  --color-glass-dark: rgba(16, 18, 26, 0.75); /* Darker glass background */
   --color-glass-light: rgba(255, 255, 255, 0.05);
 
-  /* Shadows/Glows */
+  /* Shadows/Glows (Yeh waise hi rahenge) */
   --shadow-neon: 0 0 15px rgba(0, 245, 200, 0.4);
   --shadow-subtle: 0 5px 15px rgba(0, 0, 0, 0.3);
   
-  /* FIX 1: CSS Variable for Hero Background ko DEFAULT CIRCUIT BOARD URL diya (FALLBACK) */
+  /* FIX 1: CSS Variable for Hero Background (FALLBACK) */
   --hero-bg-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25%' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); 
 }
 
@@ -36,16 +39,21 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  /* CHANGE 3: Naya "Inter" font apply kiya */
+  font-family: 'Inter', sans-serif;
 }
 
 /* Yahan hum apni premium theme apply kar rahe hain */
 body {
-  /* Yeh hai hamara Dark Navy Blue background color */
+  /* Yeh hai hamara NAYA Near-Black background color */
   background-color: var(--color-dark-navy); 
 
   /* Yeh hai hamara Off-White text color */
   color: var(--color-off-white); 
   background-size: 100px 100px;
+  
+  /* NAYA: Thodi better line height di */
+  line-height: 1.6;
 }
 
 a {

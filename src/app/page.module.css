@@ -55,8 +55,8 @@
     background-repeat: no-repeat;
     transition: background-image 0.5s ease;
 
-    /* Dynamic Overlay Layer (Overlay ko thoda halka kiya taaki background dikhe) */
-    box-shadow: inset 0 0 0 2000px rgba(26, 26, 46, 0.65); 
+    /* CHANGE 1: Overlay ko aur dark kiya premium look ke liye (0.65 se 0.9) */
+    box-shadow: inset 0 0 0 2000px rgba(10, 11, 15, 0.9); 
 }
 
 /* NAYA CLASS: Hero Content ko Services Section ke upar rakhne ke liye */
@@ -79,22 +79,25 @@
 }
 
 
-/* --- Hero Element Styles (FINAL TEXT SIZE AND SPACING) --- */
+/* --- Hero Element Styles (ULTRA PREMIUM) --- */
 .heroHeadline {
-  /* CHANGE 1: Heading font size ko aur bada kiya for impact (4.2rem) */
+  /* CHANGE 2: Heading font size ko aur bada kiya for impact (4.2rem) */
   font-size: 4.2rem; 
   font-weight: 800; /* Font weight badhaya */
   line-height: 1.1; 
   max-width: 1000px; /* Max width badhaya */
-  color: var(--color-neon-green); 
-  /* CHANGE 2: Stronger Text Glow */
-  text-shadow: 0 0 10px rgba(0, 245, 200, 0.8), 0 0 20px rgba(0, 245, 200, 0.4); 
+  
+  /* CHANGE 3: Color ko Neon Green se White kiya */
+  color: var(--color-off-white); 
+  
+  /* CHANGE 4: Text Glow ko subtle kiya */
+  text-shadow: 0 0 10px rgba(239, 239, 239, 0.1); 
   margin-bottom: 2rem; 
   
-  /* --- NAYA: Glitch Effect (Task 3) --- */
+  /* --- CHANGE 5: Glitch Effect (Task 3) ko HATAYA --- */
   position: relative;
-  /* Animation lagaya */
-  animation: glitch-flicker 3s infinite linear alternate;
+  /* NAYA: Clean Fade-in animation lagaya */
+  animation: fadeIn 1s ease-out;
 }
 
 .heroSubheadline {
@@ -103,9 +106,13 @@
   margin-top: 0; 
   margin-bottom: 3rem; 
   max-width: 800px;
-  opacity: 1.0; 
-  font-weight: 500;
+  opacity: 0.9; /* Thoda subtle kiya */
+  font-weight: 400; /* Font ko thoda patla kiya premium look ke liye */
   line-height: 1.5; /* Line height thik kiya */
+  
+  /* NAYA: Isko bhi animate kiya */
+  animation: fadeIn 1s ease-out 0.2s;
+  animation-fill-mode: backwards; /* Animation shuru hone se pehle hide rakhega */
 }
 
 /* Button Styles - Base/Primary Button ki Base Styling */
@@ -121,7 +128,6 @@
   transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.3s ease, color 0.3s ease; 
   border: none; 
   
-  /* FIX 58: Header CTA spacing ke liye margin diya (Yeh sirf Header ke liye tha, yahan isko kam karte hain) */
   margin-left: 0.5rem; /* Margin kam kiya */
 }
 
@@ -151,21 +157,28 @@
     display: inline-flex; 
 
     /* Transition update */
-    transition: transform 0.1s ease, box-shadow 0.1s ease, color 0.4s ease, background-color 0.4s ease, border-radius 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.4s ease, background-color 0.4s ease, border-radius 0.3s ease;
     
     /* CRITICAL FIX 102: Hardware Acceleration for Smoothness */
     will-change: transform, box-shadow; /* Browser ko bataya ki yeh properties change honge */
     transform: translateZ(0); /* GPU Acceleration enable kiya */
+    
+    /* NAYA: Isko bhi animate kiya */
+    animation: fadeIn 1s ease-out 0.4s, neonPulse 2.5s 1s infinite ease-in-out;
+    animation-fill-mode: backwards;
 }
 
-/* NAYA FIX: Hero Button Hover (Strong Glow & Scale Up) */
+/* --- PLAN 4.0 CHANGE --- */
+/* NAYA FIX: Hero Button Hover (LIFT Effect) */
 .heroPrimaryButton:hover {
-  transform: scale(1.05); 
+  /* CHANGE: Scale effect ko 'translateY' (lift) se replace kiya */
+  transform: translateY(-5px); 
+  
   /* Strongest Glow */
   box-shadow: 
     0 0 45px rgba(0, 245, 200, 1.0), 
     0 0 10px rgba(0, 245, 200, 0.6); 
-  animation: none;
+  animation: none; /* Idle animation ko roka */
   
   /* NAYA: Color change for glow effect */
   color: var(--color-deep-blue);
@@ -173,7 +186,7 @@
 
 /* NAYA FIX: Hero Button Active/Press State (Feedback) */
 .heroPrimaryButton:active {
-    transform: scale(1.03); 
+    transform: translateY(-2px) scale(0.98); /* Thoda lift aur press effect */
     box-shadow: 0 0 5px rgba(0, 245, 200, 0.5); 
     animation: none;
 }
@@ -391,6 +404,9 @@
   margin-bottom: 0.5rem; 
   color: var(--color-neon-light);
   text-shadow: 0 0 8px rgba(0, 245, 200, 0.8); /* Stronger glow */
+  
+  /* NAYA: Letter spacing add ki */
+  letter-spacing: 1px;
 }
 
 /* Section Subtitle - Visibility Fix */
@@ -426,32 +442,36 @@
   text-align: left;
 }
 
-/* FIX 1: Service Card Premium Look (Task 2) */
+/* --- PLAN 4.0 CHANGE: Service Card Premium Look (Refined Lift) --- */
 .serviceCard {
-  /* FIX 55: Glass background ko thoda dark aur less transparent kiya */
-  background-color: rgba(22, 33, 62, 0.75); /* 0.6 se 0.75 kiya */
-  backdrop-filter: blur(10px); /* Blur badhaya */
-  -webkit-backdrop-filter: blur(10px);
+  /* NAYA: Background ko naye dark color se match kiya */
+  background-color: var(--color-deep-blue);
+  /* Glass effect (backdrop-filter) hata diya */
   padding: 3rem; 
   border-radius: 16px;
+  
+  /* NAYA: Default border ko subtle rakha */
   border: 1px solid var(--color-glass-light);
   
-  /* NAYA: Stronger 3D Elevation Shadow */
-  box-shadow: 
-    0 15px 40px rgba(0, 0, 0, 0.9), /* Deep vertical shadow for lift */
-    0 0 5px rgba(0, 245, 200, 0.2); 
+  /* NAYA: Shadow ko bhi subtle rakha */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* CHANGE: Transition mein 'transform' waapis add kiya */
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* FIX 2: Hover State - Stronger Floating Glow */
+/* --- PLAN 4.0 CHANGE: Hover State - Lift Effect Waapis Add Kiya --- */
 .serviceCard:hover {
-  transform: translateY(-15px); 
-  /* FIX 2: Multiple layers of glow for 3D/Floating feel */
+  /* CHANGE: Transform (lift) effect WAAPIS ADD KIYA */
+  transform: translateY(-10px); 
+  
+  /* NAYA: Hover par border color bhi change hoga */
+  border-color: var(--color-neon-green);
+  
+  /* NAYA: Shadow ko badhaya aur glow add kiya */
   box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 1.0), /* Deeper vertical shadow */
-    0 0 30px var(--color-neon-green), /* Brighter neon glow */
-    0 0 10px var(--color-neon-light); /* Lighter central glow */
+    0 20px 50px rgba(0, 0, 0, 0.7), /* Deeper vertical shadow */
+    0 0 15px rgba(0, 245, 200, 0.2); /* Subtle neon glow */
 }
 
 /* FIX 3: Icon Polish */
@@ -506,47 +526,51 @@
   display: none;
 }
 
-/* Portfolio Card (ULTRA-PREMIUM LOOK) */
+/* --- PLAN 4.0 CHANGE: Portfolio Card (Refined Lift) --- */
 .portfolioCard {
   flex-shrink: 0; 
   width: 350px; 
   scroll-snap-align: start; 
   
-  /* FIX 42: Card Background Glassmorphism aur Border add kiya */
-  background-color: rgba(22, 33, 62, 0.95); /* Background aur dark/opaque kiya */
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  /* NAYA: Background ko naye dark color se match kiya */
+  background-color: var(--color-deep-blue);
+  /* Glass effect (backdrop-filter) hata diya */
   
-  /* NAYA FIX 99: Neon Border */
-  border: 1px solid var(--color-neon-green); 
+  /* NAYA: Default border ko subtle rakha (Neon border hataya) */
+  border: 1px solid var(--color-glass-light); 
   
   border-radius: 12px; 
   overflow: hidden;
   
-  /* CRITICAL FIX 100: 3D Transition Effects */
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease;
-  transform-style: preserve-3d;
+  /* CHANGE: Transition mein 'transform' waapis add kiya */
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.4s ease, box-shadow 0.4s ease;
   
   height: auto; 
   display: flex;
   flex-direction: column;
   
-  /* FIX 43: Stronger initial elevation for floating effect */
-  box-shadow: 
-    0 15px 50px rgba(0, 0, 0, 1.0), 
-    0 0 15px rgba(0, 245, 200, 0.6); /* Aggressive Shadow */
+  /* NAYA: Shadow ko subtle rakha */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   
-  /* NAYA: Subtle floating animation */
-  animation: aggressiveLift 4s infinite alternate ease-in-out;
+  /* NAYA: Subtle floating animation (aggressiveLift) HATAYA */
+  animation: none;
 }
 
+/* --- PLAN 4.0 CHANGE: Portfolio Card Hover (Refined Lift) --- */
 .portfolioCard:hover {
-  /* FIX 44: Lift up aur intense glow */
-  transform: translateY(-15px) scale(1.05) rotateX(2deg); /* 3D Lift and Slight Tilt */
+  /* CHANGE: Lift effect WAAPIS ADD KIYA (3D Tilt/Scale hataya) */
+  transform: translateY(-10px); 
+  
+  /* NAYA: Hover par border color bhi change hoga */
+  border-color: var(--color-neon-green);
+  
+  /* NAYA: Shadow ko badhaya aur intense glow add kiya */
   box-shadow: 
-    0 25px 60px rgba(0, 0, 0, 0.98), 
-    0 0 50px var(--color-neon-green); /* Ultra Intense hover glow */
-  animation: neonGlowLoop 1.5s infinite alternate; /* New Intense Glow Animation */
+    0 20px 50px rgba(0, 0, 0, 0.8), 
+    0 0 25px rgba(0, 245, 200, 0.3); 
+    
+  /* NAYA: Intense Glow Animation (neonGlowLoop) HATAYA */
+  animation: none; 
 }
 
 .portfolioImageWrapper {
@@ -808,26 +832,24 @@
   margin-top: 4rem;
 }
 
+/* --- PLAN 4.0 CHANGE: WhyUs card (Refined Lift) --- */
 .whyUsItem {
-  background-color: rgba(22, 33, 62, 0.75);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background-color: var(--color-deep-blue);
   padding: 3rem;
   border-radius: 16px;
   border: 1px solid var(--color-glass-light);
-  box-shadow: 
-    0 15px 40px rgba(0, 0, 0, 0.9),
-    0 0 5px rgba(139, 92, 246, 0.2); 
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  /* CHANGE: Transition mein 'transform' waapis add kiya */
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   text-align: center;
 }
 
 .whyUsItem:hover {
-  transform: translateY(-15px);
+  transform: translateY(-10px); /* CHANGE: Lift effect WAAPIS ADD KIYA */
+  border-color: var(--color-secondary-accent); /* NAYA: Purple border glow */
   box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 1.0), 
-    0 0 30px var(--color-secondary-accent),
-    0 0 10px rgba(139, 92, 246, 0.8);
+    0 15px 40px rgba(0, 0, 0, 0.7), 
+    0 0 15px rgba(139, 92, 246, 0.3); /* NAYA: Purple shadow glow */
 }
 
 .whyUsIcon {
@@ -885,23 +907,21 @@
     padding-bottom: 1rem; /* Shadow visibility ke liye space */
 }
 
+/* --- PLAN 4.0 CHANGE: Testimonial card (Refined Lift) --- */
 .testimonialCard {
     flex-shrink: 0; 
     width: 350px; /* Card ki fixed width */
     scroll-snap-align: start; 
     
-    background-color: var(--color-glass-dark);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background-color: var(--color-deep-blue);
     padding: 3rem; 
     border-radius: 16px;
     border: 1px solid var(--color-glass-light);
     
-    box-shadow: 
-      0 10px 30px rgba(0, 0, 0, 0.8), 
-      0 0 5px rgba(0, 245, 200, 0.2); 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
       
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* CHANGE: Transition mein 'transform' waapis add kiya */
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     text-align: left;
     display: flex;
     flex-direction: column;
@@ -909,8 +929,9 @@
 }
 
 .testimonialCard:hover {
-  transform: translateY(-5px); 
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.9), 0 0 20px var(--color-neon-light);
+  transform: translateY(-5px); /* CHANGE: Lift effect WAAPIS ADD KIYA (thoda kam) */
+  border-color: var(--color-neon-light); /* Halki neon border */
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 245, 200, 0.1);
 }
 
 .quoteIcon {
@@ -950,7 +971,8 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 20;
-    background-color: var(--color-glass-dark);
+    /* NAYA: Background ko naye dark color se match kiya */
+    background-color: var(--color-deep-blue);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     border: 1px solid var(--color-neon-green);
@@ -997,10 +1019,10 @@
 }
 
 .blogCard {
-    background-color: var(--color-dark-navy);
+    background-color: var(--color-deep-blue); /* NAYA: Dark color */
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-glass-light); /* NAYA: Subtle border */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     height: 100%;
     display: flex;
@@ -1068,14 +1090,17 @@
         perspective: none; 
     }
     
+    /* NAYA: Mobile par 3D hover effect flat rakha */
     .portfolioCard {
         transform-style: flat;
         animation: none;
     }
     
     .portfolioCard:hover {
-        transform: translateY(-8px) scale(1.02);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 30px var(--color-neon-green);
+        /* NAYA: Mobile par lift effect rakha */
+        transform: translateY(-8px);
+        border-color: var(--color-neon-green);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 245, 200, 0.3);
         animation: none;
     }
 }
@@ -1083,12 +1108,12 @@
 
 @media (max-width: 768px) {
   .heroHeadline {
-    font-size: 3.5rem; 
+    font-size: 2.8rem; /* Thoda chhota kiya mobile ke liye */
     text-align: center; 
   }
 
   .heroSubheadline {
-    font-size: 1.5rem;
+    font-size: 1.3rem; /* Thoda chhota */
     text-align: center; 
     line-height: 1.5; 
   }
@@ -1156,7 +1181,7 @@
     }
 }
 
-/* --- Keyframes are same --- */
+/* --- Keyframes --- */
 @keyframes neonPulse {
     0% {
         transform: scale(1) translateZ(0);
@@ -1192,6 +1217,19 @@
     }
 }
 
+/* NAYA: fadeIn animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Glitch animation (Ab use nahi ho raha, lekin rakha hai) */
 @keyframes glitch-flicker {
     0%, 100% {
         text-shadow: 0 0 10px rgba(0, 245, 200, 0.8), 0 0 20px rgba(0, 245, 200, 0.4); 
@@ -1219,6 +1257,7 @@
     }
 }
 
+/* Aggressive lift (Ab use nahi ho raha) */
 @keyframes aggressiveLift {
     0% {
         transform: translateY(0) scale(1) translateZ(0);
@@ -1240,6 +1279,7 @@
     }
 }
 
+/* Neon Glow Loop (Ab use nahi ho raha) */
 @keyframes neonGlowLoop {
     0% {
         box-shadow: 

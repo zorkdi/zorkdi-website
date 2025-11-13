@@ -21,6 +21,8 @@ interface FounderSettings {
     title: string;
     philosophy: string;
     imageURL: string;
+    // --- NAYA FIELD ADD KIYA ---
+    showFounderImage: boolean;
 }
 
 // Default/Initial values
@@ -30,6 +32,8 @@ const defaultSettings: FounderSettings = {
     title: "CEO & Lead Developer",
     philosophy: "Our mission at ZORK DI is rooted in crafting clean, scalable, and complex software solutions that meet the highest standards of quality and efficiency.",
     imageURL: "/images/founder-profile-placeholder.jpg", // Fallback Image
+    // --- NAYA DEFAULT VALUE ---
+    showFounderImage: false, // Default mein image hide rakho
 };
 
 const FounderCMS = () => {
@@ -57,6 +61,7 @@ const FounderCMS = () => {
 
                 if (docSnap.exists()) {
                     const fetchedData = docSnap.data();
+                    // NAYA: Ab yeh 'showFounderImage' ko bhi load karega
                     const mergedData = { ...defaultSettings, ...fetchedData } as FounderSettings;
                     
                     setContent(mergedData); 
@@ -83,6 +88,14 @@ const FounderCMS = () => {
     const handleTextChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setContent(prev => ({ ...prev, [name]: value }));
+        setSuccess('');
+        setError('');
+    };
+
+    // --- NAYA HANDLER: Checkbox/Toggle ke liye ---
+    const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target;
+        setContent(prev => ({ ...prev, [name]: checked }));
         setSuccess('');
         setError('');
     };
@@ -159,6 +172,7 @@ const FounderCMS = () => {
             }
 
             // 3. Update Document in Firestore
+            // NAYA: Ab 'content' object mein 'showFounderImage' ki value bhi save hogi
             await setDoc(DOC_REF, { ...content, imageURL: finalImageURL }, { merge: true }); 
 
             // Final state update
@@ -221,6 +235,49 @@ const FounderCMS = () => {
                         )}
                     </div>
                 </div>
+                
+                {/* --- NAYA TOGGLE SWITCH SECTION --- */}
+                <div className={formStyles.fullWidth}>
+                    <div 
+                        className={formStyles.formGroup} 
+                        style={{ 
+                            border: '1px solid var(--color-neon-green)', 
+                            padding: '1.5rem', 
+                            borderRadius: '8px', 
+                            backgroundColor: 'var(--color-dark-navy)',
+                            marginTop: '1.5rem'
+                        }}
+                    >
+                        <label 
+                            htmlFor="showFounderImage" 
+                            style={{ 
+                                flexDirection: 'row', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center', 
+                                display: 'flex', 
+                                opacity: 1, 
+                                color: 'var(--color-neon-light)', 
+                                margin: 0,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <span>Show Image on Homepage?</span>
+                            <input 
+                                type="checkbox" 
+                                id="showFounderImage" 
+                                name="showFounderImage" 
+                                checked={content.showFounderImage} 
+                                onChange={handleCheckboxChange}
+                                style={{ width: '20px', height: '20px', margin: 0, cursor: 'pointer' }}
+                            />
+                        </label>
+                        {/* --- YAHAN CHANGE KIYA GAYA HAI (FINAL FIX) --- */}
+                        <p style={{ opacity: 0.7, fontSize: '0.9rem', margin: '0.5rem 0 0 0' }}>
+                            If &apos;On&apos;, the image will be visible on the homepage. If &apos;Off&apos;, the entire image section will be hidden.
+                        </p>
+                    </div>
+                </div>
+
 
                 {/* --- Founder Details --- */}
                 <div className={formStyles.fullWidth}>

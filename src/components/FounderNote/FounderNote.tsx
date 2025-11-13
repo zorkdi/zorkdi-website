@@ -1,5 +1,5 @@
 // src/components/FounderNote/FounderNote.tsx
-"use client";
+"use-client";
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react'; // useCallback add kiya
 import Image from 'next/image';
@@ -16,6 +16,9 @@ interface FounderSettings {
     title: string;
     philosophy: string;
     imageURL: string;
+    // --- NAYA FIELD ---
+    // Yeh field admin panel se control hoga (true/false)
+    showFounderImage: boolean; 
 }
 
 // Default/Initial values
@@ -25,6 +28,8 @@ const defaultSettings: FounderSettings = {
     title: "CEO & Lead Developer",
     philosophy: "Our mission at ZORK DI is rooted in crafting clean, scalable, and complex software solutions that meet the highest standards of quality and efficiency.",
     imageURL: "/images/founder-profile-placeholder.jpg", // Fallback Image
+    // --- NAYA DEFAULT VALUE ---
+    showFounderImage: false, // Default mein image hide rakhega
 };
 
 const FounderNote: React.FC = () => {
@@ -33,13 +38,13 @@ const FounderNote: React.FC = () => {
 
     const DOC_REF = useMemo(() => doc(db, 'cms', 'founder_settings'), []);
 
-    // === YAHAN CHANGE KIYA GAYA HAI (useCallback) ===
     const fetchFounderSettings = useCallback(async () => {
         try {
             const docSnap = await getDoc(DOC_REF);
 
             if (docSnap.exists()) {
                 const fetchedData = docSnap.data();
+                // Naya 'mergedData' jo database se 'showFounderImage' ki value bhi lega
                 const mergedData = { ...defaultSettings, ...fetchedData } as FounderSettings;
                 
                 setSettings(mergedData); 
@@ -50,25 +55,23 @@ const FounderNote: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [DOC_REF]); // DOC_REF ko dependency banaya
+    }, [DOC_REF]); 
 
-    // === YAHAN CHANGE KIYA GAYA HAI (useEffect) ===
     useEffect(() => {
         fetchFounderSettings();
-    }, [fetchFounderSettings]); // fetchFounderSettings ko dependency banaya
+    }, [fetchFounderSettings]); 
 
     // Loader ya Fallback UI jab data load ho raha ho
     if (isLoading) {
         return (
              <section className={styles.founderNoteSection} style={{minHeight: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                 {/* === YAHAN CHANGE KIYA GAYA HAI === */}
                  <p style={{ opacity: 0.7 }}>Loading Founder&apos;s Vision...</p>
              </section>
         );
     }
     
     // Deconstructed settings for easier use in JSX
-    const { quote, name, title, philosophy, imageURL } = settings;
+    const { quote, name, title, philosophy, imageURL, showFounderImage } = settings;
 
     // Founder Image path ko condition kiya
     const finalImageURL = (imageURL && imageURL !== "") ? imageURL : defaultSettings.imageURL;
@@ -76,28 +79,35 @@ const FounderNote: React.FC = () => {
     return (
         <section className={styles.founderNoteSection}>
             <div className={styles.founderNoteWrapper}>
-                <AnimationWrapper delay={0.1}>
-                    <div className={styles.founderImageContainer}>
-                        
-                        <Image
-                            src={finalImageURL} 
-                            alt={name}
-                            fill
-                            // FIX 1: objectFit aur borderRadius ko style prop mein final time force kiya
-                            style={{ 
-                                objectFit: 'cover',
-                                borderRadius: '50%', 
-                            }}
-                            className={styles.founderImage}
-                            sizes="(max-width: 768px) 250px, 300px"
-                        />
-                    </div>
-                </AnimationWrapper>
+                
+                {/* --- NAYA CONDITIONAL LOGIC ---
+                    Ab yeh container sirf tab render hoga jab:
+                    1. showFounderImage == true HO
+                    2. aur finalImageURL bhi maujood HO
+                */}
+                {showFounderImage && finalImageURL && (
+                    <AnimationWrapper delay={0.1}>
+                        <div className={styles.founderImageContainer}>
+                            
+                            <Image
+                                src={finalImageURL} 
+                                alt={name}
+                                fill
+                                // FIX 1: objectFit aur borderRadius ko style prop mein final time force kiya
+                                style={{ 
+                                    objectFit: 'cover',
+                                    borderRadius: '50%', 
+                                }}
+                                className={styles.founderImage}
+                                sizes="(max-width: 768px) 250px, 300px"
+                            />
+                        </div>
+                    </AnimationWrapper>
+                )}
                 
                 <div className={styles.founderContent}>
                     <AnimationWrapper delay={0.2}>
                         <h3 className={styles.founderQuote}>
-                            {/* === YAHAN CHANGE KIYA GAYA HAI === */}
                             {quote}
                         </h3>
                     </AnimationWrapper>
