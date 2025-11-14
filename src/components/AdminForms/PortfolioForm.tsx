@@ -32,11 +32,13 @@ interface ContentBlock {
   uploadProgress?: number | null; // Is block ka upload progress
 }
 
+// === YAHAN CHANGE KIYA GAYA HAI (content add kiya) ===
 // Portfolio Data structure update kiya
 interface PortfolioData {
   title: string;
   category: string;
-  contentBlocks: ContentBlock[]; // <-- Add kiya
+  content: string; // <-- Add kiya (Short description ke liye)
+  contentBlocks: ContentBlock[]; 
   coverImageURL: string;
   createdAt?: Timestamp; 
 }
@@ -50,11 +52,13 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
   const router = useRouter();
   const isEditMode = Boolean(postId);
 
+  // === YAHAN CHANGE KIYA GAYA HAI (content add kiya) ===
   // State for form data
   const [formData, setFormData] = useState<PortfolioData>({
     title: '',
     category: 'Web App', // Default category
-    contentBlocks: [], // <-- Change kiya
+    content: '', // <-- Add kiya
+    contentBlocks: [], 
     coverImageURL: '',
   });
 
@@ -79,9 +83,10 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
             const data = docSnap.data() as PortfolioData;
+            // === YAHAN CHANGE KIYA GAYA HAI (content add kiya) ===
             setFormData({
                 ...data,
-                // Ensure contentBlocks hamesha ek array ho
+                content: data.content || '', // <-- Purane docs ke liye fallback
                 contentBlocks: data.contentBlocks || [] 
             });
             setImagePreview(data.coverImageURL);
@@ -156,8 +161,8 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
   };
 
 
-  // Handle standard input/select changes
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => { 
+  // Handle standard input/select/textarea changes
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => { 
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -322,11 +327,13 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
 
 
       // 3. Firestore Data Save
+      // === YAHAN CHANGE KIYA GAYA HAI (content add kiya) ===
       const postData = {
           title: formData.title,
           category: formData.category,
+          content: formData.content, // <-- Add kiya
           coverImageURL: finalCoverImageURL,
-          contentBlocks: uploadedBlocks, // Naya blocks array
+          contentBlocks: uploadedBlocks,
       };
 
       if (isEditMode && postId) {
@@ -401,6 +408,22 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
                   <option>UI/UX Design</option>
                 </select>
               </div>
+
+              {/* === YAHAN NAYA FIELD ADD KIYA GAYA HAI === */}
+              <div className={formStyles.formGroup} style={{marginTop: '1.5rem'}}>
+                <label htmlFor="content">Short Description (for Homepage Card)</label>
+                <textarea
+                  id="content"
+                  name="content"
+                  value={formData.content}
+                  onChange={handleInputChange}
+                  rows={4}
+                  placeholder="e.g., A sleek mobile app for managing micro-finance operations..."
+                />
+                <p className={formStyles.fieldDescription}>This text appears on the homepage portfolio card.</p>
+              </div>
+              {/* === END OF NAYA FIELD === */}
+
           </div>
 
           {/* Cover Image Upload Section */}
@@ -425,7 +448,6 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
                 <label htmlFor="coverImage" className={formStyles.uploadButton}>
                   <FaUpload /> {imagePreview ? 'Change Image' : 'Choose Image'}
                 </label>
-                {/* === YAHAN CHANGE KIYA GAYA HAI === */}
                 {typeof coverUploadProgress === 'number' && coverUploadProgress < 100 && ( 
                   <p className={formStyles.uploadProgress}>Uploading Cover: {coverUploadProgress}%</p>
                 )}
@@ -435,8 +457,12 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
         
         {/* === COLUMN 2: CONTENT BLOCKS === */}
         <div className={formStyles.contentColumn}>
-          <h3 className={formStyles.sectionHeader}>3. Project Content</h3>
-          <p style={{opacity: 0.8, marginBottom: '1.5rem', fontSize: '0.9rem'}}>Add content sections to build your portfolio page. You can re-order them (future feature) or remove them.</p>
+          <h3 className={formStyles.sectionHeader}>3. Project Content (Full Details)</h3>
+          
+          {/* === YAHAN CHANGE KIYA GAYA HAI ("" ko &quot; se replace kiya) === */}
+          <p style={{opacity: 0.8, marginBottom: '1.5rem', fontSize: '0.9rem'}}>
+            Add content sections to build the full portfolio details page. The &quot;Short Description&quot; will be used for the homepage card.
+          </p>
 
           {/* Render all content blocks */}
           <div className={formStyles.contentBlocksContainer}>
@@ -524,7 +550,6 @@ const PortfolioForm = ({ postId }: PortfolioFormProps) => {
                                         Clear Image
                                     </button>
                                 )}
-                                {/* === YAHAN CHANGE KIYA GAYA HAI === */}
                                 {typeof block.uploadProgress === 'number' && block.uploadProgress < 100 && (
                                     <p className={formStyles.uploadProgress}>Uploading: {block.uploadProgress}%</p>
                                 )}

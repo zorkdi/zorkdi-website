@@ -115,6 +115,16 @@
   animation-fill-mode: backwards; /* Animation shuru hone se pehle hide rakhega */
 }
 
+/* === YAHAN NAYI CLASS ADD KI HAI === */
+/* NAYA: Hero Button Container */
+.heroButtonContainer {
+    display: flex;
+    flex-wrap: wrap; /* Mobile par wrap hone ke liye */
+    justify-content: center;
+    gap: 1.5rem; /* Buttons ke beech space */
+}
+
+
 /* Button Styles - Base/Primary Button ki Base Styling */
 .heroButton {
   margin-top: 0; 
@@ -128,7 +138,8 @@
   transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.3s ease, color 0.3s ease; 
   border: none; 
   
-  margin-left: 0.5rem; /* Margin kam kiya */
+  /* CHANGE: Margin ko container handle karega, yahan se hataya */
+  margin-left: 0; 
 }
 
 
@@ -325,7 +336,7 @@
 }
 
 
-/* Portfolio CTA Button ke liye extra space theek kiya */
+/* Portfolio CTA Button ke liye extra space theekiya */
 .portfolioCtaButton {
     margin-left: 0; /* Center align karne ke liye extra margin hataya */
 }
@@ -333,7 +344,7 @@
 /* --- TRUST BAR FIX (Overlap Issue Solved) --- */
 
 .trustBarSection {
-    /* FIX 10: Width ko 100vw kiya taaki yeh bhi viewport ki poori width le */
+    /* FIX 10: Width ko 100vw kiya taaki yeh bhi viewport ki poori width width le */
     width: 100vw; 
     /* FIX 11: Trust Bar ko center mein rakha */
     margin-left: calc(-50vw + 50%);
@@ -496,33 +507,37 @@
   line-height: 1.7;
 }
 
+
 /* Portfolio Section */
 .portfolioSection {
   width: 100%;
   background-color: var(--color-deep-blue);
-  /* FIX 49: Portfolio section ki vertical padding ko badhaya */
+  /* Horizontal padding (4rem) yahan se HATA di */
   padding: 10rem 0; 
   text-align: center;
   position: relative; 
 }
 
-/* Portfolio Scroll Container - NAYA */
-.portfolioScrollContainer {
-  /* CRITICAL FIX 98: Transform style property add kiya 3D perspective ke liye */
+/* Portfolio Scroll Container */
+.portfolioCarousel {
   perspective: 1500px;
-  
   display: flex;
   overflow-x: scroll; 
   scroll-snap-type: x mandatory; 
   gap: 2.5rem; 
   margin-top: 4rem;
   text-align: left;
+  /* Horizontal padding (4rem) yahan ADD ki */
   padding: 0 4rem; 
   -ms-overflow-style: none; 
-  scrollbar-width: none; 
+  scrollbar-width: none;
+  
+  /* === YAHAN FINAL FIX HAI (Height) === */
+  align-items: flex-start; /* Cards ko stretch hone se rokega */
 }
 
-.portfolioScrollContainer::-webkit-scrollbar {
+
+.portfolioCarousel::-webkit-scrollbar {
   display: none;
 }
 
@@ -530,7 +545,7 @@
 .portfolioCard {
   flex-shrink: 0; 
   width: 350px; 
-  scroll-snap-align: start; 
+  scroll-snap-align: start; /* Desktop par start mein snap hoga */
   
   /* NAYA: Background ko naye dark color se match kiya */
   background-color: var(--color-deep-blue);
@@ -573,9 +588,10 @@
   animation: none; 
 }
 
+/* === YAHAN CHANGE KIYA GAYA HAI (Height Fix) === */
 .portfolioImageWrapper {
   width: 100%;
-  aspect-ratio: 16 / 10; 
+  aspect-ratio: 16 / 9; /* Ratio ko 16/10 se 16/9 kiya */
   position: relative;
   background-color: #2c3e50;
   display: flex;
@@ -640,24 +656,39 @@
     justify-content: center;
 }
 
-/* --- NAYA SECTION: CTA Bar Styling (Full Width Banner) --- */
+/* --- === YAHAN CHANGE KIYA GAYA HAI === --- */
+/* NAYA SECTION: CTA Bar Styling (Full Width Banner) */
 
 .ctaBarSection {
-    width: 100vw; 
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
-    margin: 4rem 0; 
-    background-color: var(--color-deep-blue); 
+    /* Full width viewport styles hataye */
+    /* width: 100vw;  */
+    /* margin-left: calc(-50vw + 50%); */
+    /* margin-right: calc(-50vw + 50%); */
+    
+    /* Container styles add kiye */
+    width: 100%;
+    max-width: 1200px;
+    margin: 4rem auto; /* Center mein kiya */
+    
+    background-color: var(--color-dark-navy); /* Background ko main page bg se match kiya */
     padding: 5rem 2rem; 
     position: relative;
     z-index: 9; 
-    border-radius: 0; 
-    border-top: 1px solid var(--color-secondary-accent); 
-    border-bottom: 1px solid var(--color-secondary-accent); 
-    box-shadow: 0 0 25px rgba(139, 92, 246, 0.3); 
+    
+    /* Naya Card Look */
+    border-radius: 16px; 
+    border: 1px solid var(--color-glass-light);
+    
+    /* Purple border aur shadow hataya */
+    /* border-top: 1px solid var(--color-secondary-accent);  */
+    /* border-bottom: 1px solid var(--color-secondary-accent);  */
+    /* box-shadow: 0 0 25px rgba(139, 92, 246, 0.3);  */
+    
     background-image: none; 
     color: var(--color-off-white); 
 }
+/* --- === END OF CHANGE === --- */
+
 
 .ctaBarContent {
     max-width: 1200px; 
@@ -1038,6 +1069,7 @@
 }
 
 /* ===== Mobile Responsive Styles ===== */
+
 @media (max-width: 1024px) {
     /* Trust Bar ko thoda adjust kiya for tablets */
     .logoItem {
@@ -1046,7 +1078,7 @@
     
     .ctaBarSection {
         padding: 4rem 1.5rem; 
-        margin: 3rem 0;
+        margin: 3rem auto; /* Auto margin add kiya */
     }
     .ctaBarContent {
         gap: 1.5rem; 
@@ -1085,15 +1117,22 @@
     }
     
     /* Portfolio Scroll Mobile Fix */
-    .portfolioScrollContainer {
-        padding: 0 1.5rem;
-        perspective: none; 
+    .portfolioCarousel {
+      /* CHANGE: Padding ko mobile/tablet ke liye 1.5rem kiya */
+      padding: 0 1.5rem;
+      perspective: none; 
+    }
+    /* Padding ko parent section se HATA diya */
+    .portfolioSection {
+      padding: 6rem 0; 
     }
     
     /* NAYA: Mobile par 3D hover effect flat rakha */
     .portfolioCard {
         transform-style: flat;
         animation: none;
+        /* === YAHAN NAYA DESIGN FIX HAI === */
+        scroll-snap-align: center; /* Tablet par center mein snap hoga */
     }
     
     .portfolioCard:hover {
@@ -1149,13 +1188,66 @@
     }
   
   .portfolioSection {
-      padding: 4rem 0; 
+      padding: 4rem 0; /* Mobile padding yahan se HATA di */
   }
+
+  /* === YAHAN NAYA DESIGN FIX HAI === */
+  .portfolioCarousel {
+      padding: 0 1.5rem; /* Container par padding di */
+      gap: 1rem; /* Gap ko kam kiya */
+  }
+
+  /* Mobile Card Size Fix (Pichle plan se) */
+  .portfolioCard {
+    width: 90%; /* Card ki width 90% ki */
+    scroll-snap-align: center; /* Mobile par center mein snap hoga */
+    
+    /* Font size ko chhota kiya */
+    font-size: 0.9rem;
+  }
+
+  .portfolioContent {
+      padding: 1.5rem 1rem; 
+  }
+
+  .portfolioCategory {
+      font-size: 0.9rem; 
+  }
+
+  .portfolioCard h3 {
+    font-size: 1.5rem; 
+    
+    /* === YAHAN NAYA FIX ADD KIYA GAYA HAI === */
+    /* Text ko 2 line mein cut karne ke liye */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Text ko 2 line mein cut karega */
+    line-clamp: 2; /* === YAHAN NAYA FIX ADD KIYA GAYA HAI === */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* === END OF NAYA FIX === */
+  }
+
+  /* === YAHAN FINAL FIX HAI (Height) === */
+  .portfolioCard p {
+    font-size: 0.9rem;
+    
+    /* NAYI LINES (Text ko 2 line mein cut karne ke liye) */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Text ko 2 line mein cut karega */
+    line-clamp: 2; /* === YAHAN NAYA FIX ADD KIYA GAYA HAI === */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0; /* Extra margin hatao */
+  }
+  /* === END OF NAYA DESIGN FIX === */
+
 
   /* Mobile CTA Bar */
   .ctaBarSection {
       padding: 3rem 1.5rem; 
-      margin: 2rem 0;
+      margin: 2rem auto; /* Auto margin add kiya */
   }
   .ctaHeadline {
       font-size: 1.8rem; 
@@ -1180,6 +1272,8 @@
         font-size: 1.5rem;
     }
 }
+
+
 
 /* --- Keyframes --- */
 @keyframes neonPulse {

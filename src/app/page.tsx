@@ -165,8 +165,9 @@ const fetchPortfolioProjects = async (): Promise<PortfolioPreview[]> => {
 
         return querySnapshot.docs.map(doc => {
             const data = doc.data();
-            // FIX: Portfolio content ko clean kiya taaki glitch na ho (Glitch Fix)
-            const cleanContent = data.content ? data.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').substring(0, 150) + '...' : 'Project description is missing.'; // Content limit badhaya
+            // === YAHAN CHANGE KIYA GAYA HAI (Height Fix) ===
+            // Content limit ko 150 se 80 kiya
+            const cleanContent = data.content ? data.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').substring(0, 80) + '...' : 'Project description is missing.'; 
 
             return {
                 id: doc.id,
@@ -321,17 +322,29 @@ const HomePage = () => {
                         <AnimationWrapper delay={0.2}>
                             <p className={styles.heroSubheadline}>{serviceContent.heroSubheadline}</p>
                         </AnimationWrapper>
+                        
+                        {/* === YAHAN CHANGE KIYA GAYA HAI (Button Container Add Kiya) === */}
                         <AnimationWrapper delay={0.3}>
-                            {/* FIX: Hero Button par specific PrimaryButton class lagaya */}
-                            <Link 
-                                href="/services" 
-                                className={`${styles.heroButton} ${styles.heroPrimaryButton}`} 
-                            >
-                                {/* NAYA: Button text ko span mein wrap kiya for z-index control */}
-                                <span className={styles.buttonText}>{serviceContent.heroButtonText}</span>
-                                {/* NAYA: Animated border/glow element */}
-                                <span className={styles.buttonBorderGlow}></span>
-                            </Link>
+                            <div className={styles.heroButtonContainer}>
+                                
+                                {/* === YAHAN FIX KIYA GAYA HAI === */}
+                                <Link 
+                                    href="/new-project" 
+                                    className={`${styles.heroButton} ${styles.heroPrimaryButton}`} 
+                                >
+                                    <span className={styles.buttonText}>Start a Project</span>
+                                    <span className={styles.buttonBorderGlow}></span>
+                                </Link>
+                                
+                                {/* PURANA: Explore Services Button (Ab Secondary Outline) */}
+                                <Link 
+                                    href="/services" 
+                                    // CHANGE: Class ko '.primaryOutline' mein badla
+                                    className={`${styles.heroButton} ${styles.primaryOutline}`} 
+                                >
+                                    {serviceContent.heroButtonText}
+                                </Link>
+                            </div>
                         </AnimationWrapper>
                     </div>
                 </section>
@@ -366,14 +379,14 @@ const HomePage = () => {
             </section>
 
             {/* Portfolio Section (DYNAMIC - Featured Work) */}
-            {/* REVERT FIX: Original scrolling card structure wapas laya */}
             <section className={styles.portfolioSection}>
                 <h2 className={styles.sectionTitle} style={{ textAlign: 'center' }}>Featured Work</h2>
-                {/* REVERT FIX: Original portfolioScrollContainer wapas laya */}
-                <div className={styles.portfolioScrollContainer}>
+                
+                {/* === YAHAN CHANGE KIYA GAYA HAI (Cache Busting Fix) === */}
+                {/* Class ka naam .portfolioScrollContainer se .portfolioCarousel kiya */}
+                <div className={styles.portfolioCarousel}>
                     {portfolioProjects.map((project, index) => (
                         <AnimationWrapper key={project.id} delay={index * 0.2}>
-                            {/* REVERT FIX: Original portfolioCard class wapas laya */}
                             <Link href={`/portfolio/${project.id}`} className={styles.portfolioCard}>
                                 <div className={styles.portfolioImageWrapper}>
                                     {project.coverImageURL ? (

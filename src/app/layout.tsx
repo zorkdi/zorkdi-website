@@ -1,6 +1,7 @@
 // src/app/layout.tsx
 
-export const revalidate = 0; // === YAHAN CHANGE KIYA GAYA HAI === (Server cache ko disable karta hai)
+// === YAHAN CHANGE KIYA GAYA HAI === (Caching ko 300 seconds (5 min) ke liye enable kiya)
+export const revalidate = 300; 
 
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
@@ -131,7 +132,9 @@ export default async function RootLayout({
       <body className={poppins.className} style={heroBackground ? (customCssVars as React.CSSProperties) : undefined}>
         <AuthProvider>
           
-          <Header />
+          {/* === YAHAN CHANGE KIYA GAYA HAI === (globalSettings ko prop mein pass kiya) */}
+          <Header globalSettings={globalSettings} />
+
           {children}
           <Footer />
           <FloatingActionButtons />

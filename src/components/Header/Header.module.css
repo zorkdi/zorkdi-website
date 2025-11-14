@@ -347,19 +347,20 @@
       font-size: 1.2rem;
   }
 
-  /* --- CHANGE 2: Mobile tagline ka scroll animation hataya --- */
+  /* --- YAHAN CHANGE KIYA GAYA HAI --- */
   .brandTagline {
       font-size: 0.7rem; 
       display: inline-block;
       white-space: nowrap;
-      /* NAYA: Animation hataya */
-      /* animation: scrollLeft 10s linear infinite; */
-      /* padding-left: 100%; */
       
-      /* NAYA: Ellipsis (...) add kiya agar text bada ho */
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 100%;
+      /* NAYA: Animation activate kiya */
+      animation: scrollLeft 10s linear infinite;
+      padding-left: 100%;
+      
+      /* NAYA: Ellipsis (...) waala code hataya */
+      /* overflow: hidden; */
+      /* text-overflow: ellipsis; */
+      /* width: 100%; */
   }
   /* --- END CHANGE --- */
 
@@ -395,7 +396,7 @@
     }
 }
 
-/* --- CHANGE 3: Scroll animation (ab use nahi ho raha) --- */
+/* --- YAHAN CHANGE KIYA GAYA HAI (Animation ko uncomment kiya) --- */
 @keyframes scrollLeft {
   0% {
     transform: translateX(0%);

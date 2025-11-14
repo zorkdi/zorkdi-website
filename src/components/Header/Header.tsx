@@ -5,14 +5,14 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image'; // Already imported
+import Image from 'next/image'; 
 import styles from './Header.module.css';
 import { CgMenuRight, CgClose } from "react-icons/cg";
-import { FaUserCircle } from "react-icons/fa"; // Default profile icon ke liye
+import { FaUserCircle } from "react-icons/fa"; 
 import { useAuth } from '../../context/AuthContext'; 
 import { signOut } from 'firebase/auth';
-import { auth, db } from '../../firebase';
-import { doc, getDoc } from 'firebase/firestore'; 
+import { auth } from '../../firebase';
+// === YAHAN SE 'db' AUR 'getDoc' HATA DIYA GAYA HAI ===
 
 // Global settings data type
 interface BrandingData {
@@ -28,45 +28,32 @@ const defaultBranding: BrandingData = {
     headerLogoURL: "/logo.png", // Default logo
 };
 
-const Header = () => {
+// === YAHAN CHANGE KIYA GAYA HAI (Props receive karne ke liye) ===
+interface HeaderProps {
+    globalSettings: BrandingData;
+}
+
+const Header = ({ globalSettings }: HeaderProps) => {
   const { currentUser, userProfile, loading: authLoading } = useAuth(); 
   const router = useRouter();
+  
+  // === YAHAN CHANGE KIYA GAYA HAI (const add kiya) ===
   const [menuOpen, setMenuOpen] = useState(false);
+
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   
-  // Branding state
-  const [branding, setBranding] = useState<BrandingData>(defaultBranding);
-  const [brandingLoading, setBrandingLoading] = useState(true);
+  // === YAHAN CHANGE KIYA GAYA HAI ===
+  // 'branding' state, 'brandingLoading' state, aur 'fetchBranding' useEffect ko poori tarah HATA diya gaya hai
+  // Hum ab 'globalSettings' prop ko direct use karenge
+  const branding = globalSettings || defaultBranding;
+  // ===================================
 
   // Function to close both menus
   const closeMenus = () => {
       setMenuOpen(false);
       setProfileMenuOpen(false);
   };
-  
-  // Fetch branding data from CMS
-  useEffect(() => {
-      const fetchBranding = async () => {
-          try {
-              const docRef = doc(db, 'cms', 'global_settings');
-              const docSnap = await getDoc(docRef);
-              if (docSnap.exists()) {
-                  const data = docSnap.data();
-                  setBranding({
-                      websiteTitle: data.websiteTitle || defaultBranding.websiteTitle,
-                      websiteTagline: data.websiteTagline || defaultBranding.websiteTagline,
-                      headerLogoURL: data.headerLogoURL || defaultBranding.headerLogoURL, 
-                  });
-              }
-          } catch (error) {
-              console.error("Failed to fetch branding from CMS:", error);
-          } finally {
-              setBrandingLoading(false);
-          }
-      };
-      fetchBranding();
-  }, []); 
 
   // Mobile menu toggle hone par profile dropdown close karna
   useEffect(() => {
@@ -119,11 +106,10 @@ const Header = () => {
 
   // === YAHAN CHANGE KIYA GAYA HAI ===
   // Nayi logic yeh check karegi ki logoURL valid hai ya nahi
-  const logoSrc = brandingLoading 
-    ? defaultBranding.headerLogoURL // Jab loading ho, default dikhao
-    : (branding.headerLogoURL && branding.headerLogoURL.trim() !== "" // Check karo ki URL khaali toh nahi
+  // 'brandingLoading' state ab nahi hai, toh check hata diya
+  const logoSrc = (branding.headerLogoURL && branding.headerLogoURL.trim() !== "") 
         ? branding.headerLogoURL // Agar valid hai, toh database wala URL use karo
-        : defaultBranding.headerLogoURL); // Agar khaali hai, toh default URL use karo
+        : defaultBranding.headerLogoURL; // Agar khaali hai, toh default URL use karo
 
   return (
     <header className={styles.header}>
@@ -141,11 +127,12 @@ const Header = () => {
             />
             <div className={styles.logoTextContainer}>
               {/* Dynamic Brand Name and Tagline */}
+              {/* === YAHAN CHANGE KIYA GAYA HAI ('brandingLoading' check hataya) === */}
               <span className={styles.brandName}>
-                 {brandingLoading ? defaultBranding.websiteTitle : branding.websiteTitle}
+                 {branding.websiteTitle}
               </span>
               <span className={styles.brandTagline}>
-                 {brandingLoading ? defaultBranding.websiteTagline : branding.websiteTagline}
+                 {branding.websiteTagline}
               </span>
             </div>
           </Link>
