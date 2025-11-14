@@ -12,7 +12,6 @@ import {
   collection, addDoc, serverTimestamp, doc, getDoc, updateDoc, Timestamp, deleteDoc
 } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'; 
-// === YAHAN CHANGE KIYA GAYA HAI ===
 import { FaUpload, FaTrash, FaPlus } from 'react-icons/fa'; // Icons update kiye
 
 // Styles
@@ -41,10 +40,10 @@ interface BlogPostData {
   title: string;
   slug: string; 
   category: string;
-  // content: string; // <-- Hata diya
   contentBlocks: ContentBlock[]; // <-- Add kiya
   coverImageURL: string;
   isPublished: boolean; 
+  metaDescription: string; // <-- NAYA SEO FIELD
   createdAt?: Timestamp; 
 }
 
@@ -58,9 +57,10 @@ const initialData: BlogPostData = {
     title: '',
     slug: '',
     category: 'TUTORIAL',
-    contentBlocks: [], // <-- Change kiya
+    contentBlocks: [], 
     coverImageURL: '',
     isPublished: false, 
+    metaDescription: '', // <-- NAYA SEO FIELD
 };
 
 const NewPostForm = ({ postId }: NewPostFormProps) => {
@@ -72,10 +72,7 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
   // State for cover image handling
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [coverUploadProgress, setCoverUploadProgress] = useState<number | null>(null); // Renamed progress state
-
-  // Content Image Uploader states (ab use nahi honge)
-  // ...
+  const [coverUploadProgress, setCoverUploadProgress] = useState<number | null>(null); 
 
   const [isLoading, setIsLoading] = useState(isEditMode);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -94,9 +91,11 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
           if (docSnap.exists()) {
             const data = docSnap.data() as BlogPostData;
             setFormData({ 
+                ...initialData, // Default se merge kiya taaki naye fields (metaDesc) bhi aa jayein
                 ...data, 
                 isPublished: data.isPublished ?? false,
-                contentBlocks: data.contentBlocks || [] // Ensure contentBlocks ek array hai
+                contentBlocks: data.contentBlocks || [],
+                metaDescription: data.metaDescription || '', // Naya field load kiya
             }); 
             setImagePreview(data.coverImageURL);
           } else {
@@ -171,7 +170,7 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
 
 
   // --- Handlers ---
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => { 
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => { 
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -332,8 +331,8 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
           category: formData.category,
           coverImageURL: finalCoverImageURL,
           isPublished: formData.isPublished,
-          contentBlocks: uploadedBlocks, // <-- Naya data
-          // content: formData.content, // <-- Purana data
+          contentBlocks: uploadedBlocks,
+          metaDescription: formData.metaDescription, // <-- NAYA SEO FIELD
       };
 
       if (isEditMode && postId) {
@@ -351,7 +350,10 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
       router.push('/admin/blog');
 
     } catch (error: unknown) { 
-      setError("Failed to save post data. Check console.");
+      // Error state ko set karna warning hatane ke liye
+      const newError = error instanceof Error ? error.message : "Failed to save post data. Check console.";
+      setError(newError);
+      console.error(newError, error);
     } finally {
       setIsSubmitting(false);
     }
@@ -417,15 +419,11 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
                 <label htmlFor="coverImage" className={formStyles.uploadButton}>
                   <FaUpload /> {imagePreview ? 'Change Image' : 'Choose Image'}
                 </label>
-                {/* === YAHAN CHANGE KIYA GAYA HAI === */}
                 {typeof coverUploadProgress === 'number' && coverUploadProgress < 100 && ( 
                   <p className={formStyles.uploadProgress}>Uploading: {coverUploadProgress}%</p>
                 )}
               </div>
           </div>
-
-          {/* === YAHAN CHANGE KIYA GAYA HAI === */}
-          {/* Content Image Uploader ko yahan se HATA diya gaya hai */}
         </div>
         
         {/* === RIGHT COLUMN: CONTENT BLOCKS === */}
@@ -451,10 +449,26 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
                         <option>BUSINESS</option>
                     </select>
                   </div>
+                  
+                  {/* === YAHAN CHANGE KIYA GAYA HAI (rows="4") === */}
+                  <div className={`${formStyles.formGroup} ${formStyles.fullWidthInGrid}`}>
+                    <label htmlFor="metaDescription">SEO Meta Description</label>
+                    <textarea
+                      id="metaDescription"
+                      name="metaDescription"
+                      value={formData.metaDescription}
+                      onChange={handleInputChange}
+                      rows={4}
+                      placeholder="Google search results mein dikhne wala text (max 160 characters)"
+                      maxLength={160}
+                    />
+                     <p className={formStyles.fieldDescription}>Character Count: {formData.metaDescription.length} / 160</p>
+                  </div>
+                  {/* === END OF CHANGE === */}
+
               </div>
           </div>
           
-          {/* === YAHAN CHANGE KIYA GAYA HAI === */}
           {/* Naya Content Blocks Section */}
           <div className={formCommonStyles.formSection} style={{padding: '2rem'}}>
               <h3 className={formStyles.sectionHeader}>4. Post Content</h3>
@@ -541,7 +555,6 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
                                             Clear Image
                                         </button>
                                     )}
-                                    {/* === YAHAN CHANGE KIYA GAYA HAI === */}
                                     {typeof block.uploadProgress === 'number' && block.uploadProgress < 100 && (
                                         <p className={formStyles.uploadProgress}>Uploading: {block.uploadProgress}%</p>
                                     )}

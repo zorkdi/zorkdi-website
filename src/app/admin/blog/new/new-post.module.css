@@ -54,6 +54,12 @@
     gap: 1.5rem;
 }
 
+/* === YAHAN NAYA STYLE ADD KIYA GAYA HAI === */
+.fullWidthInGrid {
+    grid-column: 1 / -1;
+}
+/* === END OF NAYA STYLE === */
+
 
 /* Image Upload Section (Cover Image) */
 .imageUploadSection {
@@ -123,6 +129,14 @@
     opacity: 0.9;
     color: var(--color-off-white);
 }
+
+/* === YAHAN NAYA STYLE ADD KIYA GAYA HAI === */
+.fieldDescription {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    margin: 0;
+}
+/* === END OF NAYA STYLE === */
 
 /* Input/Select/Textarea focus styles */
 .formGroup input:focus,
