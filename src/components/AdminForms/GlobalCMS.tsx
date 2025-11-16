@@ -12,20 +12,27 @@ import { db, storage } from '@/firebase';
 import adminStyles from '@/app/admin/admin.module.css';
 import formStyles from './forms.module.css';
 import newPostStyles from '@/app/admin/blog/new/new-post.module.css'; 
-import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaChartLine, FaSearch, FaTimesCircle, FaUpload } from "react-icons/fa"; // FaUpload add kiya
+// NAYA: Stats icon import kiya
+import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaChartLine, FaSearch, FaTimesCircle, FaUpload, FaUsers, FaProjectDiagram, FaSmile, FaCalendarAlt } from "react-icons/fa";
 
 // === YAHAN CHANGE KIYA GAYA HAI ===
 // Type for Firestore data structure
 interface GlobalSettings {
   websiteTitle: string; 
   websiteTagline: string; 
-  headerLogoURL: string; // NAYA FIELD LOGO KE LIYE
+  headerLogoURL: string; 
   
   heroBackgroundURL: string; 
   defaultHeroBackground: string; 
   
   googleAnalyticsId: string;
   googleSearchConsoleId: string; 
+
+  // NAYE FIELDS: Homepage Stats
+  statProjects: string;
+  statTeam: string;
+  statClients: string;
+  statYears: string;
 
   contactEmail: string;
   contactPhone: string;
@@ -44,13 +51,19 @@ const defaultHeroURL = 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' x
 const initialData: GlobalSettings = {
   websiteTitle: "ZORK DI - Custom Tech Solutions",
   websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
-  headerLogoURL: "/logo.png", // NAYA DEFAULT VALUE
+  headerLogoURL: "/logo.png", 
   
   heroBackgroundURL: "", 
   defaultHeroBackground: defaultHeroURL, 
 
   googleAnalyticsId: "G-XXXXXXXXXX", 
-  googleSearchConsoleId: "",
+  googleSearchConsoleId: "", 
+
+  // NAYE DEFAULT VALUES
+  statProjects: "30K+",
+  statTeam: "25+",
+  statClients: "15K+",
+  statYears: "10+",
 
   contactEmail: "info@zorkdi.com", 
   contactPhone: "+1 (555) 555-5555",
@@ -346,7 +359,7 @@ const GlobalCMS = () => {
         
         {/* --- HERO BACKGROUND IMAGE --- */}
         <div className={formStyles.fullWidth}>
-            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-green)' }}>Home Hero Background Image</h3>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-light)' }}>Home Hero Background Image</h3>
         </div>
         <div className={formStyles.fullWidth}>
              <div className={newPostStyles.imageUploadSection}>
@@ -393,7 +406,31 @@ const GlobalCMS = () => {
             <label><FaSearch /> Google Search Console Verification</label>
             <input type="text" name="googleSearchConsoleId" value={content.googleSearchConsoleId} onChange={handleTextChange} placeholder="Meta Tag Content ID only" />
         </div>
-
+        
+        
+        {/* === NAYA SECTION: HOMEPAGE STATS === */}
+        <div className={formStyles.fullWidth}>
+            <h3 style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: '1.5rem', color: 'var(--color-neon-light)' }}>Homepage Stats</h3>
+        </div>
+        
+        <div className={formStyles.formGroup}>
+            <label><FaProjectDiagram /> Projects Delivered</label>
+            <input type="text" name="statProjects" value={content.statProjects} onChange={handleTextChange} placeholder="e.g., 30K+" />
+        </div>
+        <div className={formStyles.formGroup}>
+            <label><FaUsers /> Team Members</label>
+            <input type="text" name="statTeam" value={content.statTeam} onChange={handleTextChange} placeholder="e.g., 25+" />
+        </div>
+        <div className={formStyles.formGroup}>
+            <label><FaSmile /> Happy Clients</label>
+            <input type="text" name="statClients" value={content.statClients} onChange={handleTextChange} placeholder="e.g., 15K+" />
+        </div>
+        <div className={formStyles.formGroup}>
+            <label><FaCalendarAlt /> Years of Experience</label>
+            <input type="text" name="statYears" value={content.statYears} onChange={handleTextChange} placeholder="e.g., 10+" />
+        </div>
+        {/* === END OF NAYA SECTION === */}
+        
 
         {/* --- CONTACT INFORMATION --- */}
         <div className={formStyles.fullWidth}>

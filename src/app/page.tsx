@@ -4,34 +4,31 @@
 
 import Link from 'next/link';
 import styles from './page.module.css';
-// FIX 1: Ratings ke liye FaStar aur FaQuoteLeft icons ko add kiya
-import { FaLaptopCode, FaMobileAlt, FaDraftingCompass, FaRegLightbulb, FaUserShield, FaRocket, FaNewspaper, FaChartLine, FaDesktop, FaStar, FaQuoteLeft } from "react-icons/fa";
+// NAYA: Unused icons (FaMobileAlt, FaChartLine, FaDesktop, FaQuoteLeft) hata diye
+import { FaLaptopCode, FaDraftingCompass, FaRegLightbulb, FaUserShield, FaRocket, FaNewspaper, FaStar, FaArrowRight } from "react-icons/fa";
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
-// Firestore imports mein 'where' add kiya reviews filtering ke liye
 import { doc, getDoc, collection, query, orderBy, limit, getDocs, Timestamp, where } from 'firebase/firestore';
 import { db } from '@/firebase';
 import Image from 'next/image'; 
 
 import React, { useState, useEffect } from 'react';
-// FIX 2: ReviewModal ko import kiya
 import ReviewModal from '@/components/ReviewModal/ReviewModal';
 
-// NAYA: Imports for components moved from layout.tsx
+// Components (Inko CSS restyle kar dega)
 import VisitorTracker from "@/components/VisitorTracker/VisitorTracker";
-import AnimatedBackground from "@/components/AnimatedBackground/AnimatedBackground";
-// NAYA ADDITION: TrustBar component import kiya
+// NAYA: Unused import (AnimatedBackground) hata diya
+// import AnimatedBackground from "@/components/AnimatedBackground/AnimatedBackground";
 import TrustBar from "@/components/TrustBar/TrustBar";
-// NAYA ADDITION: TestimonialSlider component import kiya
 import TestimonialSlider from "@/components/TestimonialSlider/TestimonialSlider";
-// NAYA ADDITION: CallToActionBar component import kiya
 import CallToActionBar from "@/components/CallToActionBar/CallToActionBar";
-// NAYA ADDITION: FounderNote component import kiya
 import FounderNote from "@/components/FounderNote/FounderNote";
 
+// === NAYA: SECURITY FIX - AuthContext import kiya ===
+import { useAuth } from '@/context/AuthContext';
 
-// Helper Components ko define kiya
-const ServiceIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
-const WhyUsIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
+
+// Helper Components
+const FeatureIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
 
 
 // --- Interfaces ---
@@ -39,7 +36,6 @@ interface ServiceOffering { id: string; title: string; description: string; offe
 interface ServicesContent { heroHeadline: string; heroSubheadline: string; heroButtonText: string; services: ServiceOffering[]; }
 interface BlogPreview { id: string; title: string; slug: string; coverImageURL: string; summary: string; createdAt: Timestamp | null; }
 
-// Portfolio Interface
 interface PortfolioPreview { 
     id: string; 
     title: string; 
@@ -48,7 +44,6 @@ interface PortfolioPreview {
     content: string; 
 }
 
-// NAYA: Review Interface
 interface Review {
     id: string;
     userName: string;
@@ -57,24 +52,13 @@ interface Review {
     createdAt: Timestamp;
 }
 
-
-// NAYA: Function to render Star Rating
-const StarRating = ({ rating }: { rating: number }) => {
-    const totalStars = 5;
-    const filledStars = Math.round(rating);
-    const stars = [];
-
-    for (let i = 1; i <= totalStars; i++) {
-        stars.push(
-            <FaStar 
-                key={i} 
-                style={{ color: i <= filledStars ? 'var(--color-neon-green)' : '#444', marginRight: '3px' }} 
-            />
-        );
-    }
-
-    return <div style={{ display: 'flex', fontSize: '1.1rem' }}>{stars}</div>;
-};
+// NAYA: Global Settings (Stats ke liye)
+interface GlobalSettings {
+    statProjects: string;
+    statTeam: string;
+    statClients: string;
+    statYears: string;
+}
 
 
 // --- Fallback Data (Instant Rendering Ke Liye) ---
@@ -83,9 +67,12 @@ const fallbackServiceData: ServicesContent = {
     heroSubheadline: "Transforming complex ideas into clean, high-performance, and scalable software solutions.",
     heroButtonText: "Explore Our Services", 
     services: [
-        { id: '1', title: 'Custom Web Apps', description: 'Building fast, secure, and resilient web applications using modern frameworks like Next.js and React.', offerings: [] },
-        { id: '2', title: 'Mobile App Development', description: 'Creating engaging native and cross-platform mobile experiences for iOS and Android devices.', offerings: [] },
-        { id: '3', title: 'UI/UX Design & Branding', description: 'Focusing on user-centric design to create intuitive, beautiful interfaces that drive user engagement.', offerings: [] },
+        { id: '1', title: 'Custom Web Apps', description: 'Building fast, secure, and resilient web applications using modern frameworks.', offerings: [] },
+        { id: '2', title: 'Mobile App Development', description: 'Creating engaging native and cross-platform mobile experiences for iOS and Android.', offerings: [] },
+        { id: '3', title: 'UI/UX Design & Branding', description: 'Focusing on user-centric design to create intuitive, beautiful interfaces.', offerings: [] },
+        { id: '4', title: 'Custom Software', description: 'Tailored software development for unique business needs and internal tools.', offerings: [] },
+        { id: '5', title: 'Digital Marketing', description: 'Driving measurable ROI through data-backed SEO, content strategy, and campaign.', offerings: [] },
+        { id: '6', title: 'Desktop Solutions', description: 'Building robust, high-performance Windows and cross-platform desktop software.', offerings: [] },
     ],
 };
 const fallbackBlogPosts: BlogPreview[] = [
@@ -96,18 +83,17 @@ const fallbackPortfolio: PortfolioPreview[] = [
     { id: 'p2', title: 'Aura FinTech Dashboard', category: 'Finance', coverImageURL: '', content: 'A short description of the project.' },
     { id: 'p3', title: 'SaaS Management Portal', category: 'Custom Software', coverImageURL: '', content: 'A short description of the project.' },
 ];
-
-// Icon mapping (Service icons ke liye)
-const iconMap: { [key: string]: React.ElementType } = {
-    'Web App': FaLaptopCode,
-    'Mobile App': FaMobileAlt,
-    'UI/UX': FaDraftingCompass,
-    'Custom Software': FaRocket, 
-    'Digital Marketing': FaChartLine, 
-    'Desktop Solutions': FaDesktop, 
+// NAYA: Fallback Stats
+const fallbackGlobalSettings: GlobalSettings = {
+    statProjects: "...",
+    statTeam: "...",
+    statClients: "...",
+    statYears: "...",
 };
 
+
 // --- Data Fetching Functions ---
+// (Yeh functions waise hi rahenge, content fetch karte hain)
 
 const fetchServiceContent = async (): Promise<ServicesContent> => {
     try {
@@ -115,7 +101,11 @@ const fetchServiceContent = async (): Promise<ServicesContent> => {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            return { ...fallbackServiceData, ...docSnap.data() as ServicesContent };
+            const data = docSnap.data() as Partial<ServicesContent>;
+            // Ensure services array exists and is not empty
+            if (data.services && data.services.length > 0) {
+                 return { ...fallbackServiceData, ...data };
+            }
         }
     } catch (error) {
         console.error("Error fetching services content:", error);
@@ -165,8 +155,6 @@ const fetchPortfolioProjects = async (): Promise<PortfolioPreview[]> => {
 
         return querySnapshot.docs.map(doc => {
             const data = doc.data();
-            // === YAHAN CHANGE KIYA GAYA HAI (Height Fix) ===
-            // Content limit ko 150 se 80 kiya
             const cleanContent = data.content ? data.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').substring(0, 80) + '...' : 'Project description is missing.'; 
 
             return {
@@ -184,11 +172,9 @@ const fetchPortfolioProjects = async (): Promise<PortfolioPreview[]> => {
     }
 };
 
-// NAYA FUNCTION: Reviews fetch karna AUR Overall Stats Calculate karna
 const fetchLatestReviewsAndStats = async (): Promise<{ reviews: Review[], avgRating: number, totalCount: number }> => {
     try {
         const reviewsRef = collection(db, 'reviews');
-        // Pehle saare approved reviews fetch karo stats ke liye
         const qAllApproved = query(reviewsRef, where('status', '==', 'approved'));
         const snapshotAll = await getDocs(qAllApproved);
         
@@ -200,7 +186,6 @@ const fetchLatestReviewsAndStats = async (): Promise<{ reviews: Review[], avgRat
             avgRating = totalRating / totalCount;
         }
 
-        // Fir top 3 reviews fetch karo display ke liye
         const qLatest = query(qAllApproved, orderBy('createdAt', 'desc'), limit(10)); // LIMIT badhaya for slider
         const snapshotLatest = await getDocs(qLatest);
         
@@ -223,82 +208,97 @@ const fetchLatestReviewsAndStats = async (): Promise<{ reviews: Review[], avgRat
     }
 };
 
+// NAYA: Stats data fetch karne ka function
+const fetchGlobalSettings = async (): Promise<GlobalSettings> => {
+    try {
+        const docRef = doc(db, 'cms', 'global_settings');
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            return {
+                statProjects: data.statProjects || fallbackGlobalSettings.statProjects,
+                statTeam: data.statTeam || fallbackGlobalSettings.statTeam,
+                statClients: data.statClients || fallbackGlobalSettings.statClients,
+                statYears: data.statYears || fallbackGlobalSettings.statYears,
+            };
+        }
+    } catch (error) {
+        console.error("Error fetching global settings:", error);
+    }
+    return fallbackGlobalSettings;
+};
+
 
 const HomePage = () => {
-    // Initial state ko fallback data se set kiya. isLoading state removed.
+    // === NAYA: SECURITY FIX - Auth hook ko initialize kiya ===
+    const { currentUser, userProfile } = useAuth();
+    
     const [serviceContent, setServiceContent] = useState<ServicesContent>(fallbackServiceData);
     const [blogPosts, setBlogPosts] = useState<BlogPreview[]>(fallbackBlogPosts); 
     const [portfolioProjects, setPortfolioProjects] = useState<PortfolioPreview[]>(fallbackPortfolio); 
     
-    // NAYA STATE: Reviews aur Stats ke liye
     const [latestReviews, setLatestReviews] = useState<Review[]>([]);
-    const [totalReviewsCount, setTotalReviewsCount] = useState(0); // NAYA STATE
-    const [averageRating, setAverageRating] = useState(0); // NAYA STATE
-
-    const [isLoading, setIsLoading] = useState(true); // Loading state add kiya
+    const [totalReviewsCount, setTotalReviewsCount] = useState(0);
+    const [averageRating, setAverageRating] = useState(0); 
     
-    // FIX 1: Hydration Error ke liye isClient state add kiya
-    const [isClient, setIsClient] = useState(false); 
+    // NAYA: Global Settings state
+    const [globalSettings, setGlobalSettings] = useState<GlobalSettings>(fallbackGlobalSettings);
 
-    // NAYA STATE: Review Modal ko manage karne ke liye
+    const [isLoading, setIsLoading] = useState(true); 
+    // NAYA: Unused state (isClient) hata diya
+    // const [isClient, setIsClient] = useState(false); 
+
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     
-    // Handlers for Review Modal
-    const openReviewModal = () => {
-        setIsReviewModalOpen(true);
-    };
-
+    const openReviewModal = () => setIsReviewModalOpen(true);
     const closeReviewModal = () => {
         setIsReviewModalOpen(false);
-        // Review submit hone ke baad latest reviews ko refresh karein
         fetchData(); 
     };
 
-    // Fetch Services and Blog/Portfolio Content (Runs instantly on client-side)
     const fetchData = async () => {
-        setIsLoading(true); // Loading true kiya
+        setIsLoading(true);
         try {
-            
-            // Promise.all mein reviews aur stats ek saath fetch kiye
-            const [fetchedServices, fetchedPosts, fetchedProjects, statsResult] = await Promise.all([
+            // NAYA: fetchGlobalSettings ko Promise.all mein add kiya
+            const [fetchedServices, fetchedPosts, fetchedProjects, statsResult, fetchedGlobalSettings] = await Promise.all([
                 fetchServiceContent(), 
                 fetchBlogPosts(), 
                 fetchPortfolioProjects(),
-                fetchLatestReviewsAndStats() // NAYA: Reviews aur Stats fetch kiye
+                fetchLatestReviewsAndStats(),
+                fetchGlobalSettings() // Naya fetch
             ]);
             
-            // Data fetch hone par sirf state update hogi.
             setServiceContent(fetchedServices);
             setBlogPosts(fetchedPosts);
             setPortfolioProjects(fetchedProjects); 
-            
-            // Stats aur Latest Reviews ko set kiya
             setLatestReviews(statsResult.reviews); 
-            setAverageRating(statsResult.avgRating); // NAYA: Average rating set kiya
-            setTotalReviewsCount(statsResult.totalCount); // NAYA: Total count set kiya
+            setAverageRating(statsResult.avgRating);
+            setTotalReviewsCount(statsResult.totalCount); 
+            setGlobalSettings(fetchedGlobalSettings); // Naya state set kiya
 
         } catch (error) {
             console.error("Error fetching homepage content in client useEffect:", error);
         } finally {
-            setIsLoading(false); // Loading false kiya
+            setIsLoading(false); 
         }
     };
     
     useEffect(() => {
-        // FIX 2: useEffect mein isClient ko true kiya, taaki hydration ke baad AnimatedBackground load ho
-        setIsClient(true); 
+        // NAYA: Unused state (isClient) hata diya
+        // setIsClient(true); 
         fetchData();
-    }, []); // dependency array empty rakha
+    }, []); 
 
 
-    // Helper: StarRating ko call karte hain average rating se
+    // Helper: StarRating (Overall)
     const renderOverallStars = (rating: number) => {
         const totalStars = 5;
         const roundedRating = Math.round(rating);
         return [...Array(totalStars)].map((_, i) => (
             <FaStar 
                 key={i} 
-                style={{ color: i < roundedRating ? 'var(--color-neon-green)' : '#444', marginRight: '3px', fontSize: '2rem' }} 
+                style={{ color: i < roundedRating ? 'var(--color-neon-green)' : '#444' }} 
             />
         ));
     };
@@ -306,41 +306,61 @@ const HomePage = () => {
     
     return (
         <main className={styles.main}>
-            {/* FIX 3: isClient check kiya AnimatedBackground ko render karne ke liye */}
-            {isClient && <AnimatedBackground />}
+            {/* NAYA: Unused component (AnimatedBackground) hata diya */}
             <VisitorTracker />
             
-            {/* HERO SECTION - IMAGE + OVERLAP FIX */}
+            {/* --- 
+            --- NAYA: HERO SECTION (VIDEO BACKGROUND)
+            ---
+            */}
             <div className={styles.heroSpacer}>
-                 <section 
-                    className={styles.heroFixedContent}
-                 >
+                 <section className={styles.heroFixedContent}>
+                    
+                    {/* --- NAYA: HERO VIDEO BACKGROUND --- */}
+                    <video 
+                        className={styles.heroBackgroundVideo}
+                        src="/videos/hero-bg.mp4" // YAHAN APNA VIDEO PATH DAALEIN (e.g., /videos/hero-bg.mp4)
+                        autoPlay 
+                        loop 
+                        muted 
+                        playsInline
+                    />
+                    {/* --- END VIDEO --- */}
+
                     <div className={styles.heroContentWrapper}> 
-                        <AnimationWrapper delay={0.1}>
+                        
+                        {/* === NAYA: SECURITY FIX === */}
+                        {currentUser && userProfile?.email === 'admin@zorkdi.com' && (
+                            <AnimationWrapper delay={0.1}>
+                                <Link href="/admin" className={styles.newFeatureLozenge}>
+                                    <span>New Feature</span>
+                                    Checkout the team dashboard <FaArrowRight style={{ fontSize: '0.8rem' }} />
+                                </Link>
+                            </AnimationWrapper>
+                        )}
+                        
+                        <AnimationWrapper delay={0.2}>
                             <h1 className={styles.heroHeadline}>{serviceContent.heroHeadline}</h1>
                         </AnimationWrapper>
-                        <AnimationWrapper delay={0.2}>
+                        <AnimationWrapper delay={0.3}>
                             <p className={styles.heroSubheadline}>{serviceContent.heroSubheadline}</p>
                         </AnimationWrapper>
                         
-                        {/* === YAHAN CHANGE KIYA GAYA HAI (Button Container Add Kiya) === */}
-                        <AnimationWrapper delay={0.3}>
+                        <AnimationWrapper delay={0.4}>
                             <div className={styles.heroButtonContainer}>
                                 
-                                {/* === YAHAN FIX KIYA GAYA HAI === */}
+                                {/* === FIX: BUTTON STYLE CHANGE === */}
                                 <Link 
                                     href="/new-project" 
-                                    className={`${styles.heroButton} ${styles.heroPrimaryButton}`} 
+                                    className={`${styles.heroButton} ${styles.primaryOutline}`} /* heroPrimaryButton se primaryOutline kiya */
                                 >
-                                    <span className={styles.buttonText}>Start a Project</span>
-                                    <span className={styles.buttonBorderGlow}></span>
+                                    Start a Project
                                 </Link>
                                 
-                                {/* PURANA: Explore Services Button (Ab Secondary Outline) */}
+                                {/* === FIX: BUTTON STYLE CHANGE === */}
                                 <Link 
                                     href="/services" 
-                                    // CHANGE: Class ko '.primaryOutline' mein badla
-                                    className={`${styles.heroButton} ${styles.primaryOutline}`} 
+                                    className={`${styles.heroButton} ${styles.secondary}`} /* primaryOutline se secondary (purple) kiya */
                                 >
                                     {serviceContent.heroButtonText}
                                 </Link>
@@ -350,25 +370,102 @@ const HomePage = () => {
                 </section>
             </div>
             
-            {/* Trust Bar Hero Section ke theek neeche */}
+            {/* --- 
+            --- TRUST BAR (Component) 
+            ---
+            */}
             <TrustBar /> 
 
 
-            {/* Services Section (DYNAMIC) */}
+            {/* --- 
+            --- NAYA: FEATURES SECTION (Medvolve Style) 
+            ---
+            */}
+            <section className={styles.featuresSection}>
+                <div className={styles.featuresGrid}>
+                    <AnimationWrapper>
+                        <div className={styles.featureCard}>
+                            <div className={styles.featureIcon}><FeatureIcon icon={FaUserShield} /></div>
+                            <h3>Secure & Scalable</h3>
+                            <p>Our solutions are built with security first and engineered to grow with your business.</p>
+                        </div>
+                    </AnimationWrapper>
+                    <AnimationWrapper delay={0.2}>
+                        <div className={styles.featureCard}>
+                            <div className={styles.featureIcon}><FeatureIcon icon={FaRegLightbulb} /></div>
+                            <h3>Innovative Mindset</h3>
+                            <p>We leverage cutting-edge technologies to deliver truly modern and efficient products.</p>
+                        </div>
+                    </AnimationWrapper>
+                    <AnimationWrapper delay={0.4}>
+                        <div className={styles.featureCard}>
+                            <div className={styles.featureIcon}><FeatureIcon icon={FaRocket} /></div>
+                            <h3>Speed & Delivery</h3>
+                            <p>Agile development focused on fast iteration and timely, high-quality product delivery.</p>
+                        </div>
+                    </AnimationWrapper>
+                </div>
+            </section>
+            
+
+            {/* --- 
+            --- NAYA: "EMPOWERING" SECTION (FounderNote Component)
+            ---
+            */}
+            <FounderNote />
+            
+            
+            {/* --- 
+            --- NAYA: STATS SECTION (DYNAMIC)
+            ---
+            */}
+            <section className={styles.statsSection}>
+                <div className={styles.statsGrid}>
+                    <AnimationWrapper>
+                        <div className={styles.statItem}>
+                            {/* NAYA: Dynamic Data */}
+                            <div className={styles.statNumber}>{globalSettings.statProjects}</div>
+                            <div className={styles.statLabel}>Projects Delivered</div>
+                        </div>
+                    </AnimationWrapper>
+                    <AnimationWrapper delay={0.2}>
+                        <div className={styles.statItem}>
+                            {/* NAYA: Dynamic Data */}
+                            <div className={styles.statNumber}>{globalSettings.statTeam}</div>
+                            <div className={styles.statLabel}>Team Members</div>
+                        </div>
+                    </AnimationWrapper>
+                    <AnimationWrapper delay={0.4}>
+                         <div className={styles.statItem}>
+                            {/* NAYA: Dynamic Data */}
+                            <div className={styles.statNumber}>{globalSettings.statClients}</div>
+                            <div className={styles.statLabel}>Happy Clients</div>
+                        </div>
+                    </AnimationWrapper>
+                    <AnimationWrapper delay={0.6}>
+                         <div className={styles.statItem}>
+                            {/* NAYA: Dynamic Data */}
+                            <div className={styles.statNumber}>{globalSettings.statYears}</div>
+                            <div className={styles.statLabel}>Years of Experience</div>
+                        </div>
+                    </AnimationWrapper>
+                </div>
+            </section>
+
+            
+            {/* --- 
+            --- NAYA: SERVICES SECTION (Medvolve Style) 
+            ---
+            */}
             <section className={styles.servicesSection}>
                 <h2 className={styles.sectionTitle}>Our Core Services</h2>
+                <p className={styles.sectionSubtitle}>We provide a wide range of digital services, from web and mobile development to complete software solutions.</p>
                 
                 <div className={styles.servicesGrid}>
                     {serviceContent.services.map((service, index) => {
-                        const IconKey = Object.keys(iconMap).find(key => service.title.includes(key)) || 'Custom Software'; 
-                        const IconComponent = iconMap[IconKey];
-
                         return (
-                            <AnimationWrapper key={service.id} delay={index * 0.2}>
+                            <AnimationWrapper key={service.id} delay={index * 0.1}>
                                 <div className={styles.serviceCard}>
-                                    <div className={styles.serviceIcon}>
-                                        <ServiceIcon icon={IconComponent} />
-                                    </div> 
                                     <h3>{service.title}</h3>
                                     <p>{service.description}</p>
                                 </div>
@@ -378,12 +475,40 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* Portfolio Section (DYNAMIC - Featured Work) */}
+            
+            {/* --- 
+            --- NAYA: VIDEO BANNER SECTION (Medvolve Style)
+            ---
+            */}
+            <section className={styles.videoBannerSection}>
+                 <video 
+                    className={styles.videoBanner}
+                    src="/videos/banner-video.mp4" // YAHAN APNA VIDEO PATH DAALEIN (e.g., /videos/banner-video.mp4)
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                />
+                <div className={styles.videoOverlay}></div>
+            </section>
+            {/* --- (End Video Banner) --- */}
+            
+
+            {/* --- 
+            --- NAYA: PORTFOLIO SECTION (Medvolve Inspired) 
+            ---
+            */}
             <section className={styles.portfolioSection}>
-                <h2 className={styles.sectionTitle} style={{ textAlign: 'center' }}>Featured Work</h2>
+                <div className={styles.portfolioHeader}>
+                    <h2 className={styles.sectionTitle}>Featured Work</h2>
+                     <Link 
+                        href="/portfolio" 
+                        className={`${styles.heroButton} ${styles.heroPrimaryButton} ${styles.portfolioCtaButton}`} 
+                    >
+                        View All Projects
+                    </Link>
+                </div>
                 
-                {/* === YAHAN CHANGE KIYA GAYA HAI (Cache Busting Fix) === */}
-                {/* Class ka naam .portfolioScrollContainer se .portfolioCarousel kiya */}
                 <div className={styles.portfolioCarousel}>
                     {portfolioProjects.map((project, index) => (
                         <AnimationWrapper key={project.id} delay={index * 0.2}>
@@ -399,108 +524,103 @@ const HomePage = () => {
                                         />
                                     ) : (
                                         <div className={styles.noImagePlaceholder}>
-                                            <span style={{ color: 'var(--color-neon-green)', fontWeight: 600 }}>No Image</span>
+                                            <span>No Image</span>
                                         </div>
                                     )}
                                 </div>
                                 <div className={styles.portfolioContent}>
                                     <p className={styles.portfolioCategory}>{project.category}</p>
                                     <h3>{project.title}</h3>
-                                    <p style={{marginBottom: '1.2rem', opacity: 0.8}}>{project.content}</p> 
+                                    <p>{project.content}</p> 
                                 </div>
                             </Link>
                         </AnimationWrapper>
                     ))}
                 </div>
-                {/* FIX 1: View All Projects button ko primary animated button style diya */}
-                <Link 
-                    href="/portfolio" 
-                    className={`${styles.heroButton} ${styles.heroPrimaryButton} ${styles.portfolioCtaButton}`} 
-                >
-                    {/* NAYA: Button text ko span mein wrap kiya for z-index control */}
-                    <span className={styles.buttonText}>View All Projects</span>
-                    {/* NAYA: Animated border/glow element */}
-                    <span className={styles.buttonBorderGlow}></span>
-                </Link>
             </section>
             
-            {/* NAYA ADDITION: Call To Action Bar (Task 3) */}
+            
+            {/* --- 
+            --- NAYA: CTA BAR (Medvolve Inspired)
+            ---
+            */}
             <CallToActionBar />
             
-            {/* NAYA ADDITION: Founder's Note Section (About Us Groundwork) */}
-            <FounderNote />
 
-            {/* Why Choose Us Section */}
+            {/* --- 
+            --- NAYA: WHY CHOOSE US (Medvolve Style) 
+            ---
+            */}
             <section className={styles.whyUsSection}>
-                <h2 className={styles.sectionTitle}>Why Choose ZORK DI?</h2>
+                 <h2 className={styles.sectionTitle}>Why Choose ZORK DI?</h2>
+                 <p className={styles.sectionSubtitle}>We are committed to delivering excellence and innovation in everything we do.</p>
                 <div className={styles.whyUsGrid}>
-                    {/* NOTE: Dummy Content maintained */}
                     <AnimationWrapper>
                         <div className={styles.whyUsItem}>
-                            <div className={styles.whyUsIcon}><WhyUsIcon icon={FaUserShield} /></div>
-                            <h3>Secure & Scalable</h3>
-                            <p>Our solutions are built with security first and engineered to grow with your business.</p>
+                            <div className={styles.whyUsIcon}><FeatureIcon icon={FaDraftingCompass} /></div>
+                            <h3>Expertise in AI</h3>
+                            <p>Leveraging advanced AI to build intelligent and efficient solutions for your business.</p>
                         </div>
                     </AnimationWrapper>
                     <AnimationWrapper delay={0.2}>
                         <div className={styles.whyUsItem}>
-                            <div className={styles.whyUsIcon}><WhyUsIcon icon={FaRegLightbulb} /></div>
-                            <h3>Innovative Mindset</h3>
-                            <p>We leverage cutting-edge technologies to deliver truly modern and efficient products.</p>
+                            <div className={styles.whyUsIcon}><FeatureIcon icon={FaLaptopCode} /></div>
+                            <h3>Seamless Integration</h3>
+                            <p>Our products are designed to integrate perfectly with your existing digital ecosystem.</p>
                         </div>
                     </AnimationWrapper>
                     <AnimationWrapper delay={0.4}>
                         <div className={styles.whyUsItem}>
-                            <div className={styles.whyUsIcon}><WhyUsIcon icon={FaRocket} /></div>
-                            <h3>Speed & Delivery</h3>
-                            <p>Agile development focused on fast iteration and timely, high-quality product delivery.</p>
+                            <div className={styles.whyUsIcon}><FeatureIcon icon={FaRocket} /></div>
+                            <h3>Cutting-Edge Tech</h3>
+                            <p>We stay ahead of the curve, utilizing the latest technologies to ensure future-proof products.</p>
                         </div>
                     </AnimationWrapper>
                 </div>
             </section>
             
-            {/* NAYA FEATURE: Testimonials Section (Ratings/Reviews Display and Rate Button) */}
+            
+            {/* --- 
+            --- NAYA: TESTIMONIALS SECTION (Medvolve Style) 
+            ---
+            */}
             <section className={styles.testimonialsSection}>
-                <h2 className={styles.sectionTitle}>Client Testimonials</h2>
-                {/* FIX 4: Subtitle ko sectionSubtitle class diya */}
-                <p className={styles.sectionSubtitle} style={{ opacity: 0.7, fontSize: '1.2rem', marginBottom: '3rem' }}>We turn complex challenges into simple, elegant digital products. See what our clients say.</p>
+                {/* FIX: Header (Title + Rating) */}
+                <div className={styles.testimonialHeader}>
+                    <div className={styles.testimonialTitleWrapper}>
+                        <h2 className={styles.sectionTitle}>Client Testimonials</h2>
+                        <p className={styles.sectionSubtitle}>See what our clients say about our work.</p>
+                    </div>
+                    
+                    {!isLoading && totalReviewsCount > 0 && (
+                        <div className={styles.testimonialRatingWrapper}>
+                            <div className={styles.overallRatingStars}>
+                                {renderOverallStars(averageRating)}
+                            </div>
+                            <p className={styles.overallRatingText}>{averageRating.toFixed(1)} / 5.0 Rating</p>
+                            <p className={styles.overallRatingCount}>Based on {totalReviewsCount} client reviews</p>
+                        </div>
+                    )}
+                </div>
                 
                 {isLoading ? (
                     <div style={{ textAlign: 'center', padding: '2rem' }}>Loading testimonials...</div>
                 ) : (
                     <>
-                        {/* 1. Overall Rating (DYNAMIC) */}
-                         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                            <div style={{ display: 'inline-flex', gap: '5px', color: 'var(--color-neon-green)' }}>
-                                {renderOverallStars(averageRating)} {/* DYNAMIC STARS */}
-                            </div>
-                            {/* FIX: Overall rating ka dynamic value */}
-                            <p style={{ fontSize: '1.5rem', fontWeight: 600, marginTop: '0.5rem' }}>{averageRating.toFixed(1)} / 5.0 Rating</p>
-                            <p style={{ opacity: 0.7 }}>Based on {totalReviewsCount} client reviews</p>
-                        </div>
-                        
-                        {/* FIX 6: Existing Review Cards Grid ko TestimonialSlider se REPLACE kiya */}
+                        {/* Slider Component (CSS isko restyle karega) */}
                         <TestimonialSlider reviews={latestReviews} />
                         
-                        {/* 3. Action Buttons */}
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '3rem' }}>
-                            
-                            {/* NAYA BUTTON: Rate Your Rating */}
+                        {/* NAYA: Action Buttons (Center aligned) */}
+                        <div className={styles.testimonialActions}>
                             <button 
                                 onClick={openReviewModal} 
-                                // CLASS CHANGE KIYA GAYA (pichla task)
                                 className={`${styles.heroButton} ${styles.primaryOutline}`} 
-                                style={{ 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    gap: '10px'
-                                }}
+                                style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
                             >
                                 <FaStar /> Rate Your Experience
                             </button>
                             
-                            {/* FIX 5: View All Reviews button ko secondary class diya */}
-                            <Link href="/reviews" className={`${styles.heroButton} ${styles.secondary}`} style={{ display: 'flex', alignItems: 'center' }}>
+                            <Link href="/reviews" className={`${styles.heroButton} ${styles.secondary}`}>
                                 View All Reviews
                             </Link>
                         </div>
@@ -508,26 +628,22 @@ const HomePage = () => {
                 )}
             </section>
             
-            {/* Blog Section (DYNAMIC) */}
+            
+            {/* --- 
+            --- NAYA: BLOG SECTION (Medvolve Inspired) 
+            ---
+            */}
             <section className={styles.blogSection}>
                 <h2 className={styles.sectionTitle}>Latest Tech Insights</h2>
-                <p style={{ opacity: 0.7, fontSize: '1.2rem', marginBottom: '3rem' }}>Stay updated with the latest in web development, design, and mobile tech.</p>
+                <p className={styles.sectionSubtitle}>Stay updated with the latest in web development, design, and mobile tech.</p>
                 
                 {blogPosts[0]?.id === 'dummy1' && blogPosts.length === 1 ? (
-                    <div style={{ 
-                        padding: '2rem', 
-                        border: '1px solid rgba(255, 255, 255, 0.1)', 
-                        borderRadius: '12px', 
-                        opacity: 0.8, 
-                        maxWidth: '600px', 
-                        margin: '0 auto',
-                        backgroundColor: 'var(--color-deep-blue)'
-                    }}>
+                    <div style={{ padding: '2rem', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '12px', opacity: 0.8, maxWidth: '600px', backgroundColor: 'var(--color-deep-blue)'}}>
                         <FaNewspaper style={{marginRight: '0.5rem', color: 'var(--color-neon-green)'}}/> 
                         {blogPosts[0].summary}
                     </div>
                 ) : (
-                    <div className={styles.blogGrid} style={{ gap: '2rem' }}>
+                    <div className={styles.blogGrid}>
                         {blogPosts.map((post, index) => (
                             <AnimationWrapper key={post.id} delay={index * 0.2}>
                                 <Link href={`/blog/${post.slug}`} className={styles.blogCard}>
@@ -542,17 +658,17 @@ const HomePage = () => {
                                             />
                                         ) : (
                                             <div className={styles.noImagePlaceholder}>
-                                                <span style={{ color: 'var(--color-neon-green)', fontWeight: 600 }}>No Image</span>
+                                                <span>No Image</span>
                                             </div>
                                         )}
                                     </div>
-                                    <div style={{ padding: '0 1.2rem', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                                        <p style={{ opacity: 0.7, fontSize: '0.85rem', marginTop: '1.2rem', color: 'var(--color-neon-green)' }}>
-                                            {/* Date formatting code is correct */}
+                                    {/* NAYA: Blog Card content structure */}
+                                    <div className={styles.blogCardContent}>
+                                        <p className={styles.blogDate}>
                                             {post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Draft'}
                                         </p>
                                         <h3>{post.title}</h3>
-                                        <p style={{marginBottom: '1.2rem', opacity: 0.8}}>{post.summary}</p>
+                                        <p>{post.summary}</p>
                                     </div>
                                 </Link>
                             </AnimationWrapper>
@@ -560,18 +676,15 @@ const HomePage = () => {
                     </div>
                 )}
                 
-                {/* === YAHAN CHANGE KIYA GAYA HAI === */}
                 <Link 
                     href="/blog" 
-                    // CHANGE: Class ko '.primaryOutline' mein badla
-                    className={`${styles.heroButton} ${styles.primaryOutline}`} 
-                    style={{ marginTop: '3rem' }}
+                    className={`${styles.heroButton} ${styles.primaryOutline} ${styles.blogCtaButton}`} 
                 >
                     Read All Insights
                 </Link>
             </section>
 
-            {/* Review Modal component */}
+            {/* Review Modal component (Waise hi rahega) */}
             <ReviewModal 
                 isOpen={isReviewModalOpen} 
                 onClose={closeReviewModal} 

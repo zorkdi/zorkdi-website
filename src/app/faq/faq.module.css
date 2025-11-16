@@ -1,0 +1,120 @@
+/* src/app/faq/faq.module.css */
+
+.faqPage {
+    width: 100%;
+    min-height: 80vh;
+    padding: 6rem 2rem;
+    background-color: var(--color-dark-navy);
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.header h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--color-neon-green);
+    margin-bottom: 1rem;
+}
+
+.header p {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.accordionItem {
+    background-color: var(--color-deep-blue);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.accordionItem:hover {
+    border-color: var(--color-neon-green);
+}
+
+.question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.question h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-off-white);
+}
+
+.icon {
+    font-size: 1.2rem;
+    color: var(--color-neon-green);
+    transition: transform 0.3s ease;
+}
+
+/* Icon ko rotate karein jab active ho */
+.accordionItem.active .icon {
+    transform: rotate(135deg);
+}
+
+.answer {
+    /* Niche se upar slide animation */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+}
+
+.answer p {
+    padding: 0 2rem 2rem 2rem;
+    font-size: 1rem;
+    opacity: 0.8;
+    line-height: 1.7;
+    white-space: pre-wrap; /* Newlines ko respect karega */
+}
+
+/* Jab active ho, toh answer dikhayein */
+.accordionItem.active .answer {
+    max-height: 500px; /* Ek max height de dein */
+    transition: max-height 0.5s ease-in;
+}
+
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2.5rem;
+    }
+    .header p {
+        font-size: 1rem;
+    }
+    .question {
+        padding: 1.2rem 1.5rem;
+    }
+    .question h3 {
+        font-size: 1rem;
+    }
+    .answer p {
+        padding: 0 1.5rem 1.5rem 1.5rem;
+        font-size: 0.95rem;
+    }
+}

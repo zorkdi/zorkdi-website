@@ -1,17 +1,16 @@
 /* components/Footer/Footer.module.css */
 
-/* --- GENERAL FOOTER STYLE (PREMIUM BASE) --- */
+/* --- NAYA: Medvolve Style Footer --- */
 .footer {
   width: 100%;
-  /* Thoda zyada deep dark background diya */
-  background-color: var(--color-deep-blue); 
+  /* FIX: Background ko PURE BLACK kiya */
+  background-color: #000; 
   color: var(--color-off-white);
-  padding: 5rem 0 2rem 0; 
+  padding: 6rem 0 2rem 0; 
   
-  /* PREMIUM TOUCH: Neon Top Border with Stronger Glow */
-  border-top: 2px solid var(--color-neon-green); 
-  box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.6),
-              0 -2px 10px rgba(0, 245, 200, 0.2); 
+  /* NAYA: Top border ko subtle kiya (Medvolve style) */
+  border-top: 1px solid rgba(255, 255, 255, 0.1); 
+  box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.6);
 }
 
 .container {
@@ -25,31 +24,25 @@
   display: flex;
   justify-content: space-between; 
   align-items: flex-start;
-  margin-bottom: 3rem; 
+  margin-bottom: 4rem; /* Margin badhayi */
   flex-wrap: wrap;
   gap: 3rem; 
 }
 
-/* Base column widths */
+/* --- NAYA: Column 1 - Brand Info --- */
 .footerBrand {
-    /* Brand ko zyada jagah denge */
-    flex-basis: 550px; 
+  flex: 1;
+  min-width: 250px; /* Minimum width di */
+  max-width: 300px;
 }
 
-.footerSocial {
-    /* Social ko kam jagah denge aur right side align karenge */
-    flex-basis: 250px;
-    text-align: right; 
-}
-
-/* --- LOGO & TITLE STYLES (FINAL MINIMAL LOOK) --- */
+/* Logo Link */
 .logoLink {
-    display: inline-block;
-    /* FIX: Margin hata diya */
-    margin-bottom: 0; 
+    display: flex; /* Logo aur title ko align karne ke liye */
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem; /* Tagline se gap */
     transition: transform 0.2s ease;
-    /* FIX: Vertical align theek kiya */
-    vertical-align: middle; 
 }
 
 .logoLink:hover {
@@ -57,41 +50,125 @@
 }
 
 .logoImage {
-    height: 40px; /* FIX: Logo height thodi badhayi */
+    height: 40px; 
     width: auto;
-    filter: drop-shadow(0 0 12px rgba(0, 245, 200, 0.8)); /* FIX: Glow thoda aur badhaya */
-    transition: filter 0.2s ease;
+    filter: drop-shadow(0 0 12px rgba(0, 245, 200, 0.8));
 }
 
-/* BRAND TITLE */
-.footerBrand h3.brandTitle {
-    font-size: 2.2rem; /* FIX: Title size badhaya */
+/* Brand Title */
+.brandTitle {
+    font-size: 1.8rem; /* Size adjust kiya */
     font-weight: 800;
-    margin: 0 0 0 15px; /* FIX: Logo se thoda zyada gap diya */
+    margin: 0;
     color: var(--color-neon-light); 
     text-shadow: 0 0 10px rgba(0, 245, 200, 0.8); 
-    letter-spacing: 1px;
-    display: inline-block; 
-    vertical-align: middle; /* FIX: Logo aur Title ko perfectly center align kiya */
-    line-height: 1; /* Line height control */
+    line-height: 1;
 }
 
-/* TAGLINE */
-.footerBrand p.tagline { 
-    opacity: 0.85; /* FIX: Opacity badhayi for better readability */
-    max-width: 450px; 
-    font-size: 1.05rem; /* FIX: Font size badhaya */
+/* FIX: Tagline Wrapper (Animation ke liye) */
+.taglineWrapper {
+    width: 100%;
+    overflow: hidden;
+    margin-top: 1rem; /* Logo se gap */
+}
+
+/* FIX: Tagline (Animation ke liye) */
+.tagline { 
+    opacity: 0.7; 
+    font-size: 0.95rem; 
     color: var(--color-off-white);
-    margin-top: 1rem; 
+    line-height: 1.6;
+    
+    /* NAYA: Animation properties */
+    white-space: nowrap;
+    animation: scrollLeft 10s linear infinite;
 }
 
-/* --- SOCIAL LINKS (NO CHANGE) --- */
-.footerSocial h3 {
-  font-size: 1.4rem; 
+/* === NAYA: FOOTER VIDEO SCREEN (BLEND FIX) === */
+.footerVideoScreen {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-top: 1.5rem; /* Tagline se gap */
+  overflow: hidden; 
+  background-color: transparent; /* Background hataya */
+  
+  /* FIX: Border aur Radius HATA diye gaye hain */
+  /* border-radius: 8px; */
+  /* border: 1px solid rgba(255, 255, 255, 0.1); */
+}
+
+.footerVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* FIX: Opacity ko NORMAL (1) kar diya */
+  opacity: 1; 
+}
+/* === END OF NAYA SECTION === */
+
+/* --- End Column 1 --- */
+
+
+/* --- NAYA: Column 2, 3 - Links Grid --- */
+.footerLinksGrid {
+  flex: 2; /* Bachi hui jagah lega */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2rem;
+  min-width: 300px; /* Minimum width */
+}
+
+.footerLinkColumn h3 {
+  font-size: 1.1rem; /* Chhota, bold title (Medvolve style) */
   font-weight: 700;
   margin-bottom: 1.5rem; 
-  color: var(--color-neon-green); 
+  color: var(--color-off-white);
+  opacity: 0.9;
+  text-transform: uppercase; /* Medvolve style */
+  letter-spacing: 0.5px;
+}
+
+.footerLinkColumn ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column; 
+  gap: 1rem; /* Links ke beech gap */
+}
+
+.footerLinkColumn ul a {
+  color: var(--color-off-white);
+  opacity: 0.7; /* Subtle links */
+  text-decoration: none;
+  transition: all 0.2s ease; 
+  font-size: 0.95rem;
+}
+
+.footerLinkColumn ul a:hover {
+  opacity: 1;
+  color: var(--color-neon-light); 
+  padding-left: 5px; /* Hover pe halka move */
+}
+/* --- End Links Grid --- */
+
+
+/* --- FIX: NAYA COLUMN 4: SOCIALS --- */
+.footerSocial {
+    display: block; /* Waapis visible kiya */
+    flex: 1;
+    min-width: 200px;
+    text-align: left; /* Left align kiya */
+}
+
+.footerSocial h3 {
+  font-size: 1.1rem; 
+  font-weight: 700;
+  margin-bottom: 1.5rem; 
+  color: var(--color-off-white);
+  opacity: 0.9;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .socialList {
@@ -100,96 +177,104 @@
   margin: 0;
   display: flex;
   flex-direction: column; 
-  gap: 1.2rem; 
-  align-items: flex-end; 
+  gap: 1rem; /* Gap adjust */
 }
 
 .socialList a {
   display: flex;
   align-items: center; 
-  gap: 0.75rem; 
+  gap: 0.75rem; /* Icon aur text ke beech gap */
   color: var(--color-off-white);
-  opacity: 0.9;
+  opacity: 0.7;
   text-decoration: none;
   transition: all 0.2s ease; 
-  flex-direction: row-reverse; 
+  font-size: 1.1rem; /* Font size adjust kiya */
 }
 
 .socialList a:hover {
   opacity: 1;
   color: var(--color-neon-light); 
-  transform: translateX(-8px); 
+  transform: translateX(5px); /* Hover effect */
 }
 
-.socialList a svg {
-  font-size: 1.8rem; 
-  color: var(--color-neon-green); 
-  filter: drop-shadow(0 0 8px rgba(0, 245, 200, 0.8)); 
+.socialList a span {
+  display: inline-block; /* Text ko dikhaya */
+  font-size: 0.95rem; /* Text ka size */
 }
+/* --- End Socials --- */
+
 
 /* --- BOTTOM BAR (COPYRIGHT) --- */
 .footerBottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.15); 
+  border-top: 1px solid rgba(255, 255, 255, 0.1); 
   padding-top: 2rem;
-  text-align: center;
+  /* FIX: Waapis center kiya */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap; 
+  gap: 1rem;
 }
 
 .footerBottom p {
   opacity: 0.6;
   font-size: 0.9rem;
+  margin: 0; /* Default margin hatayi */
 }
+
+/* FIX: Bottom social list ko hata diya */
+.socialListBottom {
+  display: none;
+}
+
 
 /* --- MOBILE RESPONSIVE STYLES --- */
-@media (min-width: 993px) {
-    .footerTop {
-        justify-content: space-between;
-    }
-}
-
 @media (max-width: 768px) {
     .container {
         padding: 0 1.5rem;
     }
     .footerTop {
         flex-direction: column;
-        align-items: center;
-        text-align: center;
+        align-items: flex-start; /* Center se start kiya */
         gap: 3rem; 
     }
     
-    .footerBrand, .footerSocial {
-        flex-basis: 100%;
-        text-align: center;
+    .footerBrand {
+      max-width: 100%; /* Full width */
+      text-align: left; /* Text left rakha */
     }
     
-    .footerBrand h3.brandTitle {
-        /* Mobile par Title ko center mein rakha */
-        display: block;
-        margin: 0.5rem 0 0 0; 
+    .footerLinksGrid {
+      width: 100%; /* Full width */
+      grid-template-columns: repeat(2, 1fr); /* Mobile pe 2 column */
+      min-width: 0;
     }
     
     .footerSocial {
-        text-align: center;
+        width: 100%;
+        text-align: left;
     }
     
     .socialList {
-        flex-direction: row; 
+        flex-direction: row; /* Mobile pe row mein */
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    /* FIX: Mobile pe bottom bar ko center kiya */
+    .footerBottom {
+        flex-direction: column;
         justify-content: center;
-        gap: 2rem;
-        align-items: center; 
+        gap: 1.5rem;
     }
-    
-    .socialList a {
-        flex-direction: row; 
-        transform: none !important; 
-        gap: 0;
-    }
-    
-    .socialList a span {
-        display: none; 
-    }
-    
-    .socialList a:hover {
-        transform: scale(1.2) !important; 
-    }
+}
+
+/* NAYA: Tagline scroll animation */
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-150%); 
+  }
 }

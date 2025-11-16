@@ -1,0 +1,137 @@
+/* src/app/case-studies/[id]/case-study-detail.module.css */
+
+.pageContainer {
+    width: 100%;
+    min-height: 80vh;
+    background-color: var(--color-dark-navy);
+}
+
+/* Header (jismein image background mein hogi) */
+.header {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: var(--color-deep-blue); /* Fallback */
+    overflow: hidden; /* Image ko contain karne ke liye */
+}
+
+.headerImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    opacity: 0.2; /* Image ko dark theme se blend kiya */
+}
+
+.headerOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(10, 11, 15, 0.5) 0%, var(--color-dark-navy) 95%);
+    z-index: 2;
+}
+
+.headerContent {
+    position: relative;
+    z-index: 3;
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+    color: var(--color-off-white);
+}
+
+.category {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-neon-green);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.headerContent h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+}
+
+.headerContent p {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Page ka main content area */
+.contentArea {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    position: relative;
+    z-index: 5; /* Header overlay ke upar */
+}
+
+.contentBody {
+    background-color: var(--color-deep-blue);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 3rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--color-off-white);
+    opacity: 0.9;
+}
+
+/* Content ke andar basic styling */
+.contentBody h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--color-neon-light);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 245, 200, 0.2);
+    padding-bottom: 0.5rem;
+}
+
+.contentBody p {
+    margin-bottom: 1.5rem;
+}
+
+.contentBody ul {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+.contentBody li {
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header {
+        height: 50vh;
+    }
+    .headerContent h1 {
+        font-size: 2.5rem;
+    }
+    .headerContent p {
+        font-size: 1rem;
+    }
+    .contentArea {
+        padding: 2rem 1.5rem;
+    }
+    .contentBody {
+        padding: 2rem;
+        font-size: 1rem;
+    }
+}

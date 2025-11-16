@@ -142,8 +142,8 @@ const Header = ({ globalSettings }: HeaderProps) => {
             className={styles.hamburgerButton} 
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
-            style={{ display: 'none' }} 
         >
+            {/* NAYA: Icon change hoga state ke basis pe */}
             {menuOpen ? <CgClose /> : <CgMenuRight />}
         </button>
 
@@ -158,15 +158,30 @@ const Header = ({ globalSettings }: HeaderProps) => {
         </nav>
 
         <div className={styles.rightControls}>
-          {/* Desktop Only CTAs */}
-          <Link href="/contact" className={styles.secondaryCtaButton}>Contact</Link>
-          <Link href="/new-project" className={styles.primaryCtaButton}>Start a Project</Link>
+          
+          {/* === FIX: NAYA BUTTON STYLE APPLY KIYA === */}
+          <Link 
+            href="/contact" 
+            className={`${styles.headerButtonBase} ${styles.secondaryCtaButton}`}
+          >
+            Contact
+          </Link>
+          
+          {/* === FIX: NAYA BUTTON STYLE APPLY KIYA === */}
+          <Link 
+            href="/new-project" 
+            className={`${styles.headerButtonBase} ${styles.primaryCtaButton}`}
+          >
+            Start a Project
+          </Link>
           
           {!authLoading && (
               <>
+                  {/* YEH LINK AB CSS SE HIDE/SHOW HOGA (Tablet/Mobile) */}
                   <Link 
                       href="/new-project" 
-                      className={`${styles.primaryCtaButton} ${styles.mobileCtaButtonVisible}`} 
+                      className={`${styles.headerButtonBase} ${styles.primaryCtaButton} ${styles.mobileCtaButtonVisible}`} 
+                      style={{ display: 'none' }} /* Extra safety */
                   >
                       Start a Project
                   </Link>
@@ -217,16 +232,15 @@ const Header = ({ globalSettings }: HeaderProps) => {
         </div>
       </div>
 
-      {menuOpen && (
-        <div className={styles.mobileMenu}>
-          <button 
-            className={styles.hamburgerButton} 
-            onClick={() => setMenuOpen(false)}
-            aria-label="Close menu"
-            style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }} 
-          >
-            <CgClose />
-          </button>
+      {/* NAYA CHANGE: Mobile menu ab hamesha DOM mein rahega 
+        aur visibility 'mobileMenuOpen' class se control hogi.
+      */}
+      <div className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ''}`}>
+          
+          {/* FIX: Duplicate close button yahan se HATA diya gaya hai.
+              Ab sirf header wala button hi icon change karega.
+          */}
+          
           <nav>
             <ul className={styles.mobileNavLinks}>
               <li><Link href="/services" onClick={closeMenus}>Services</Link></li>
@@ -238,7 +252,6 @@ const Header = ({ globalSettings }: HeaderProps) => {
             </ul>
           </nav>
         </div>
-      )}
     </header>
   );
 };

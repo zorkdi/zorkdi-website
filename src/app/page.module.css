@@ -4,31 +4,34 @@
   flex-direction: column;
   align-items: center;
   padding: 0;
+  background-color: var(--color-dark-navy); /* NAYA: Base background color */
 }
 
-/* Hero Section */
-.heroSection {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+/* --- 
+--- HERO SECTION (MEDVOLVE STYLE) 
+---
+*/
+
+/* NAYA: Hero Background Video */
+.heroBackgroundVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  min-height: 100vh;
-  padding: 2rem;
-  text-align: center;
-  position: relative; 
-  overflow: hidden; 
+  height: 100%;
+  object-fit: cover;
+  z-index: 1; /* Overlay ke peeche */
+  opacity: 0.15; /* Thoda subtle */
 }
 
-/* NAYA FIX: Ek invisible spacer div Hero Section ke liye */
+
+/* NAYA FIX: Invisible spacer div */
 .heroSpacer {
-    /* FIX 8: Width ko 100vw kiya taaki yeh viewport ki poori width width le */
     width: 100vw; 
-    height: 100vh; 
+    height: 100vh; /* Full screen height */
     flex-shrink: 0;
     position: relative;
     z-index: 4; 
-    /* FIX 9: Hero spacer ko center mein rakka jab main container limited ho */
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
 }
@@ -47,19 +50,20 @@
     padding: 2rem;
     z-index: 2; 
 
-    /* FIX: Simple Parallax effect ke liye background-attachment: fixed use kiya */
+    /* Parallax effect ke liye background */
     background-image: var(--hero-bg-image); 
-    background-attachment: fixed; /* Parallax effect ke liye essential */
+    background-attachment: fixed;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     transition: background-image 0.5s ease;
 
-    /* CHANGE 1: Overlay ko aur dark kiya premium look ke liye (0.65 se 0.9) */
-    box-shadow: inset 0 0 0 2000px rgba(10, 11, 15, 0.9); 
+    /* NAYA: Dark overlay (Medvolve style) */
+    /* Video ke upar (z-index 2) */
+    box-shadow: inset 0 0 0 2000px rgba(10, 11, 15, 0.95); 
 }
 
-/* NAYA CLASS: Hero Content ko Services Section ke upar rakhne ke liye */
+/* NAYA CLASS: Hero Content Wrapper */
 .heroContentWrapper {
     position: absolute;
     top: 0;
@@ -69,639 +73,722 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    /* NAYA: Left align (Medvolve style) */
+    align-items: flex-start;
     padding: 2rem;
-    /* CHANGE 2: Z-index Services Section (10) se zyada rakha (15) */
-    z-index: 15; 
+    z-index: 15; /* Sabse upar */
     
-    /* FIX 3: Content Wrapper ko center align kiya */
-    text-align: center;
+    /* NAYA: Max width content */
+    max-width: 1200px;
+    margin: 0 auto; /* Center the content wrapper */
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 
-/* --- Hero Element Styles (ULTRA PREMIUM) --- */
+/* --- Hero Element Styles (MEDVOLVE) --- */
+
+/* NAYA: "New Feature" Lozenge (Medvolve Style) */
+.newFeatureLozenge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    border-radius: 50px;
+    background-color: rgba(0, 245, 200, 0.1); /* Neon Green transparent */
+    border: 1px solid rgba(0, 245, 200, 0.3);
+    color: var(--color-neon-light);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.newFeatureLozenge:hover {
+    background-color: rgba(0, 245, 200, 0.2);
+}
+.newFeatureLozenge span {
+    background-color: var(--color-neon-green);
+    color: var(--color-dark-navy);
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+/* --- End Lozenge --- */
+
+
 .heroHeadline {
-  /* CHANGE 2: Heading font size ko aur bada kiya for impact (4.2rem) */
-  font-size: 4.2rem; 
-  font-weight: 800; /* Font weight badhaya */
+  /* NAYA: Font size/weight (Medvolve style) */
+  font-size: 4.5rem; 
+  font-weight: 700; /* Thoda kam bold */
   line-height: 1.1; 
-  max-width: 1000px; /* Max width badhaya */
-  
-  /* CHANGE 3: Color ko Neon Green se White kiya */
+  max-width: 800px; /* Max width */
   color: var(--color-off-white); 
-  
-  /* CHANGE 4: Text Glow ko subtle kiya */
-  text-shadow: 0 0 10px rgba(239, 239, 239, 0.1); 
+  text-shadow: none; /* Shadow hataya */
   margin-bottom: 2rem; 
-  
-  /* --- CHANGE 5: Glitch Effect (Task 3) ko HATAYA --- */
-  position: relative;
-  /* NAYA: Clean Fade-in animation lagaya */
   animation: fadeIn 1s ease-out;
 }
 
 .heroSubheadline {
-  /* CHANGE 3: Font size badhaya (2rem) */
-  font-size: 2rem; 
-  margin-top: 0; 
+  font-size: 1.3rem; /* NAYA: Font size */
   margin-bottom: 3rem; 
-  max-width: 800px;
-  opacity: 0.9; /* Thoda subtle kiya */
-  font-weight: 400; /* Font ko thoda patla kiya premium look ke liye */
-  line-height: 1.5; /* Line height thik kiya */
-  
-  /* NAYA: Isko bhi animate kiya */
+  max-width: 600px; /* NAYA: Max width */
+  opacity: 0.8; /* NAYA: Opacity */
+  font-weight: 400; 
+  line-height: 1.6; /* Line height */
   animation: fadeIn 1s ease-out 0.2s;
-  animation-fill-mode: backwards; /* Animation shuru hone se pehle hide rakhega */
+  animation-fill-mode: backwards;
 }
 
-/* === YAHAN NAYI CLASS ADD KI HAI === */
-/* NAYA: Hero Button Container */
+/* NAYA: Button Container */
 .heroButtonContainer {
     display: flex;
-    flex-wrap: wrap; /* Mobile par wrap hone ke liye */
-    justify-content: center;
-    gap: 1.5rem; /* Buttons ke beech space */
-}
-
-
-/* Button Styles - Base/Primary Button ki Base Styling */
-.heroButton {
-  margin-top: 0; 
-  padding: 1rem 3rem; 
-  background-color: var(--color-neon-green);
-  color: var(--color-dark-navy);
-  font-weight: 700; 
-  border-radius: 10px;
-  font-size: 1.1rem;
-  box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.3s ease, color 0.3s ease; 
-  border: none; 
-  
-  /* CHANGE: Margin ko container handle karega, yahan se hataya */
-  margin-left: 0; 
-}
-
-
-/* NAYA CLASS: Dedicated Hero Button Style for Max Impact (Composes removed) */
-.heroPrimaryButton {
-    /* Base properties from Hero Button style */
-    margin-top: 0; 
-    font-weight: 700; 
-    font-size: 1.1rem;
-    
-    /* FIX 1: Hero Button se clip-path hataya aur rounded corners use kiye */
-    border-radius: 10px; /* Rounded corners ensure no cutting */
-    
-    /* Animation and Glow */
-    box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
-    /* FIX: Faster Neon Pulse Animation */
-    animation: neonPulse 2.5s infinite ease-in-out; 
-    
-    /* --- CRITICAL FIX: Animated Button Styling (Hero Primary Button) --- */
-    position: relative;
-    overflow: hidden; 
-    z-index: 1;
-    padding: 0; 
-    border: none;
-    background-color: transparent; 
-    display: inline-flex; 
-
-    /* Transition update */
-    transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.4s ease, background-color 0.4s ease, border-radius 0.3s ease;
-    
-    /* CRITICAL FIX 102: Hardware Acceleration for Smoothness */
-    will-change: transform, box-shadow; /* Browser ko bataya ki yeh properties change honge */
-    transform: translateZ(0); /* GPU Acceleration enable kiya */
-    
-    /* NAYA: Isko bhi animate kiya */
-    animation: fadeIn 1s ease-out 0.4s, neonPulse 2.5s 1s infinite ease-in-out;
+    flex-wrap: wrap; 
+    justify-content: flex-start; /* Left align */
+    gap: 1.5rem; 
+    animation: fadeIn 1s ease-out 0.4s;
     animation-fill-mode: backwards;
 }
 
-/* --- PLAN 4.0 CHANGE --- */
-/* NAYA FIX: Hero Button Hover (LIFT Effect) */
-.heroPrimaryButton:hover {
-  /* CHANGE: Scale effect ko 'translateY' (lift) se replace kiya */
-  transform: translateY(-5px); 
-  
-  /* Strongest Glow */
-  box-shadow: 
-    0 0 45px rgba(0, 245, 200, 1.0), 
-    0 0 10px rgba(0, 245, 200, 0.6); 
-  animation: none; /* Idle animation ko roka */
-  
-  /* NAYA: Color change for glow effect */
-  color: var(--color-deep-blue);
+/* --- NAYA: Button Styles (MEDVOLVE) --- */
+
+/* Base button style (common properties) */
+.heroButton {
+  margin-top: 0; 
+  padding: 1rem 2.5rem; /* NAYA: Padding */
+  font-weight: 600; /* NAYA: Weight */
+  border-radius: 50px; /* NAYA: Pill shape */
+  font-size: 1rem; /* NAYA: Font size */
+  transition: all 0.3s ease;
+  border: 2px solid transparent; /* Border ke liye space */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* NAYA FIX: Hero Button Active/Press State (Feedback) */
-.heroPrimaryButton:active {
-    transform: translateY(-2px) scale(0.98); /* Thoda lift aur press effect */
-    box-shadow: 0 0 5px rgba(0, 245, 200, 0.5); 
-    animation: none;
-}
-
-/* Inner Text Span: Yeh hamesha top par rahega */
-.buttonText {
+/* NAYA: Primary Button (Filled Neon) - Medvolve Style */
+.heroPrimaryButton {
+    background-color: var(--color-neon-green);
+    color: var(--color-dark-navy) !important; /* !important add kiya */
+    box-shadow: 0 0 20px rgba(0, 245, 200, 0.5);
+    border-color: var(--color-neon-green);
+    
+    /* Animated button properties ko override kiya */
     position: relative;
-    z-index: 5; 
-    display: block;
-    padding: 1rem 3rem; 
-    background-color: var(--color-neon-green);
-    color: var(--color-dark-navy);
-    transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.3s ease; /* Shadow transition add ki */
-    /* FIX 4: Inner text span ko bhi radius diya aur z-index badhaya */
-    border-radius: 10px;
+    overflow: hidden; 
+    padding: 1rem 2.5rem; /* Padding yahan bhi define ki */
+    animation: none; /* NeonPulse animation hataya */
+}
+.heroPrimaryButton:hover {
+    background-color: var(--color-neon-light);
+    box-shadow: 0 0 30px rgba(0, 245, 200, 0.8);
+    transform: translateY(-3px); /* Lift effect */
+    color: var(--color-dark-navy) !important; /* !important add kiya */
 }
 
-/* Hover par inner text span ka style change */
+/* Complex animated button parts ko hide kiya */
+.buttonText {
+    padding: 0;
+    background-color: transparent;
+    color: inherit;
+    border-radius: 0;
+    position: static;
+    z-index: 1;
+}
 .heroPrimaryButton:hover .buttonText {
-    background-color: var(--color-dark-navy); 
-    color: var(--color-neon-green); 
-    box-shadow: none; 
+    background-color: transparent;
+    color: inherit;
 }
-
-
-/* Border Glow Element: Yeh button ki asali animation karega */
 .buttonBorderGlow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    display: none; /* Animation glow border hataya */
+}
+/* --- End Primary Button --- */
+
+
+/* NAYA: Outline Button (Medvolve Style) */
+.primaryOutline {
     background: transparent;
-    z-index: 2; /* FIX: Iska z-index buttonText (5) se kam aur button (1) se zyada hona chahiye */
-    content: '';
-    display: block;
-    /* FIX 3: Border Glow ko bhi rounded corners diye */
-    border-radius: 10px;
-    
-    /* Animation ki properties */
-    transform: scaleX(0); 
-    transition: transform 0.6s cubic-bezier(0.86, 0, 0.07, 1); 
-    transform-origin: left;
-    
-    /* Neon glow effect */
-    box-shadow: 
-        0 0 5px var(--color-neon-light),
-        0 0 10px var(--color-neon-light),
-        0 0 20px var(--color-neon-light);
-    
-    background-color: var(--color-neon-green);
-    opacity: 0.8;
-    
-    /* CRITICAL FIX 103: Hardware Acceleration for Smoothness */
-    will-change: transform;
-    transform: translateZ(0) scaleX(0); /* translateZ(0) add kiya */
+    border: 2px solid var(--color-neon-green); 
+    color: var(--color-neon-green); 
+    box-shadow: 0 0 10px rgba(0, 245, 200, 0.3);
+    padding: 1rem 2.5rem;
 }
-
-/* Hover par Border Glow element ko poora stretch karo */
-.heroPrimaryButton:hover .buttonBorderGlow {
-    transform: scaleX(1) translateZ(0); /* translateZ(0) yahan bhi rakha */
-    animation: pulseGlow 1.5s infinite alternate; 
+.primaryOutline:hover {
+    background-color: var(--color-neon-green); 
+    color: var(--color-dark-navy) !important; /* !important add kiya */
+    box-shadow: 0 0 35px rgba(0, 245, 200, 0.7);
+    transform: translateY(-3px);
 }
+/* --- End Outline Button --- */
 
 
-/* Secondary Button Style (Rate Your Experience aur View All Reviews mein use hoga) */
-.heroButton.secondary {
-    /* Secondary button se animation hataya */
-    animation: none; 
+/* NAYA: Secondary Button (Purple) - Medvolve Style */
+.secondary {
     background: transparent;
     border: 2px solid var(--color-secondary-accent);
     color: var(--color-secondary-accent);
-    border-radius: 10px; /* Ensure rounded corners */
+    border-radius: 50px; /* Pill shape */
     box-shadow: 0 0 10px rgba(139, 92, 246, 0.4); 
-    
-    /* FIX 59: Secondary button ka padding adjust kiya */
-    padding: 0.8rem 1.5rem; 
+    padding: 1rem 2.5rem; 
     font-size: 1rem;
     font-weight: 600;
 }
-
-/* Secondary Button hover state */
-.heroButton.secondary:hover {
+.secondary:hover {
     background-color: var(--color-secondary-accent); 
-    color: var(--color-dark-navy); 
+    color: var(--color-dark-navy) !important; /* !important add kiya */
     box-shadow: 0 0 35px rgba(139, 92, 246, 0.9);
-    transform: translateY(-5px);
+    transform: translateY(-3px);
 }
+/* --- End Secondary Button --- */
 
-/* Secondary Button Press state */
-.heroButton.secondary:active {
-    transform: translateY(0) scale(0.98);
-    background-color: var(--color-secondary-accent);
-    color: var(--color-dark-navy);
-    box-shadow: 0 0 5px rgba(139, 92, 246, 0.5); 
-}
-
-/* === YAHAN NAYI CLASS ADD KI HAI === */
-/* NAYA: Primary Outline Button Style (Rate Your Experience) */
-.heroButton.primaryOutline {
-    animation: none; 
-    background: transparent;
-    /* Neon green border */
-    border: 2px solid var(--color-neon-green); 
-    /* Neon green text */
-    color: var(--color-neon-green); 
-    border-radius: 10px;
-    /* Neon green glow */
-    box-shadow: 0 0 10px rgba(0, 245, 200, 0.4); 
-    
-    padding: 0.8rem 1.5rem; 
-    font-size: 1rem;
-    font-weight: 600;
-    
-    /* Transition add ki */
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-}
-
-/* Primary Outline Button hover state */
-.heroButton.primaryOutline:hover {
-    /* Fill with neon green */
-    background-color: var(--color-neon-green); 
-    /* Text dark ho jayega */
-    color: var(--color-dark-navy); 
-    /* Stronger glow */
-    box-shadow: 0 0 35px rgba(0, 245, 200, 0.9);
-    transform: translateY(-5px);
-}
-
-/* Primary Outline Button Press state */
-.heroButton.primaryOutline:active {
-    transform: translateY(0) scale(0.98);
-    background-color: var(--color-neon-green);
-    color: var(--color-dark-navy);
-    box-shadow: 0 0 5px rgba(0, 245, 200, 0.5); 
-}
-
-
-/* Portfolio CTA Button ke liye extra space theekiya */
+/* Portfolio CTA Button */
 .portfolioCtaButton {
-    margin-left: 0; /* Center align karne ke liye extra margin hataya */
+    margin-left: 0; 
+    margin-top: 3rem; /* NAYA: Grid se space */
+    /* Primary button style (filled neon) use karega */
 }
 
-/* --- TRUST BAR FIX (Overlap Issue Solved) --- */
-
+/* --- 
+--- TRUST BAR (MEDVOLVE STYLE) 
+---
+*/
 .trustBarSection {
-    /* FIX 10: Width ko 100vw kiya taaki yeh bhi viewport ki poori width width le */
     width: 100vw; 
-    /* FIX 11: Trust Bar ko center mein rakha */
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
-    
     margin-top: 0; 
     position: relative;
     z-index: 10; 
     overflow: hidden; 
-    background-color: var(--color-dark-navy); 
-    padding-top: 2rem; 
+    /* NAYA: Background ko deep blue kiya (Medvolve style) */
+    background-color: var(--color-deep-blue);
+    padding-top: 4rem; /* Padding badhayi */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* NAYA: Border */
 }
 
 .trustBarContent {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 2rem 3rem 2rem; 
+    padding: 0 2rem 4rem 2rem; 
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 .trustBarText {
-    font-size: 0.9rem;
-    font-weight: 600;
-    opacity: 0.5;
+    font-size: 1rem; /* Size badhaya */
+    font-weight: 500;
+    opacity: 0.6; /* Opacity adjust ki */
     color: var(--color-off-white);
-    letter-spacing: 2px;
-    margin-bottom: 2rem;
+    letter-spacing: 1px; /* Spacing kam ki */
+    margin-bottom: 2.5rem; /* Gap badhaya */
     text-align: center;
 }
 
-/* FIX 87: Trust Logo Resize */
 .logoStrip {
     width: 100%;
     overflow: hidden;
-    /* Edge fade effect */
     mask-image: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
 }
 
 .logoTrack {
     display: flex;
-    animation: scrollLogos 25s linear infinite; /* Animation add kiya */
-    width: fit-content; /* Saare logos ko fit karne ke liye */
+    animation: scrollLogos 25s linear infinite;
+    width: fit-content;
 }
 
 .logoItem {
     flex-shrink: 0;
-    /* FIX 97: Logo Item size ko Image tag mein set ki gayi 200x60 ke hisaab se adjust kiya */
-    padding: 0 2.5rem; /* Spacing kam rakhi */
-    height: 60px; /* Image Height */
-    width: 220px; /* Image Width (200) + Extra buffer */
-    
+    padding: 0 2.5rem; 
+    height: 60px; 
+    width: 220px; 
     display: flex;
     align-items: center;
     justify-content: center;
-    
     transform: none; 
-    opacity: 0.6; 
+    opacity: 0.6; /* Opacity adjust ki */
 }
 
-/* --- Universal Section Title - Glitch Fix */
-.sectionTitle {
-  /* CHANGE: Font size badhaya */
-  font-size: 3.5rem; 
-  font-weight: 800;
-  margin-bottom: 0.5rem; 
-  color: var(--color-neon-light);
-  text-shadow: 0 0 8px rgba(0, 245, 200, 0.8); /* Stronger glow */
-  
-  /* NAYA: Letter spacing add ki */
-  letter-spacing: 1px;
-}
 
-/* Section Subtitle - Visibility Fix */
-.sectionSubtitle {
-    font-size: 1.2rem;
-    opacity: 0.85; 
-    max-width: 800px;
-    margin: 0 auto 3rem; 
+/* --- 
+--- NAYA: FEATURES SECTION (Medvolve Style) 
+---
+*/
+.featuresSection {
+    width: 100%;
+    max-width: 1200px;
+    padding: 6rem 2rem;
+    text-align: left;
+    position: relative;
+    z-index: 10;
+    background-color: var(--color-dark-navy);
+}
+.featuresGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2.5rem; 
+}
+.featureCard {
+    background-color: transparent; /* No background */
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.featureCard:hover {
+    transform: translateY(-8px);
+    border-color: var(--color-neon-green);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 245, 200, 0.2);
+}
+.featureIcon {
+    font-size: 2.5rem; 
+    margin-bottom: 1.5rem;
+    color: var(--color-neon-green); 
+    text-shadow: 0 0 10px rgba(0, 245, 200, 0.8);
+}
+.featureCard h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+.featureCard p {
+    opacity: 0.7;
     line-height: 1.6;
-    color: var(--color-off-white);
+    font-size: 0.95rem;
+}
+/* --- End Features Section --- */
+
+
+/* --- 
+--- NAYA: "Empowering" Section (FounderNote ko restyle kiya) 
+---
+*/
+.founderNoteSection {
+    width: 100vw; 
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    background-color: var(--color-deep-blue); /* NAYA: Background */
+    padding: 6rem 2rem;
+    position: relative;
+    z-index: 8; 
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Services Section */
+/* FIX: Layout Changed to Column (Image Top, Text Bottom) */
+.founderNoteWrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column; /* NAYA: Column layout */
+    align-items: center; 
+    gap: 3rem; /* NAYA: Gap */
+    text-align: center; /* NAYA: Center align */
+}
+
+.founderImageContainer {
+    position: relative;
+    width: 250px; /* NAYA: Size adjust */
+    height: 250px; /* NAYA: Size adjust */
+    flex-shrink: 0;
+    border-radius: 50%; /* NAYA: Round shape */
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+    border: 2px solid var(--color-secondary-accent); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Image ko clip karne ke liye */
+}
+
+.founderImage {
+    filter: grayscale(0%); 
+    transition: transform 0.4s ease;
+    object-fit: cover !important; 
+    border-radius: 50% !important; /* NAYA: Round shape */
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.founderImageContainer:hover .founderImage {
+    filter: grayscale(0%);
+    transform: scale(1.05); /* NAYA: Hover zoom */
+}
+
+.founderContent {
+    flex-grow: 1;
+    text-align: center; /* NAYA: Center */
+    max-width: 800px; /* Quote ko limit kiya */
+}
+
+/* NAYA: Section Subtitle (Medvolve style) */
+.sectionSubtitleSmall {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-neon-green);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.founderQuote {
+    font-size: 2.2rem; /* NAYA: Size adjust */
+    font-weight: 700;
+    line-height: 1.4; /* NAYA: Line height */
+    margin-bottom: 2rem;
+    color: var(--color-off-white);
+    text-shadow: none; 
+    position: relative;
+    padding-left: 0; 
+    border-left: none; 
+    font-style: normal; 
+}
+
+.founderName {
+    font-size: 1.1rem; 
+    font-weight: 600;
+    margin-bottom: 0.5rem; 
+    color: var(--color-neon-green);
+}
+
+.founderTitle {
+    opacity: 0.7;
+    font-weight: 500; 
+    color: var(--color-off-white);
+    font-size: 1rem;
+}
+
+.founderPhilosophy {
+    font-size: 1.05rem; 
+    opacity: 0.8;
+    line-height: 1.7;
+    margin-top: 1.5rem; 
+}
+/* End of Founder's Note Styling */
+
+
+/* --- 
+--- NAYA: STATS SECTION (Medvolve Style) 
+---
+*/
+.statsSection {
+    width: 100%;
+    max-width: 1200px;
+    padding: 6rem 2rem;
+    position: relative;
+    z-index: 10;
+    background-color: var(--color-dark-navy);
+}
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 3rem;
+    text-align: left;
+}
+.statItem {
+    border-left: 3px solid var(--color-neon-green);
+    padding-left: 1.5rem;
+}
+.statNumber {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--color-neon-light);
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+.statLabel {
+    font-size: 1.1rem;
+    opacity: 0.7;
+    font-weight: 500;
+}
+/* --- End Stats Section --- */
+
+
+/* --- 
+--- SERVICES SECTION (MEDVOLVE STYLE) 
+---
+*/
 .servicesSection {
-  /* FIX 5: Margin top ko wapas zero kiya taaki TrustBar ke neeche immediately start ho */
   margin-top: 0; 
   width: 100%;
   max-width: 1200px;
-  /* FIX 48: Services section ki vertical padding ko badhaya */
-  padding: 10rem 2rem; 
-  text-align: center;
+  padding: 6rem 2rem; 
+  text-align: left; /* NAYA: Left Align */
   position: relative; 
   z-index: 10; 
   background-color: var(--color-dark-navy); 
 }
 
+/* NAYA: Section Title (Medvolve Style) */
+.sectionTitle {
+  font-size: 3rem; 
+  font-weight: 700;
+  margin-bottom: 1.5rem; 
+  color: var(--color-off-white); /* NAYA: White color */
+  text-shadow: none; /* Shadow hataya */
+  letter-spacing: 0; /* Spacing hatayi */
+  max-width: 500px; /* NAYA: Width limit */
+  line-height: 1.2;
+}
 
-/* Services Grid (Rest of the CSS is maintained) */
+/* NAYA: Section Subtitle (Medvolve Style) */
+.sectionSubtitle {
+    font-size: 1.1rem;
+    opacity: 0.8; 
+    max-width: 500px;
+    margin: 0 0 4rem 0; /* NAYA: Margin */
+    line-height: 1.6;
+    color: var(--color-off-white);
+}
+
+/* NAYA: Services Grid (Medvolve Style) */
 .servicesGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 3rem; 
+  gap: 2rem; /* Gap kam kiya */
   text-align: left;
 }
 
-/* --- PLAN 4.0 CHANGE: Service Card Premium Look (Refined Lift) --- */
+/* NAYA: Service Card (Medvolve Style) */
 .serviceCard {
-  /* NAYA: Background ko naye dark color se match kiya */
   background-color: var(--color-deep-blue);
-  /* Glass effect (backdrop-filter) hata diya */
-  padding: 3rem; 
-  border-radius: 16px;
+  padding: 2.5rem; /* Padding adjust ki */
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: none; /* Shadow hataya */
+  transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
   
-  /* NAYA: Default border ko subtle rakha */
-  border: 1px solid var(--color-glass-light);
-  
-  /* NAYA: Shadow ko bhi subtle rakha */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    
-  /* CHANGE: Transition mein 'transform' waapis add kiya */
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  /* NAYA: Arrow icon ke liye */
+  position: relative;
+  cursor: pointer;
 }
-
-/* --- PLAN 4.0 CHANGE: Hover State - Lift Effect Waapis Add Kiya --- */
 .serviceCard:hover {
-  /* CHANGE: Transform (lift) effect WAAPIS ADD KIYA */
-  transform: translateY(-10px); 
-  
-  /* NAYA: Hover par border color bhi change hoga */
+  transform: translateY(-8px); 
   border-color: var(--color-neon-green);
-  
-  /* NAYA: Shadow ko badhaya aur glow add kiya */
-  box-shadow: 
-    0 20px 50px rgba(0, 0, 0, 0.7), /* Deeper vertical shadow */
-    0 0 15px rgba(0, 245, 200, 0.2); /* Subtle neon glow */
+  background-color: #141720; /* Thoda lighter */
 }
 
-/* FIX 3: Icon Polish */
+/* NAYA: Arrow icon styling */
+.serviceCard::after {
+    content: '→';
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    font-size: 1.5rem;
+    color: var(--color-neon-green);
+    opacity: 0.5;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.serviceCard:hover::after {
+    opacity: 1;
+    transform: translateX(5px);
+}
+
+/* NAYA: Service Icon (Medvolve style - HIDE) */
 .serviceIcon {
-  font-size: 3rem; 
-  margin-bottom: 1.5rem;
-  /* FIX 3: Primary neon color diya */
-  color: var(--color-neon-green); 
-  /* FIX 3: Strong text shadow for glow */
-  text-shadow: 0 0 10px rgba(0, 245, 200, 0.8), 0 0 3px var(--color-neon-light);
+  display: none; /* Medvolve mein icon nahi hai */
 }
-
 
 .serviceCard h3 {
-  font-size: 1.8rem; 
-  font-weight: 700;
+  font-size: 1.5rem; /* Font chhota kiya */
+  font-weight: 600;
   margin-bottom: 1rem;
+  color: var(--color-off-white); /* White color */
+  max-width: 80%; /* Arrow se overlap na ho */
 }
 
 .serviceCard p {
-  opacity: 0.85;
-  line-height: 1.7;
+  opacity: 0.7; /* Opacity kam ki */
+  line-height: 1.6;
+  font-size: 0.95rem; /* Font chhota kiya */
+  max-width: 90%; /* Arrow se overlap na ho */
 }
 
 
-/* Portfolio Section */
+/* --- 
+--- NAYA: VIDEO BANNER SECTION (Medvolve Style) 
+---
+*/
+.videoBannerSection {
+  width: 100vw;
+  height: 60vh; /* 60% of viewport height */
+  position: relative;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  overflow: hidden;
+  background-color: var(--color-dark-navy); /* Fallback */
+}
+.videoBanner {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+.videoOverlay {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  background-color: rgba(10, 11, 15, 0.7); /* Dark overlay */
+}
+/* --- (End Video Banner) --- */
+
+
+/* --- 
+--- PORTFOLIO SECTION (MEDVOLVE INSPIRED) 
+---
+*/
 .portfolioSection {
   width: 100%;
-  background-color: var(--color-deep-blue);
-  /* Horizontal padding (4rem) yahan se HATA di */
-  padding: 10rem 0; 
-  text-align: center;
+  /* NAYA: Background Navy */
+  background-color: var(--color-dark-navy);
+  padding: 6rem 0; 
+  text-align: left; /* NAYA: Left Align */
   position: relative; 
 }
+/* NAYA: Portfolio Title/Subtitle ko container mein daala */
+.portfolioHeader {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem 2rem;
+}
 
-/* Portfolio Scroll Container */
 .portfolioCarousel {
-  perspective: 1500px;
   display: flex;
   overflow-x: scroll; 
   scroll-snap-type: x mandatory; 
-  gap: 2.5rem; 
-  margin-top: 4rem;
+  gap: 2rem; /* Gap kam kiya */
+  margin-top: 0; /* Header handle karega */
   text-align: left;
-  /* Horizontal padding (4rem) yahan ADD ki */
-  padding: 0 4rem; 
+  /* NAYA: Full width scroll, 1200px pe end padding */
+  padding: 0 2rem;
+  padding-left: calc((100vw - 1200px) / 2 + 2rem);
+  padding-right: calc((100vw - 1200px) / 2 + 2rem);
+  
   -ms-overflow-style: none; 
   scrollbar-width: none;
-  
-  /* === YAHAN FINAL FIX HAI (Height) === */
-  align-items: flex-start; /* Cards ko stretch hone se rokega */
+  align-items: flex-start;
 }
-
-
 .portfolioCarousel::-webkit-scrollbar {
   display: none;
 }
 
-/* --- PLAN 4.0 CHANGE: Portfolio Card (Refined Lift) --- */
+/* NAYA: Portfolio Card (Medvolve Inspired) */
 .portfolioCard {
   flex-shrink: 0; 
   width: 350px; 
-  scroll-snap-align: start; /* Desktop par start mein snap hoga */
-  
-  /* NAYA: Background ko naye dark color se match kiya */
+  scroll-snap-align: start; 
   background-color: var(--color-deep-blue);
-  /* Glass effect (backdrop-filter) hata diya */
-  
-  /* NAYA: Default border ko subtle rakha (Neon border hataya) */
-  border: 1px solid var(--color-glass-light); 
-  
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px; 
   overflow: hidden;
-  
-  /* CHANGE: Transition mein 'transform' waapis add kiya */
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.4s ease, box-shadow 0.4s ease;
-  
+  transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
   height: auto; 
   display: flex;
   flex-direction: column;
-  
-  /* NAYA: Shadow ko subtle rakha */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  
-  /* NAYA: Subtle floating animation (aggressiveLift) HATAYA */
-  animation: none;
+  box-shadow: none; /* Shadow hataya */
+  animation: none; /* Animation hataya */
 }
-
-/* --- PLAN 4.0 CHANGE: Portfolio Card Hover (Refined Lift) --- */
 .portfolioCard:hover {
-  /* CHANGE: Lift effect WAAPIS ADD KIYA (3D Tilt/Scale hataya) */
-  transform: translateY(-10px); 
-  
-  /* NAYA: Hover par border color bhi change hoga */
+  transform: translateY(-8px); 
   border-color: var(--color-neon-green);
-  
-  /* NAYA: Shadow ko badhaya aur intense glow add kiya */
-  box-shadow: 
-    0 20px 50px rgba(0, 0, 0, 0.8), 
-    0 0 25px rgba(0, 245, 200, 0.3); 
-    
-  /* NAYA: Intense Glow Animation (neonGlowLoop) HATAYA */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 245, 200, 0.2);
   animation: none; 
 }
 
-/* === YAHAN CHANGE KIYA GAYA HAI (Height Fix) === */
 .portfolioImageWrapper {
   width: 100%;
-  aspect-ratio: 16 / 9; /* Ratio ko 16/10 se 16/9 kiya */
+  aspect-ratio: 16 / 10; /* Ratio change */
   position: relative;
-  background-color: #2c3e50;
+  background-color: #1a1d27;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
   overflow: hidden; 
-  
-  /* NAYA FIX 101: Image Wrapper Bottom Border Glow */
-  border-bottom: 2px solid var(--color-neon-light);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* NAYA: Border */
 }
-
 .portfolioImageWrapper::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* NAYA: Subtle Static Noise Overlay for Tech Feel */
-    background: var(--hero-bg-image);
-    opacity: 0.1;
-    z-index: 2; 
-    pointer-events: none;
-    background-size: 50px 50px;
-    animation: textureScroll 60s linear infinite; /* Texture ko slow scroll karo */
+    display: none; /* Noise overlay hataya */
 }
 
 .portfolioContent {
-    padding: 1.8rem 1.2rem; /* Padding badhaya */
+    padding: 1.5rem; /* Padding adjust ki */
 }
 
 .portfolioCategory {
-    opacity: 0.95; 
-    font-size: 1.1rem; /* FIX 45: Category font size badhaya */
-    font-weight: 700;
-    color: var(--color-secondary-accent); /* Secondary color for contrast */
+    opacity: 0.9; 
+    font-size: 0.9rem; /* Chhota kiya */
+    font-weight: 500; /* Kam bold */
+    color: var(--color-neon-green); /* NAYA: Neon Green */
     margin-bottom: 0.5rem;
-    text-shadow: 0 0 5px rgba(139, 92, 246, 0.6);
+    text-shadow: none; /* Shadow hataya */
 }
 
 .portfolioCard h3 {
-  font-size: 1.8rem; /* FIX 46: Title font size badhaya */
-  font-weight: 800;
+  font-size: 1.3rem; /* Chhota kiya */
+  font-weight: 600; /* Kam bold */
   color: var(--color-off-white);
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 .portfolioCard p {
-  opacity: 0.8; 
-  font-size: 1rem; /* FIX 47: Description font size badhaya */
-  line-height: 1.5;
+  opacity: 0.7; 
+  font-size: 0.95rem; 
+  line-height: 1.6;
   flex-grow: 1; 
 }
 
-.noImagePlaceholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* NAYA: View All Projects ko header ke neeche rakha */
+.portfolioCtaButton {
+    /* Style .heroPrimaryButton se aa raha hai */
+    margin-top: 0; /* Margin upar header mein chali gayi */
 }
+/* --- End Portfolio --- */
 
-/* --- === YAHAN CHANGE KIYA GAYA HAI === --- */
-/* NAYA SECTION: CTA Bar Styling (Full Width Banner) */
-
+            
+/* --- 
+--- CTA BAR (MEDVOLVE INSPIRED) 
+---
+*/
+/* FIX: Change to full-width viewport */
 .ctaBarSection {
-    /* Full width viewport styles hataye */
-    /* width: 100vw;  */
-    /* margin-left: calc(-50vw + 50%); */
-    /* margin-right: calc(-50vw + 50%); */
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    margin-top: 6rem;
+    margin-bottom: 6rem;
     
-    /* Container styles add kiye */
-    width: 100%;
-    max-width: 1200px;
-    margin: 4rem auto; /* Center mein kiya */
-    
-    background-color: var(--color-dark-navy); /* Background ko main page bg se match kiya */
-    padding: 5rem 2rem; 
+    background: linear-gradient(90deg, var(--color-deep-blue) 0%, #1a1d27 100%);
+    padding: 5rem 3rem; 
     position: relative;
     z-index: 9; 
     
-    /* Naya Card Look */
-    border-radius: 16px; 
-    border: 1px solid var(--color-glass-light);
-    
-    /* Purple border aur shadow hataya */
-    /* border-top: 1px solid var(--color-secondary-accent);  */
-    /* border-bottom: 1px solid var(--color-secondary-accent);  */
-    /* box-shadow: 0 0 25px rgba(139, 92, 246, 0.3);  */
-    
+    /* Removed: max-width, margin auto, border-radius, border */
     background-image: none; 
     color: var(--color-off-white); 
+    
+    /* Removed: display: flex and alignment (moved to inner container) */
 }
-/* --- === END OF CHANGE === --- */
 
-
+/* FIX: .ctaBarContent ab alignment handle karega */
 .ctaBarContent {
-    max-width: 1200px; 
+    max-width: 1200px;
     margin: 0 auto;
     display: flex;
-    flex-direction: column; 
-    align-items: center; 
+    justify-content: space-between;
+    align-items: center;
     gap: 2rem;
 }
 
 .ctaTextWrapper {
     flex: 1; 
-    text-align: center; 
+    text-align: left; /* NAYA: Left align */
 }
 
 .ctaButtonWrapper {
@@ -710,218 +797,155 @@
 
 .ctaHeadline {
     font-size: 2.5rem; 
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 0.5rem;
     line-height: 1.2; 
-    color: var(--color-neon-green); 
-    text-shadow: 0 0 8px rgba(0, 245, 200, 0.8);
+    color: var(--color-off-white); /* NAYA: White color */
+    text-shadow: none; /* Shadow hataya */
 }
 
 .ctaSubheadline {
-    font-size: 1.2rem; 
-    font-weight: 500;
+    font-size: 1.1rem; /* Chhota kiya */
+    font-weight: 400; /* Patla kiya */
     margin-bottom: 0; 
-    opacity: 0.9;
+    opacity: 0.7;
     color: var(--color-off-white); 
     max-width: 650px; 
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 0;
+    margin-right: 0;
 }
 
+/* === FIX: CTA BUTTON STYLING HATA DI GAYI === */
+/* Ab yeh .primaryOutline style ko direct use karega */
 .ctaPrimaryButton {
-    background-color: transparent; 
-    color: var(--color-dark-navy); 
-    font-size: 1rem; 
-    box-shadow: none;
     animation: none;
-    transition: transform 0.1s ease;
 }
-
-.ctaPrimaryButton .buttonText {
-    background: linear-gradient(145deg, #2a2a2e 0%, #1a1a1e 100%);
-    color: var(--color-neon-green);
-    padding: 0.8rem 2rem; 
-    border: 1px solid var(--color-neon-green);
-    box-shadow: 0 0 15px rgba(0, 245, 200, 0.6);
-    transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.3s ease, background 0.3s ease;
-}
-
 .ctaPrimaryButton:hover {
-    transform: scale(1.05);
-    box-shadow: none; 
-    animation: none;
+    /* Hover styles ab .primaryOutline:hover se aayenge */
 }
-
-.ctaPrimaryButton:hover .buttonText {
-    background: linear-gradient(145deg, #3a3a3e 0%, #2a2a2e 100%);
-    color: var(--color-neon-light); 
-    box-shadow: 0 0 25px rgba(0, 245, 200, 0.9);
-    border-color: var(--color-neon-light);
-}
+/* --- End CTA Bar --- */
 
 
-/* --- NAYA SECTION: Founder's Note Section (Phase 3, Task 1) --- */
-
-.founderNoteSection {
-    width: 100vw; 
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
-    background-color: var(--color-deep-blue);
-    padding: 8rem 2rem;
-    position: relative;
-    z-index: 8; 
-}
-
-.founderNoteWrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-    gap: 3rem; 
-    text-align: center;
-}
-
-.founderImageContainer {
-    position: relative;
-    width: 220px; 
-    height: 220px;
-    flex-shrink: 0;
-    transform: none; 
-    border-radius: 50%; 
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 0 20px var(--color-secondary-accent);
-    border: 3px solid var(--color-secondary-accent); 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.founderImage {
-    filter: grayscale(80%) brightness(110%); 
-    transition: filter 0.3s ease;
-    object-fit: cover !important; 
-    border-radius: 50% !important; 
-}
-
-.founderImageContainer:hover .founderImage {
-    filter: grayscale(0%) brightness(100%);
-    transform: none;
-}
-
-.founderContent {
-    flex-grow: 1;
-    text-align: center;
-}
-
-.founderQuote {
-    font-size: 2rem; 
-    font-weight: 700;
-    line-height: 1.4;
-    margin-bottom: 1.5rem;
-    color: var(--color-off-white);
-    text-shadow: 0 0 5px rgba(139, 92, 246, 0.4); 
-    position: relative;
-    padding-left: 20px;
-    border-left: 5px solid var(--color-secondary-accent);
-    font-style: italic;
-}
-
-.founderName {
-    font-size: 1rem; 
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--color-neon-green);
-}
-
-.founderTitle {
-    opacity: 0.7;
-    font-weight: 400;
-    color: var(--color-off-white);
-}
-
-.founderPhilosophy {
-    font-size: 0.95rem; 
-    opacity: 0.85;
-    line-height: 1.6;
-}
-/* End of Founder's Note Styling */
-
-
-/* Why Choose Us Section */
+/* --- 
+--- WHY CHOOSE US (MEDVOLVE STYLE) 
+---
+*/
 .whyUsSection {
-  padding: 10rem 2rem;
+  padding: 6rem 2rem;
   width: 100%;
   max-width: 1200px;
-  text-align: center;
+  text-align: left; /* NAYA: Left Align */
   position: relative; 
 }
 
 .whyUsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 3rem;
+  gap: 2rem; /* Gap kam kiya */
   margin-top: 4rem;
 }
 
-/* --- PLAN 4.0 CHANGE: WhyUs card (Refined Lift) --- */
+/* NAYA: WhyUs Card (Medvolve Style) */
 .whyUsItem {
-  background-color: var(--color-deep-blue);
-  padding: 3rem;
-  border-radius: 16px;
-  border: 1px solid var(--color-glass-light);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  /* CHANGE: Transition mein 'transform' waapis add kiya */
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-  text-align: center;
+  background-color: transparent; /* No background */
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: none; /* Shadow hataya */
+  transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+  text-align: left; /* NAYA: Left Align */
 }
-
 .whyUsItem:hover {
-  transform: translateY(-10px); /* CHANGE: Lift effect WAAPIS ADD KIYA */
-  border-color: var(--color-secondary-accent); /* NAYA: Purple border glow */
-  box-shadow: 
-    0 15px 40px rgba(0, 0, 0, 0.7), 
-    0 0 15px rgba(139, 92, 246, 0.3); /* NAYA: Purple shadow glow */
+  transform: translateY(-8px);
+  border-color: var(--color-secondary-accent); /* Purple border */
+  background-color: var(--color-deep-blue);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(139, 92, 246, 0.2);
 }
 
 .whyUsIcon {
-  font-size: 3rem;
+  font-size: 2.5rem; /* Chhota kiya */
   margin-bottom: 1.5rem;
   color: var(--color-secondary-accent); 
-  text-shadow: 0 0 10px rgba(139, 92, 246, 0.8), 0 0 3px var(--color-secondary-accent);
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
 }
 
 .whyUsItem h3 {
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 1.5rem; /* Chhota kiya */
+  font-weight: 600;
   margin-bottom: 1rem;
 }
 
 .whyUsItem p {
-  opacity: 0.85;
-  line-height: 1.7;
+  opacity: 0.7; /* Opacity kam ki */
+  line-height: 1.6;
+  font-size: 0.95rem;
 }
 
-/* Testimonials Section */
+/* --- 
+--- TESTIMONIALS (FIX)
+---
+*/
 .testimonialsSection {
   width: 100%;
+  /* FIX: Background ko waapis DEEP BLUE kiya */
   background-color: var(--color-deep-blue);
-  padding: 10rem 2rem; 
-  text-align: center;
+  padding: 6rem 2rem; 
+  text-align: left; 
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+/* FIX: Testimonial Header (Layout Change) */
+.testimonialHeader {
+    display: flex;
+    /* FIX: Waapis flex-end (space-between) kiya */
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+.testimonialTitleWrapper {
+    /* FIX: Flex grow diya taaki space le */
+    flex: 2;
+    min-width: 300px;
+}
+.testimonialRatingWrapper {
+    /* FIX: Flex grow diya aur text-align right kiya */
+    flex: 1;
+    min-width: 250px;
+    text-align: right;
+}
+.overallRatingStars {
+    display: inline-flex; 
+    gap: 5px; 
+    color: var(--color-neon-green);
+    font-size: 1.5rem; /* NAYA: Size */
+}
+.overallRatingText {
+    font-size: 1.1rem; /* NAYA: Size */
+    font-weight: 500; 
+    margin-top: 0.5rem;
+    opacity: 0.9;
+}
+.overallRatingCount {
+    opacity: 0.6;
+    font-size: 0.9rem;
+}
+/* --- End Header --- */
 
-/* --- NAYA STYLING: Testimonial Slider (Phase 2, Task 2) --- */
 
+/* Slider Container (Full width) */
 .sliderContainer {
     position: relative;
-    width: 100vw; /* Full width viewport */
+    width: 100vw; 
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
     overflow: hidden;
-    padding: 0 0 3rem 0; /* Neeche space diya */
+    padding: 0 0 3rem 0; 
 }
 
 .sliderTrackWrapper {
-    padding: 0 4rem; 
+    padding: 0; /* Padding parent pe hai */
     -ms-overflow-style: none; 
     scrollbar-width: none;
     overflow-x: scroll;
@@ -933,53 +957,54 @@
 
 .sliderTrack {
     display: flex;
-    gap: 2.5rem; /* Cards ke beech space */
+    gap: 2rem; /* Gap kam kiya */
     width: fit-content; 
-    padding-bottom: 1rem; /* Shadow visibility ke liye space */
+    padding-bottom: 1rem; 
+    /* NAYA: Full width scroll padding */
+    padding-left: calc((100vw - 1200px) / 2 + 2rem);
+    padding-right: calc((100vw - 1200px) / 2 + 2rem);
 }
 
-/* --- PLAN 4.0 CHANGE: Testimonial card (Refined Lift) --- */
+/* FIX: Testimonial Card (Color Change) */
 .testimonialCard {
     flex-shrink: 0; 
-    width: 350px; /* Card ki fixed width */
+    width: 380px; /* Width badhayi */
     scroll-snap-align: start; 
-    
-    background-color: var(--color-deep-blue);
-    padding: 3rem; 
-    border-radius: 16px;
-    border: 1px solid var(--color-glass-light);
-    
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
-      
-    /* CHANGE: Transition mein 'transform' waapis add kiya */
+    /* FIX: Background ko DARK NAVY kiya (Section se alag) */
+    background-color: var(--color-dark-navy); 
+    padding: 2.5rem; /* Padding adjust ki */
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: none; /* Shadow hataya */
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     text-align: left;
     display: flex;
     flex-direction: column;
     position: relative;
 }
-
 .testimonialCard:hover {
-  transform: translateY(-5px); /* CHANGE: Lift effect WAAPIS ADD KIYA (thoda kam) */
-  border-color: var(--color-neon-light); /* Halki neon border */
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 245, 200, 0.1);
+  transform: translateY(-5px); 
+  border-color: var(--color-neon-light); 
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 245, 200, 0.1);
 }
 
 .quoteIcon {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    font-size: 2.5rem;
-    opacity: 0.1;
+    /* NAYA: Quote icon (Medvolve style) */
+    position: static; /* Top right se hataya */
+    font-size: 2rem;
+    opacity: 1;
     color: var(--color-neon-green);
+    margin-bottom: 1.5rem; /* NAYA: Gap */
 }
 
 .reviewComment {
-    font-style: italic;
+    font-style: normal; /* Italic hataya */
     margin-bottom: 1.5rem;
     flex-grow: 1;
-    line-height: 1.6;
+    line-height: 1.7; /* Line height badhayi */
     opacity: 0.9;
+    font-size: 1.1rem; /* Font bada kiya */
+    font-weight: 500; /* Weight badhaya */
 }
 
 .reviewFooter {
@@ -987,12 +1012,13 @@
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 1rem;
+    padding-top: 1.5rem; /* Padding badhayi */
     margin-top: 1rem;
 }
 
 .reviewerName {
     font-weight: 600;
+    font-size: 1rem;
     color: var(--color-off-white);
 }
 
@@ -1002,16 +1028,14 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 20;
-    /* NAYA: Background ko naye dark color se match kiya */
     background-color: var(--color-deep-blue);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
     border: 1px solid var(--color-neon-green);
     color: var(--color-neon-green);
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    display: flex;
+    /* FIX: YAHAN BUTTONS HATA DIYE GAYE HAIN */
+    display: none !important; 
     justify-content: center;
     align-items: center;
     font-size: 1.2rem;
@@ -1019,27 +1043,38 @@
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
-
 .sliderControl:hover {
     background-color: rgba(0, 245, 200, 0.2);
     transform: translateY(-50%) scale(1.1);
 }
-
+/* NAYA: Control position (Medvolve style) */
 .sliderControl.left {
-    left: 1.5rem;
+    left: calc((100vw - 1200px) / 2 - 60px);
 }
-
 .sliderControl.right {
-    right: 1.5rem;
+    right: calc((100vw - 1200px) / 2 - 60px);
 }
 
+/* NAYA: Testimonial Action Buttons (Rate/View All) */
+.testimonialActions {
+    display: flex;
+    /* FIX: Buttons ko CENTER mein kiya */
+    justify-content: center; 
+    gap: 1.5rem; 
+    margin-top: 3rem; /* Slider se gap badhaya */
+}
+/* Buttons .primaryOutline aur .secondary styles use karenge */
 
-/* Blog Section */
+
+/* --- 
+--- BLOG SECTION (MEDVOLVE INSPIRED) 
+---
+*/
 .blogSection {
   width: 100%;
   max-width: 1200px;
-  padding: 10rem 2rem; 
-  text-align: center;
+  padding: 6rem 2rem; 
+  text-align: left; /* NAYA: Left Align */
 }
 
 .blogGrid {
@@ -1049,43 +1084,167 @@
     margin-top: 4rem;
 }
 
+/* NAYA: Blog Card (Medvolve Inspired) */
 .blogCard {
-    background-color: var(--color-deep-blue); /* NAYA: Dark color */
+    background-color: var(--color-deep-blue); 
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid var(--color-glass-light); /* NAYA: Subtle border */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     height: 100%;
     display: flex;
     flex-direction: column;
+}
+.blogCard:hover {
+    transform: translateY(-8px);
+    border-color: var(--color-neon-green);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 245, 200, 0.2);
 }
 
 .blogImageWrapper {
     width: 100%;
     aspect-ratio: 16 / 10;
     position: relative;
-    background-color: #2c3e50;
+    background-color: #1a1d27;
     overflow: hidden;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* NAYA: Border */
 }
+
+/* NAYA: Blog Content Padding */
+.blogCardContent {
+    padding: 1.5rem;
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column;
+}
+.blogDate {
+    opacity: 0.7; 
+    font-size: 0.85rem; 
+    color: var(--color-neon-green);
+    font-weight: 500;
+}
+.blogCard h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0.5rem 0 0.8rem 0;
+    line-height: 1.4;
+    flex-grow: 1; /* Title ko space fill karne diya */
+}
+.blogCard p {
+    opacity: 0.7;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* NAYA: Blog CTA Button */
+.blogCtaButton {
+    margin-top: 3rem;
+    /* .primaryOutline style use karega */
+}
+
 
 /* ===== Mobile Responsive Styles ===== */
 
+@media (max-width: 1200px) {
+    /* Full width scroll sections ko adjust kiya */
+    .portfolioCarousel {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+    .sliderTrack {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+    .sliderControl.left {
+        left: 1rem;
+    }
+    .sliderControl.right {
+        right: 1rem;
+    }
+}
+
+
 @media (max-width: 1024px) {
-    /* Trust Bar ko thoda adjust kiya for tablets */
-    .logoItem {
-        padding: 0 1.5rem;
+    /* Tablet */
+    .heroContentWrapper {
+        padding: 1.5rem;
+    }
+    .heroHeadline {
+        font-size: 3.5rem;
+    }
+    .heroSubheadline {
+        font-size: 1.2rem;
+        max-width: 500px;
     }
     
+    .sectionTitle {
+        font-size: 2.5rem;
+    }
+
+    .servicesSection,
+    .portfolioSection,
+    .whyUsSection,
+    .testimonialsSection,
+    .blogSection,
+    .featuresSection,
+    .statsSection,
+    .videoBannerSection { /* NAYA: Responsive padding */
+        padding: 4rem 1.5rem;
+    }
+    .videoBannerSection {
+        height: 50vh; /* Tablet pe thodi kam height */
+    }
+    
+    .founderNoteSection {
+        padding: 4rem 1.5rem;
+    }
+    
+    .founderNoteWrapper {
+        /* Ab base style se match karta hai, koi change nahi */
+        gap: 2rem; 
+    }
+    .founderContent {
+        /* Base style se match karta hai */
+    }
+    .founderImageContainer {
+        width: 200px; /* Tablet pe thoda chhota */
+        height: 200px;
+    }
+    .founderQuote {
+        font-size: 1.8rem;
+    }
+    
+    .portfolioHeader {
+        padding: 0 1.5rem 3rem 1.5rem;
+    }
+    .portfolioCarousel {
+      padding: 0 1.5rem;
+    }
+    .portfolioSection {
+      padding: 4rem 0; 
+    }
+    
+    .portfolioCard {
+        scroll-snap-align: center;
+    }
+    
+    /* FIX: CTA Bar responsive */
     .ctaBarSection {
         padding: 4rem 1.5rem; 
-        margin: 3rem auto; /* Auto margin add kiya */
+        margin-top: 3rem;
+        margin-bottom: 3rem;
     }
     .ctaBarContent {
-        gap: 1.5rem; 
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
     }
-    
+    .ctaTextWrapper {
+        text-align: center;
+    }
     .ctaSubheadline {
-        margin-bottom: 0; 
+        margin-bottom: 2rem; /* Button se gap */
     }
     .ctaHeadline {
         font-size: 2rem;
@@ -1094,160 +1253,138 @@
         font-size: 1.1rem;
     }
     
-    .servicesSection,
-    .portfolioSection,
-    .whyUsSection,
-    .testimonialsSection,
-    .blogSection {
-        padding-top: 6rem;
-        padding-bottom: 6rem;
+    /* Testimonials */
+    .testimonialHeader {
+        /* FIX: Tablet par bhi stacked rahega */
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
     }
-    
-    /* Founder Note Mobile */
-    .founderNoteWrapper {
-        gap: 2rem; 
+    .sliderTrack {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
     }
-    .founderImageContainer {
-        width: 200px; 
-        height: 200px;
-        transform: translate(0, 0); 
+    .testimonialCard {
+        width: 320px; /* Thoda chhota */
+        scroll-snap-align: center;
     }
-    .founderQuote {
-        font-size: 1.8rem;
+    .sliderControl {
+        display: none !important; /* Tablet/Mobile pe hide */
     }
-    
-    /* Portfolio Scroll Mobile Fix */
-    .portfolioCarousel {
-      /* CHANGE: Padding ko mobile/tablet ke liye 1.5rem kiya */
-      padding: 0 1.5rem;
-      perspective: none; 
-    }
-    /* Padding ko parent section se HATA diya */
-    .portfolioSection {
-      padding: 6rem 0; 
-    }
-    
-    /* NAYA: Mobile par 3D hover effect flat rakha */
-    .portfolioCard {
-        transform-style: flat;
-        animation: none;
-        /* === YAHAN NAYA DESIGN FIX HAI === */
-        scroll-snap-align: center; /* Tablet par center mein snap hoga */
-    }
-    
-    .portfolioCard:hover {
-        /* NAYA: Mobile par lift effect rakha */
-        transform: translateY(-8px);
-        border-color: var(--color-neon-green);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 245, 200, 0.3);
-        animation: none;
+    .testimonialActions {
+        justify-content: center; /* Center buttons */
     }
 }
 
 
 @media (max-width: 768px) {
+  /* Mobile */
+  .heroContentWrapper {
+      align-items: center; /* Center align */
+      text-align: center;
+  }
   .heroHeadline {
-    font-size: 2.8rem; /* Thoda chhota kiya mobile ke liye */
+    font-size: 2.5rem; 
     text-align: center; 
   }
-
   .heroSubheadline {
-    font-size: 1.3rem; /* Thoda chhota */
+    font-size: 1.1rem;
     text-align: center; 
     line-height: 1.5; 
   }
-  
-  .sectionTitle {
-    font-size: 2.5rem;
+  .heroButtonContainer {
+      justify-content: center; /* Center buttons */
   }
   
-  /* Trust Bar Section Mobile */
+  .sectionTitle {
+    font-size: 2rem;
+    max-width: 100%;
+  }
+  .sectionSubtitle {
+      max-width: 100%;
+  }
+  
   .trustBarSection {
-      margin-top: 0;
-      padding-top: 1rem;
-      margin-left: 0;
-      margin-right: 0;
+      padding-top: 3rem;
   }
   .trustBarContent {
       padding: 0 1rem 3rem 1rem;
+  }
+  .trustBarText {
+      font-size: 0.9rem;
   }
   .logoTrack {
       animation-duration: 15s; 
   }
   .logoItem {
       padding: 0 1rem;
+      opacity: 0.5;
   }
   
     .servicesSection,
     .portfolioSection,
     .whyUsSection,
     .testimonialsSection,
-    .blogSection {
-        padding-top: 4rem;
-        padding-bottom: 4rem;
+    .blogSection,
+    .featuresSection,
+    .statsSection,
+    .videoBannerSection { /* NAYA: Responsive padding */
+        padding: 3rem 1rem;
+    }
+    .videoBannerSection {
+        height: 40vh; /* Mobile pe aur kam height */
+    }
+    
+    .founderNoteSection {
+        padding: 3rem 1rem;
     }
   
-  .portfolioSection {
-      padding: 4rem 0; /* Mobile padding yahan se HATA di */
-  }
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr); /* 2 column */
+        gap: 2rem;
+    }
+    .statNumber {
+        font-size: 2.5rem;
+    }
+    .statLabel {
+        font-size: 0.9rem;
+    }
 
-  /* === YAHAN NAYA DESIGN FIX HAI === */
+    .portfolioHeader {
+        padding: 0 1rem 3rem 1rem;
+        text-align: center;
+    }
+    .portfolioSection {
+      padding: 3rem 0;
+  }
   .portfolioCarousel {
-      padding: 0 1.5rem; /* Container par padding di */
-      gap: 1rem; /* Gap ko kam kiya */
+      padding: 0 1rem;
+      gap: 1rem; 
   }
-
-  /* Mobile Card Size Fix (Pichle plan se) */
   .portfolioCard {
-    width: 90%; /* Card ki width 90% ki */
-    scroll-snap-align: center; /* Mobile par center mein snap hoga */
-    
-    /* Font size ko chhota kiya */
-    font-size: 0.9rem;
+    width: 280px; /* Chhota card */
+    scroll-snap-align: center;
   }
-
   .portfolioContent {
-      padding: 1.5rem 1rem; 
+      padding: 1.2rem; 
   }
-
   .portfolioCategory {
-      font-size: 0.9rem; 
+      font-size: 0.8rem; 
   }
-
   .portfolioCard h3 {
-    font-size: 1.5rem; 
-    
-    /* === YAHAN NAYA FIX ADD KIYA GAYA HAI === */
-    /* Text ko 2 line mein cut karne ke liye */
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Text ko 2 line mein cut karega */
-    line-clamp: 2; /* === YAHAN NAYA FIX ADD KIYA GAYA HAI === */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* === END OF NAYA FIX === */
+    font-size: 1.1rem; 
   }
-
-  /* === YAHAN FINAL FIX HAI (Height) === */
   .portfolioCard p {
     font-size: 0.9rem;
-    
-    /* NAYI LINES (Text ko 2 line mein cut karne ke liye) */
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Text ko 2 line mein cut karega */
-    line-clamp: 2; /* === YAHAN NAYA FIX ADD KIYA GAYA HAI === */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 0; /* Extra margin hatao */
+    line-height: 1.5;
   }
-  /* === END OF NAYA DESIGN FIX === */
 
 
   /* Mobile CTA Bar */
   .ctaBarSection {
       padding: 3rem 1.5rem; 
-      margin: 2rem auto; /* Auto margin add kiya */
+      margin: 2rem auto; 
   }
   .ctaHeadline {
       font-size: 1.8rem; 
@@ -1256,60 +1393,50 @@
       font-size: 1rem;
   }
   
-  .ctaPrimaryButton .buttonText {
-    padding: 0.6rem 1.5rem; 
-  }
-  
-  .ctaPrimaryButton {
-      font-size: 0.9rem;
-  }
-  
   /* Founder Note Mobile */
     .founderNoteSection {
-        padding: 4rem 1.5rem;
+        padding: 3rem 1rem;
     }
     .founderQuote {
         font-size: 1.5rem;
     }
-}
-
-
-
-/* --- Keyframes --- */
-@keyframes neonPulse {
-    0% {
-        transform: scale(1) translateZ(0);
-        box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
+    .founderImageContainer {
+        width: 180px; /* Mobile pe aur chhota */
+        height: 180px;
+        /* border-radius: 50%; (base se aa raha hai) */
     }
-    50% {
-        transform: scale(1.015) translateZ(0);
-        box-shadow: 0 0 30px rgba(0, 245, 200, 0.8), 0 0 5px rgba(0, 245, 200, 0.4);
+    .founderImage {
+        /* border-radius: 50% !important; (base se aa raha hai) */
     }
-    100% {
-        transform: scale(1) translateZ(0);
-        box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
+    
+    /* Testimonials Mobile */
+    .testimonialsSection {
+        padding: 3rem 1rem;
     }
-}
-
-@keyframes pulseGlow {
-    0% {
-        opacity: 0.8;
-        transform: scale(1) translateZ(0);
+    .testimonialHeader {
+        /* FIX: Mobile par stacked rahega */
+        align-items: center;
+        text-align: center;
     }
-    100% {
-        opacity: 1;
-        transform: scale(1.01) translateZ(0);
+    .testimonialRatingWrapper {
+        /* FIX: Mobile par center-align */
+        text-align: center;
     }
-}
-
-@keyframes scrollLogos {
-    from {
-        transform: translateX(0) translateZ(0);
+    .sliderTrack {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
-    to {
-        transform: translateX(-50%) translateZ(0); 
+    .testimonialCard {
+        width: 300px;
+    }
+    .reviewComment {
+        font-size: 1rem;
     }
 }
+
+
+
+/* --- Keyframes (Purane waale hata diye) --- */
 
 /* NAYA: fadeIn animation */
 @keyframes fadeIn {
@@ -1323,67 +1450,12 @@
     }
 }
 
-/* Glitch animation (Ab use nahi ho raha, lekin rakha hai) */
-@keyframes glitch-flicker {
-    0%, 100% {
-        text-shadow: 0 0 10px rgba(0, 245, 200, 0.8), 0 0 20px rgba(0, 245, 200, 0.4); 
-        transform: none;
-        opacity: 1;
+@keyframes scrollLogos {
+    from {
+        transform: translateX(0) translateZ(0);
     }
-    10% {
-        text-shadow: 2px 0 10px var(--color-neon-light), -2px 0 10px var(--color-secondary-accent);
-        transform: translate(-1px, 1px) translateZ(0);
-    }
-    20% {
-        text-shadow: -1px 0 10px var(--color-secondary-accent), 1px 0 10px var(--color-neon-light);
-        transform: translate(1px, -1px) translateZ(0);
-        opacity: 0.95;
-    }
-    30% {
-        text-shadow: 4px 0 10px var(--color-neon-light), -4px 0 10px var(--color-secondary-accent);
-        transform: translate(2px, 0) translateZ(0);
-    }
-    90% {
-        opacity: 1;
-    }
-    92% {
-        opacity: 0.98;
-    }
-}
-
-/* Aggressive lift (Ab use nahi ho raha) */
-@keyframes aggressiveLift {
-    0% {
-        transform: translateY(0) scale(1) translateZ(0);
-        box-shadow: 
-            0 15px 50px rgba(0, 0, 0, 1.0), 
-            0 0 15px rgba(0, 245, 200, 0.6);
-    }
-    50% {
-        transform: translateY(-5px) scale(1.005) translateZ(0);
-        box-shadow: 
-            0 20px 60px rgba(0, 0, 0, 1.0), 
-            0 0 25px rgba(0, 245, 200, 0.8);
-    }
-    100% {
-        transform: translateY(0) scale(1) translateZ(0);
-        box-shadow: 
-            0 15px 50px rgba(0, 0, 0, 1.0), 
-            0 0 15px rgba(0, 245, 200, 0.6);
-    }
-}
-
-/* Neon Glow Loop (Ab use nahi ho raha) */
-@keyframes neonGlowLoop {
-    0% {
-        box-shadow: 
-            0 25px 60px rgba(0, 0, 0, 0.98), 
-            0 0 40px var(--color-neon-green);
-    }
-    100% {
-        box-shadow: 
-            0 25px 60px rgba(0, 0, 0, 0.98), 
-            0 0 50px var(--color-neon-light);
+    to {
+        transform: translateX(-50%) translateZ(0); 
     }
 }
 

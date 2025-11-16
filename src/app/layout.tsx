@@ -112,6 +112,12 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      {/* === NAYA FIX: Viewport tag add kiya gaya hai === */}
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
+      {/* ============================================== */}
+
       {gaId && gaId !== 'G-XXXXXXXXXX' && (
         <>
           <Script 

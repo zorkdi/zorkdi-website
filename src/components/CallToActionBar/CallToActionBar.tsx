@@ -34,17 +34,16 @@ const CallToActionBar: React.FC = () => {
                 {/* NAYA: Button ke liye wrapper */}
                 <div className={styles.ctaButtonWrapper}>
                     <AnimationWrapper delay={0.3}>
-                        {/* Hero Primary Button style reuse kiya for maximum impact */}
+                        {/* === FIX: BUTTON STYLE CHANGE ===
+                          Button class ko .heroPrimaryButton se .primaryOutline mein badal diya hai
+                          taaki yeh testimonial buttons jaisa outline animation le.
+                          Inner <span> tags bhi hata diye gaye hain.
+                        */}
                         <Link 
                             href="/new-project" 
-                            className={`${styles.heroButton} ${styles.ctaPrimaryButton}`} 
+                            className={`${styles.heroButton} ${styles.primaryOutline}`} 
                         >
-                            {/* CHANGE: Icon hata diya */}
-                            {/* <FaRocket style={{ marginRight: '10px' }} /> */}
-                            
-                            {/* CHANGE: Button text update kiya */}
-                            <span className={styles.buttonText}>Start Your Project</span>
-                            <span className={styles.buttonBorderGlow}></span>
+                            Start Your Project
                         </Link>
                     </AnimationWrapper>
                 </div>

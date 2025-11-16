@@ -7,7 +7,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import styles from './admin.module.css';
 import { 
-    FaTachometerAlt, FaFeatherAlt, FaUsers, FaTasks, FaCog, FaChartLine, FaSignOutAlt, FaEnvelope, FaUserTie, FaBuilding // NAYA: FaBuilding import kiya
+    FaTachometerAlt, FaFeatherAlt, FaUsers, FaTasks, FaCog, FaChartLine, FaSignOutAlt, FaEnvelope, FaUserTie, FaBuilding,
+    FaBookOpen // NAYA ICON: Case Studies ke liye
 } from 'react-icons/fa';
 import { CgClose } from 'react-icons/cg';
 import { useState, useEffect } from 'react';
@@ -20,11 +21,13 @@ const navLinks = [
     { name: 'Dashboard', href: '/admin', icon: FaTachometerAlt },
     { name: 'Blog Posts', href: '/admin/blog', icon: FaFeatherAlt },
     { name: 'Portfolio', href: '/admin/portfolio', icon: FaChartLine },
+    // === NAYA LINK ADD KIYA GAYA HAI ===
+    { name: 'Case Studies', href: '/admin/case-studies', icon: FaBookOpen },
+    // ===================================
     { name: 'Project Requests', href: '/admin/projects', icon: FaTasks },
     { name: 'Client Chat', href: '/admin/chat', icon: FaUsers },
     { name: 'Client Inbox', href: '/admin/mail', icon: FaEnvelope },
     { name: 'Founder Profile', href: '/admin/founder', icon: FaUserTie },
-    // NAYA: Trust Settings link add kiya
     { name: 'Trust Settings', href: '/admin/trust', icon: FaBuilding },
     { name: 'Settings', href: '/admin/settings', icon: FaCog },
 ];
@@ -59,13 +62,13 @@ export default function AdminLayout({
                 const docRef = doc(db, 'cms', 'global_settings');
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    setAdminUID(docSnap.data().adminUID || 'eWCjS5yqHvSuafrN5IbWlT6Kmyf2'); // Fallback to default
+                    setAdminUID(docSnap.data().adminUID || 'eWCjS5yqHvSuafrJ5IbWlT6Kmyf2'); // Fallback to default
                 } else {
-                    setAdminUID('eWCjS5yqHvSuafrN5IbWlT6Kmyf2'); // Use fallback if CMS doc not found
+                    setAdminUID('eWCjS5yqHvSuafrJ5IbWlT6Kmyf2'); // Use fallback if CMS doc not found
                 }
             } catch (error) {
                 console.error("Error fetching admin UID:", error);
-                setAdminUID('eWCjS5yqHvSuafrN5IbWlT6Kmyf2'); // Use fallback on error
+                setAdminUID('eWCjS5yqHvSuafrJ5IbWlT6Kmyf2'); // Use fallback on error
             } finally {
                 setCmsLoading(false);
             }
