@@ -1,107 +1,149 @@
 // src/app/layout.tsx
 
-// === YAHAN CHANGE KIYA GAYA HAI === (Caching ko 300 seconds (5 min) ke liye enable kiya)
+// Cache settings: 5 minute baad data refresh hoga
 export const revalidate = 300; 
 
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins } from "next/font/google"; // Font import
 import "./globals.css";
 import Script from "next/script";
 
+// Components Imports
 import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import { AuthProvider } from "../context/AuthContext";
 import FloatingActionButtons from "../components/FloatingActionButtons/FloatingActionButtons"; 
 
-// Firebase imports for metadata and marketing settings fetch
+// Firebase Imports
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
+  variable: '--font-poppins', // Variable add kiya future use ke liye
 });
 
-// Interface for Global Settings 
+// --- Settings Interface ---
 interface GlobalSettings {
   websiteTitle: string;
   websiteTagline: string;
-  headerLogoURL: string; // NAYA FIELD LOGO KE LIYE
+  headerLogoURL: string; 
   googleAnalyticsId?: string; 
   googleSearchConsoleId?: string; 
   heroBackgroundURL?: string; 
-  defaultHeroBackground?: string; 
 }
 
-// Default/Fallback settings
+// --- Default Values (Agar Firebase fail ho jaye) ---
 const defaultSettings: GlobalSettings = {
-    websiteTitle: "ZORK DI - Custom Tech Solutions",
-    websiteTagline: "We transform your ideas into high-performance applications, websites, and software.",
-    headerLogoURL: "/logo.png", // NAYA DEFAULT VALUE
-    googleAnalyticsId: "G-XXXXXXXXXX", 
+    websiteTitle: "ZORK DI", // Title chhota rakha taaki Google pura dikhaye
+    websiteTagline: "Empowering Ideas With Technology - Premium IT Solutions", // Tagline thodi descriptive ki
+    headerLogoURL: "/logo.png", 
+    googleAnalyticsId: "", 
     googleSearchConsoleId: "", 
     heroBackgroundURL: "", 
-    defaultHeroBackground: "",
 };
 
-// Function to fetch ALL Global Settings from Firestore
+// --- Firebase Data Fetcher ---
 async function getGlobalSettings(): Promise<GlobalSettings> {
     try {
         const docRef = doc(db, 'cms', 'global_settings');
-        // === YAHAN CHANGE KIYA GAYA HAI ===
-        // getDoc ko 'no-store' cache option diya
-        const docSnap = await getDoc(docRef); 
+        const docSnap = await getDoc(docRef); // Cache handling upar revalidate se hogi
 
         if (docSnap.exists()) {
             const data = docSnap.data();
-            return {
-                ...defaultSettings,
-                ...data,
-            } as GlobalSettings;
+            return { ...defaultSettings, ...data } as GlobalSettings;
         } else {
             return defaultSettings;
         }
     } catch (error) {
-        console.error("Server-side fetching error for global settings:", error);
+        console.error("SEO Fetch Error:", error);
         return defaultSettings; 
     }
 }
 
-// --- Next.js Metadata Function ---
+// --- MAJOR FIX: CORRECT METADATA GENERATION ---
 export async function generateMetadata(): Promise<Metadata> {
     const globalSettings = await getGlobalSettings();
     
-    const verificationMeta = globalSettings.googleSearchConsoleId 
-        ? { google: globalSettings.googleSearchConsoleId } 
-        : {};
+    // 1. Domain Fix: Google ko batana zaroori hai ki main site kaunsi hai
+    const siteBaseUrl = 'https://www.zorkdi.in'; 
 
-    // NAYA: Favicon logic
+    // 2. Favicon Logic
     const faviconURL = (globalSettings.headerLogoURL && globalSettings.headerLogoURL.trim() !== "")
         ? globalSettings.headerLogoURL
         : defaultSettings.headerLogoURL;
 
     return {
-        title: globalSettings.websiteTitle,
+        // FIX: MetadataBase set karna zaroori hai Vercel issues ke liye
+        metadataBase: new URL(siteBaseUrl),
+
+        title: {
+            default: globalSettings.websiteTitle,
+            template: `%s | ${globalSettings.websiteTitle}` // "Contact | ZORK DI" style
+        },
         description: globalSettings.websiteTagline,
-        verification: verificationMeta, 
-        // NAYA: icons property add ki
+        
+        // FIX: Canonical URL (Ye Vercel link hatayega aur main domain layega)
+        alternates: {
+            canonical: '/',
+        },
+
+        // FIX: Robots txt control
+        robots: {
+            index: true,
+            follow: true,
+            googleBot: {
+                index: true,
+                follow: true,
+                'max-video-preview': -1,
+                'max-image-preview': 'large',
+                'max-snippet': -1,
+            },
+        },
+
+        // FIX: Open Graph (Social Media Previews ke liye)
+        openGraph: {
+            title: globalSettings.websiteTitle,
+            description: globalSettings.websiteTagline,
+            url: siteBaseUrl,
+            siteName: 'ZORK DI',
+            locale: 'en_US',
+            type: 'website',
+            images: [
+                {
+                    url: faviconURL, // Social share par logo dikhega
+                    width: 800,
+                    height: 600,
+                    alt: globalSettings.websiteTitle,
+                }
+            ],
+        },
+
+        // Icons (Favicon in Search Results)
         icons: {
             icon: faviconURL,
+            shortcut: faviconURL,
             apple: faviconURL,
-        }
+        },
+
+        // Google Verification (Search Console)
+        verification: globalSettings.googleSearchConsoleId 
+            ? { google: globalSettings.googleSearchConsoleId } 
+            : {},
     };
 }
 
-
+// --- Root Layout Component ---
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Global settings ko fetch kiya
   const globalSettings = await getGlobalSettings();
   const gaId = globalSettings.googleAnalyticsId;
   
+  // Dynamic Hero Background logic
   const heroBackground = globalSettings.heroBackgroundURL 
     ? `url('${globalSettings.heroBackgroundURL}')` 
     : ''; 
@@ -112,13 +154,12 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      {/* === NAYA FIX: Viewport tag add kiya gaya hai === */}
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </head>
-      {/* ============================================== */}
 
-      {gaId && gaId !== 'G-XXXXXXXXXX' && (
+      {/* Google Analytics Injection */}
+      {gaId && (
         <>
           <Script 
             strategy="afterInteractive" 
@@ -137,11 +178,11 @@ export default async function RootLayout({
 
       <body className={poppins.className} style={heroBackground ? (customCssVars as React.CSSProperties) : undefined}>
         <AuthProvider>
-          
-          {/* === YAHAN CHANGE KIYA GAYA HAI === (globalSettings ko prop mein pass kiya) */}
+          {/* Header ko settings pass ki gayi */}
           <Header globalSettings={globalSettings} />
 
           {children}
+
           <Footer />
           <FloatingActionButtons />
         </AuthProvider>
