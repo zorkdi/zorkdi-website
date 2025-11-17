@@ -142,3 +142,12 @@ select {
         font-size: 1.2rem;
     }
 }
+
+/* --- NAYA: Lenis Smooth Scroll CSS --- */
+html.lenis {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+/* Khaali ruleset ( .lenis.lenis-stopping... ) yahan se hata diya gaya hai */

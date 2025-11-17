@@ -13,6 +13,7 @@ import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import { AuthProvider } from "../context/AuthContext";
 import FloatingActionButtons from "../components/FloatingActionButtons/FloatingActionButtons"; 
+import SmoothScroll from "../components/SmoothScroll"; // <-- YAHAN ADD KIYA HAI
 
 // Firebase Imports
 import { doc, getDoc } from 'firebase/firestore';
@@ -178,13 +179,15 @@ export default async function RootLayout({
 
       <body className={poppins.className} style={heroBackground ? (customCssVars as React.CSSProperties) : undefined}>
         <AuthProvider>
-          {/* Header ko settings pass ki gayi */}
-          <Header globalSettings={globalSettings} />
+          <SmoothScroll> {/* <-- YAHAN ADD KIYA HAI */}
+            {/* Header ko settings pass ki gayi */}
+            <Header globalSettings={globalSettings} />
 
-          {children}
+            {children}
 
-          <Footer />
-          <FloatingActionButtons />
+            <Footer />
+            <FloatingActionButtons />
+          </SmoothScroll> {/* <-- YAHAN WRAP CLOSE KIYA HAI */}
         </AuthProvider>
       </body>
     </html>
