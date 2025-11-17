@@ -13,7 +13,7 @@ import Header from "../components/Header/Header";
 import Footer from "../components/Footer/Footer";
 import { AuthProvider } from "../context/AuthContext";
 import FloatingActionButtons from "../components/FloatingActionButtons/FloatingActionButtons"; 
-import SmoothScroll from "../components/SmoothScroll"; // <-- YAHAN ADD KIYA HAI
+import SmoothScroll from "../components/SmoothScroll"; 
 
 // Firebase Imports
 import { doc, getDoc } from 'firebase/firestore';
@@ -69,6 +69,10 @@ export async function generateMetadata(): Promise<Metadata> {
     
     // 1. Domain Fix: Google ko batana zaroori hai ki main site kaunsi hai
     const siteBaseUrl = 'https://www.zorkdi.in'; 
+    
+    // --- NAYA: Vercel Environment Logic ---
+    // Yeh check karega ki site production (zorkdi.in) par hai ya preview (zorkdi.vercel.app) par
+    const isProduction = process.env.VERCEL_ENV === 'production';
 
     // 2. Favicon Logic
     const faviconURL = (globalSettings.headerLogoURL && globalSettings.headerLogoURL.trim() !== "")
@@ -90,13 +94,14 @@ export async function generateMetadata(): Promise<Metadata> {
             canonical: '/',
         },
 
-        // FIX: Robots txt control
+        // --- NAYA: DYNAMIC ROBOTS TXT ---
+        // Agar production hai toh index karo, varna mat karo
         robots: {
-            index: true,
-            follow: true,
+            index: isProduction,
+            follow: isProduction,
             googleBot: {
-                index: true,
-                follow: true,
+                index: isProduction,
+                follow: isProduction,
                 'max-video-preview': -1,
                 'max-image-preview': 'large',
                 'max-snippet': -1,
@@ -179,7 +184,7 @@ export default async function RootLayout({
 
       <body className={poppins.className} style={heroBackground ? (customCssVars as React.CSSProperties) : undefined}>
         <AuthProvider>
-          <SmoothScroll> {/* <-- YAHAN ADD KIYA HAI */}
+          <SmoothScroll> 
             {/* Header ko settings pass ki gayi */}
             <Header globalSettings={globalSettings} />
 
@@ -187,7 +192,7 @@ export default async function RootLayout({
 
             <Footer />
             <FloatingActionButtons />
-          </SmoothScroll> {/* <-- YAHAN WRAP CLOSE KIYA HAI */}
+          </SmoothScroll> 
         </AuthProvider>
       </body>
     </html>
