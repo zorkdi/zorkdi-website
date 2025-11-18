@@ -252,14 +252,33 @@
     
     .footerSocial {
         width: 100%;
-        text-align: left;
+        /* NAYA CHANGE: Center align kiya */
+        text-align: center; 
+    }
+    
+    /* NAYA CHANGE: "Connect" title ko hide kiya */
+    .footerSocial h3 {
+        display: none;
     }
     
     .socialList {
         flex-direction: row; /* Mobile pe row mein */
         flex-wrap: wrap;
-        gap: 1.5rem;
+        gap: 2rem; /* NAYA CHANGE: Gap badhaya */
+        /* NAYA CHANGE: Icons ko center kiya */
+        justify-content: center; 
     }
+
+    /* NAYA CHANGE: Icon ka size badhaya */
+    .socialList a {
+        font-size: 1.4rem; 
+    }
+
+    /* Mobile par social media text ko hide karo */
+    .socialList a span {
+        display: none;
+    }
+
 
     /* FIX: Mobile pe bottom bar ko center kiya */
     .footerBottom {

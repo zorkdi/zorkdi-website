@@ -4,7 +4,7 @@
 
 import Link from 'next/link';
 import styles from './page.module.css';
-// NAYA: Unused icons (FaMobileAlt, FaChartLine, FaDesktop, FaQuoteLeft) hata diye
+// FIX: FaUserShield ko import kiya (Why Choose Us ke naye icon ke liye)
 import { FaLaptopCode, FaDraftingCompass, FaRegLightbulb, FaUserShield, FaRocket, FaNewspaper, FaStar, FaArrowRight } from "react-icons/fa";
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs, Timestamp, where } from 'firebase/firestore';
@@ -477,21 +477,9 @@ const HomePage = () => {
 
             
             {/* --- 
-            --- NAYA: VIDEO BANNER SECTION (Medvolve Style)
+            --- VIDEO BANNER SECTION REMOVED
             ---
             */}
-            <section className={styles.videoBannerSection}>
-                 <video 
-                    className={styles.videoBanner}
-                    src="/videos/banner-video.mp4" // YAHAN APNA VIDEO PATH DAALEIN (e.g., /videos/banner-video.mp4)
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline
-                />
-                <div className={styles.videoOverlay}></div>
-            </section>
-            {/* --- (End Video Banner) --- */}
             
 
             {/* --- 
@@ -555,25 +543,34 @@ const HomePage = () => {
                  <h2 className={styles.sectionTitle}>Why Choose ZORK DI?</h2>
                  <p className={styles.sectionSubtitle}>We are committed to delivering excellence and innovation in everything we do.</p>
                 <div className={styles.whyUsGrid}>
+                    
+                    {/* === CARD 1 (Waisa hi hai) === */}
                     <AnimationWrapper>
                         <div className={styles.whyUsItem}>
                             <div className={styles.whyUsIcon}><FeatureIcon icon={FaDraftingCompass} /></div>
-                            <h3>Expertise in AI</h3>
-                            <p>Leveraging advanced AI to build intelligent and efficient solutions for your business.</p>
+                            <h3>Expertise You Can Trust</h3>
+                            <p>We believe great software is built by dedicated people. Our team consists of experienced developers and designers who are passionate about quality and precision.</p>
                         </div>
                     </AnimationWrapper>
+                    
+                    {/* === CARD 2 (Waisa hi hai) === */}
                     <AnimationWrapper delay={0.2}>
                         <div className={styles.whyUsItem}>
                             <div className={styles.whyUsIcon}><FeatureIcon icon={FaLaptopCode} /></div>
-                            <h3>Seamless Integration</h3>
-                            <p>Our products are designed to integrate perfectly with your existing digital ecosystem.</p>
+                            <h3>Your Partner in Success</h3>
+                            <p>We take the time to truly understand your business challenges. Our goal is to build solutions that not only work perfectly but also help you achieve your long-term objectives.</p>
                         </div>
                     </AnimationWrapper>
+                    
+                    {/* === CARD 3 UPDATED (Security & Privacy) === */}
                     <AnimationWrapper delay={0.4}>
                         <div className={styles.whyUsItem}>
-                            <div className={styles.whyUsIcon}><FeatureIcon icon={FaRocket} /></div>
-                            <h3>Cutting-Edge Tech</h3>
-                            <p>We stay ahead of the curve, utilizing the latest technologies to ensure future-proof products.</p>
+                            {/* NAYA ICON */}
+                            <div className={styles.whyUsIcon}><FeatureIcon icon={FaUserShield} /></div>
+                            {/* NAYA TITLE */}
+                            <h3>Security & Privacy by Design</h3>
+                            {/* NAYA DESCRIPTION */}
+                            <p>We treat your data and security as our highest priority. Our solutions are engineered with robust safeguards and strict privacy protocols from day one, ensuring your information is always protected.</p>
                         </div>
                     </AnimationWrapper>
                 </div>
