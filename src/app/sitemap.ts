@@ -1,8 +1,10 @@
+// src/app/sitemap.ts
+
 import { MetadataRoute } from 'next';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/firebase'; // Firebase import
 
-// Base URL defines karo
+// Base URL defines karo (Aapka confirm kiya hua domain)
 const BASE_URL = 'https://www.zorkdi.in';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -29,8 +31,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let blogRoutes: MetadataRoute.Sitemap = [];
   try {
       const blogRef = collection(db, 'blog');
-      // Saare blogs le aao (Last 50 kaafi hain sitemap ke liye)
-      const q = query(blogRef, orderBy('createdAt', 'desc'), limit(50));
+      // CHANGE: limit(50) hata diya taaki SAARE blogs Google index kare
+      const q = query(blogRef, orderBy('createdAt', 'desc'));
       const snapshot = await getDocs(q);
 
       blogRoutes = snapshot.docs.map((doc) => {
@@ -50,7 +52,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let projectRoutes: MetadataRoute.Sitemap = [];
   try {
       const portfolioRef = collection(db, 'portfolio');
-      const q = query(portfolioRef, orderBy('createdAt', 'desc'), limit(50));
+      // CHANGE: limit(50) hata diya taaki SAARE projects Google index kare
+      const q = query(portfolioRef, orderBy('createdAt', 'desc'));
       const snapshot = await getDocs(q);
 
       projectRoutes = snapshot.docs.map((doc) => {

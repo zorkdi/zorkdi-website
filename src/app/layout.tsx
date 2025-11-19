@@ -4,7 +4,7 @@
 export const revalidate = 300; 
 
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google"; // Font import
+import { Poppins } from "next/font/google"; 
 import "./globals.css";
 import Script from "next/script";
 
@@ -22,7 +22,7 @@ import { db } from '@/firebase';
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-  variable: '--font-poppins', // Variable add kiya future use ke liye
+  variable: '--font-poppins',
 });
 
 // --- Settings Interface ---
@@ -35,10 +35,10 @@ interface GlobalSettings {
   heroBackgroundURL?: string; 
 }
 
-// --- Default Values (Agar Firebase fail ho jaye) ---
+// --- Default Values ---
 const defaultSettings: GlobalSettings = {
-    websiteTitle: "ZORK DI", // Title chhota rakha taaki Google pura dikhaye
-    websiteTagline: "Empowering Ideas With Technology - Premium IT Solutions", // Tagline thodi descriptive ki
+    websiteTitle: "ZORK DI", 
+    websiteTagline: "Empowering Ideas With Technology - Premium IT Solutions", 
     headerLogoURL: "/logo.png", 
     googleAnalyticsId: "", 
     googleSearchConsoleId: "", 
@@ -49,7 +49,7 @@ const defaultSettings: GlobalSettings = {
 async function getGlobalSettings(): Promise<GlobalSettings> {
     try {
         const docRef = doc(db, 'cms', 'global_settings');
-        const docSnap = await getDoc(docRef); // Cache handling upar revalidate se hogi
+        const docSnap = await getDoc(docRef); 
 
         if (docSnap.exists()) {
             const data = docSnap.data();
@@ -63,39 +63,29 @@ async function getGlobalSettings(): Promise<GlobalSettings> {
     }
 }
 
-// --- MAJOR FIX: CORRECT METADATA GENERATION ---
+// --- METADATA GENERATION (SEO ENGINE) ---
 export async function generateMetadata(): Promise<Metadata> {
     const globalSettings = await getGlobalSettings();
     
-    // 1. Domain Fix: Google ko batana zaroori hai ki main site kaunsi hai
+    // Domain set kiya (Important for SEO)
     const siteBaseUrl = 'https://www.zorkdi.in'; 
-    
-    // --- NAYA: Vercel Environment Logic ---
-    // Yeh check karega ki site production (zorkdi.in) par hai ya preview (zorkdi.vercel.app) par
     const isProduction = process.env.VERCEL_ENV === 'production';
 
-    // 2. Favicon Logic
-    const faviconURL = (globalSettings.headerLogoURL && globalSettings.headerLogoURL.trim() !== "")
-        ? globalSettings.headerLogoURL
-        : defaultSettings.headerLogoURL;
-
     return {
-        // FIX: MetadataBase set karna zaroori hai Vercel issues ke liye
         metadataBase: new URL(siteBaseUrl),
 
         title: {
             default: globalSettings.websiteTitle,
-            template: `%s | ${globalSettings.websiteTitle}` // "Contact | ZORK DI" style
+            template: `%s | ${globalSettings.websiteTitle}` 
         },
         description: globalSettings.websiteTagline,
         
-        // FIX: Canonical URL (Ye Vercel link hatayega aur main domain layega)
+        // Canonical URL automatically generate hoga
         alternates: {
             canonical: '/',
         },
 
-        // --- NAYA: DYNAMIC ROBOTS TXT ---
-        // Agar production hai toh index karo, varna mat karo
+        // Robots.txt control
         robots: {
             index: isProduction,
             follow: isProduction,
@@ -108,7 +98,7 @@ export async function generateMetadata(): Promise<Metadata> {
             },
         },
 
-        // FIX: Open Graph (Social Media Previews ke liye)
+        // Social Media Preview (Open Graph)
         openGraph: {
             title: globalSettings.websiteTitle,
             description: globalSettings.websiteTagline,
@@ -118,7 +108,7 @@ export async function generateMetadata(): Promise<Metadata> {
             type: 'website',
             images: [
                 {
-                    url: faviconURL, // Social share par logo dikhega
+                    url: globalSettings.headerLogoURL || '/logo.png', 
                     width: 800,
                     height: 600,
                     alt: globalSettings.websiteTitle,
@@ -126,14 +116,9 @@ export async function generateMetadata(): Promise<Metadata> {
             ],
         },
 
-        // Icons (Favicon in Search Results)
-        icons: {
-            icon: faviconURL,
-            shortcut: faviconURL,
-            apple: faviconURL,
-        },
-
-        // Google Verification (Search Console)
+        // NOTE: Icons yahan se hata diye gaye hain taaki src/app/icon.png use ho.
+        
+        // Google Search Console Verification
         verification: globalSettings.googleSearchConsoleId 
             ? { google: globalSettings.googleSearchConsoleId } 
             : {},
@@ -149,7 +134,6 @@ export default async function RootLayout({
   const globalSettings = await getGlobalSettings();
   const gaId = globalSettings.googleAnalyticsId;
   
-  // Dynamic Hero Background logic
   const heroBackground = globalSettings.heroBackgroundURL 
     ? `url('${globalSettings.heroBackgroundURL}')` 
     : ''; 
@@ -158,10 +142,31 @@ export default async function RootLayout({
       '--hero-bg-image': heroBackground,
   };
 
+  // --- JSON-LD Schema (Organization) ---
+  // Yeh Google ko structured data dega
+  const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: globalSettings.websiteTitle,
+      url: 'https://www.zorkdi.in',
+      logo: 'https://www.zorkdi.in/icon.png', // Auto-detected icon ka path
+      description: globalSettings.websiteTagline,
+      address: {
+          '@type': 'PostalAddress',
+          addressCountry: 'IN', 
+      },
+  };
+
   return (
     <html lang="en">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        
+        {/* Schema Injection */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
 
       {/* Google Analytics Injection */}
@@ -185,11 +190,8 @@ export default async function RootLayout({
       <body className={poppins.className} style={heroBackground ? (customCssVars as React.CSSProperties) : undefined}>
         <AuthProvider>
           <SmoothScroll> 
-            {/* Header ko settings pass ki gayi */}
             <Header globalSettings={globalSettings} />
-
             {children}
-
             <Footer />
             <FloatingActionButtons />
           </SmoothScroll> 

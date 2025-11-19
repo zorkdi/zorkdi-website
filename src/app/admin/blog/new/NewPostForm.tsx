@@ -12,15 +12,13 @@ import {
   collection, addDoc, serverTimestamp, doc, getDoc, updateDoc, Timestamp, deleteDoc
 } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage'; 
-import { FaUpload, FaTrash, FaPlus } from 'react-icons/fa'; // Icons update kiye
+import { FaUpload, FaTrash, FaPlus, FaSearch, FaLink, FaTag } from 'react-icons/fa'; // SEO Icons add kiye
 
 // Styles
 import adminStyles from '@/app/admin/admin.module.css'; 
 import formStyles from './new-post.module.css'; // Blog specific styles
 import formCommonStyles from '@/components/AdminForms/forms.module.css'; // Common form styles
 
-
-// === YAHAN CHANGE KIYA GAYA HAI ===
 
 // Naya Interface Content Block ke liye
 interface ContentBlock {
@@ -35,15 +33,21 @@ interface ContentBlock {
   uploadProgress?: number | null;
 }
 
-// Blog Post Data structure update kiya
+// Blog Post Data structure update kiya (SEO FIELDS ADDED)
 interface BlogPostData {
   title: string;
   slug: string; 
   category: string;
-  contentBlocks: ContentBlock[]; // <-- Add kiya
+  contentBlocks: ContentBlock[]; 
   coverImageURL: string;
   isPublished: boolean; 
-  metaDescription: string; // <-- NAYA SEO FIELD
+  
+  // --- SEO ENGINE FIELDS (New) ---
+  seoTitle: string;
+  metaDescription: string; 
+  focusKeywords: string;
+  canonicalUrl: string;
+  
   createdAt?: Timestamp; 
 }
 
@@ -60,7 +64,12 @@ const initialData: BlogPostData = {
     contentBlocks: [], 
     coverImageURL: '',
     isPublished: false, 
-    metaDescription: '', // <-- NAYA SEO FIELD
+    
+    // SEO Defaults
+    seoTitle: '',
+    metaDescription: '', 
+    focusKeywords: '',
+    canonicalUrl: '',
 };
 
 const NewPostForm = ({ postId }: NewPostFormProps) => {
@@ -91,11 +100,15 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
           if (docSnap.exists()) {
             const data = docSnap.data() as BlogPostData;
             setFormData({ 
-                ...initialData, // Default se merge kiya taaki naye fields (metaDesc) bhi aa jayein
+                ...initialData, // Default se merge kiya
                 ...data, 
                 isPublished: data.isPublished ?? false,
                 contentBlocks: data.contentBlocks || [],
-                metaDescription: data.metaDescription || '', // Naya field load kiya
+                // SEO Fields Load karna
+                seoTitle: data.seoTitle || '',
+                metaDescription: data.metaDescription || '',
+                focusKeywords: data.focusKeywords || '',
+                canonicalUrl: data.canonicalUrl || '',
             }); 
             setImagePreview(data.coverImageURL);
           } else {
@@ -324,15 +337,25 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
           });
       }
 
+      // Auto-generate slug if not present
+      const finalSlug = formData.slug || formData.title.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-');
+      // Fallback for SEO Title
+      const finalSeoTitle = formData.seoTitle || formData.title;
+
       // 3. Firestore Data Save
       const postData = {
           title: formData.title,
-          slug: formData.slug || formData.title.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-'),
+          slug: finalSlug,
           category: formData.category,
           coverImageURL: finalCoverImageURL,
           isPublished: formData.isPublished,
           contentBlocks: uploadedBlocks,
-          metaDescription: formData.metaDescription, // <-- NAYA SEO FIELD
+          
+          // SEO Data Save
+          seoTitle: finalSeoTitle,
+          metaDescription: formData.metaDescription,
+          focusKeywords: formData.focusKeywords,
+          canonicalUrl: formData.canonicalUrl,
       };
 
       if (isEditMode && postId) {
@@ -350,7 +373,6 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
       router.push('/admin/blog');
 
     } catch (error: unknown) { 
-      // Error state ko set karna warning hatane ke liye
       const newError = error instanceof Error ? error.message : "Failed to save post data. Check console.";
       setError(newError);
       console.error(newError, error);
@@ -378,7 +400,7 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
       
       <div className={formStyles.formWrapper}>
         
-        {/* === LEFT COLUMN: METADATA, COVER IMAGE === */}
+        {/* === LEFT COLUMN: METADATA, COVER IMAGE, SEO === */}
         <div className={formStyles.metadataColumn}>
           
           <div className={formCommonStyles.formSection} style={{padding: '2rem'}}>
@@ -392,11 +414,68 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
                     onChange={handleStatusChange}
                     required 
                 >
-                    <option value="Draft">Draft</option>
-                    <option value="Published">Published</option>
+                    <option value="Draft">Draft (Hidden)</option>
+                    <option value="Published">Published (Live)</option>
                 </select>
               </div>
           </div>
+
+          {/* === SEO ENGINE (NEW SECTION ADDED HERE) === */}
+          <div className={formCommonStyles.formSection} style={{padding: '2rem', border: '1px solid var(--color-neon-green)'}}>
+              <h3 className={formStyles.sectionHeader} style={{color: 'var(--color-neon-green)', display: 'flex', alignItems: 'center', gap: '10px'}}>
+                  <FaSearch /> SEO Engine™
+              </h3>
+              
+              <div className={formStyles.formGroup}>
+                  <label style={{fontSize: '0.9rem'}}>SEO Title (Google Blue Link)</label>
+                  <input 
+                      type="text" 
+                      name="seoTitle" 
+                      value={formData.seoTitle} 
+                      onChange={handleInputChange} 
+                      placeholder={formData.title || "Same as Post Title"}
+                      className={formStyles.input}
+                  />
+                  <p className={formStyles.fieldDescription}>Ideally 50-60 characters.</p>
+              </div>
+
+              <div className={formStyles.formGroup}>
+                  <label style={{fontSize: '0.9rem'}}>Meta Description (Summary)</label>
+                  <textarea 
+                      name="metaDescription" 
+                      value={formData.metaDescription} 
+                      onChange={handleInputChange} 
+                      rows={3} 
+                      maxLength={160} 
+                      placeholder="Summary for search results..."
+                  />
+                  <p className={formStyles.fieldDescription}>{formData.metaDescription.length}/160 characters.</p>
+              </div>
+
+              <div className={formStyles.formGroup}>
+                  <label style={{fontSize: '0.9rem'}}><FaTag /> Focus Keywords</label>
+                  <input 
+                      type="text" 
+                      name="focusKeywords" 
+                      value={formData.focusKeywords} 
+                      onChange={handleInputChange} 
+                      placeholder="e.g. React, SEO, Web Dev"
+                  />
+                  <p className={formStyles.fieldDescription}>Comma separated.</p>
+              </div>
+
+              <div className={formStyles.formGroup}>
+                  <label style={{fontSize: '0.9rem'}}><FaLink /> Canonical URL (Optional)</label>
+                  <input 
+                      type="text" 
+                      name="canonicalUrl" 
+                      value={formData.canonicalUrl} 
+                      onChange={handleInputChange} 
+                      placeholder="https://..."
+                  />
+              </div>
+          </div>
+          {/* === END SEO ENGINE === */}
           
           <div className={formCommonStyles.formSection} style={{padding: '2rem'}}>
               <h3 className={formStyles.sectionHeader}>2. Cover Image *</h3>
@@ -449,23 +528,6 @@ const NewPostForm = ({ postId }: NewPostFormProps) => {
                         <option>BUSINESS</option>
                     </select>
                   </div>
-                  
-                  {/* === YAHAN CHANGE KIYA GAYA HAI (rows="4") === */}
-                  <div className={`${formStyles.formGroup} ${formStyles.fullWidthInGrid}`}>
-                    <label htmlFor="metaDescription">SEO Meta Description</label>
-                    <textarea
-                      id="metaDescription"
-                      name="metaDescription"
-                      value={formData.metaDescription}
-                      onChange={handleInputChange}
-                      rows={4}
-                      placeholder="Google search results mein dikhne wala text (max 160 characters)"
-                      maxLength={160}
-                    />
-                     <p className={formStyles.fieldDescription}>Character Count: {formData.metaDescription.length} / 160</p>
-                  </div>
-                  {/* === END OF CHANGE === */}
-
               </div>
           </div>
           
