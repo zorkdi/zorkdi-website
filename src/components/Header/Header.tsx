@@ -158,65 +158,55 @@ const Header = ({ globalSettings }: HeaderProps) => {
             Start a Project
           </Link>
           
-          {!authLoading && (
-              <>
-                  {/* Mobile CTA Button Hidden on Desktop */}
-                  <Link 
-                      href="/new-project" 
-                      className={`${styles.headerButtonBase} ${styles.primaryCtaButton} ${styles.mobileCtaButtonVisible}`} 
-                      style={{ display: 'none' }} 
-                  >
-                      Start a Project
-                  </Link>
-              
-                  <div className={styles.profileMenuContainer} ref={profileMenuRef}>
-                    
-                    {currentUser && userProfile?.photoURL ? (
-                      <Image 
-                        src={userProfile.photoURL} 
-                        alt="Profile" 
-                        width={40} 
-                        height={40} 
-                        className={styles.profileImage}
-                        onClick={() => setProfileMenuOpen(!profileMenuOpen)} 
-                      />
-                    ) : (
-                      <button 
-                        className={styles.profileIcon} 
-                        onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                        aria-label="Profile menu"
-                      >
-                        <FaUserCircle /> 
-                      </button>
+          {/* FIX: Removed the !authLoading wrapper so container always renders */}
+          <div className={styles.profileMenuContainer} ref={profileMenuRef}>
+            
+            {/* Logic: Agar Loading hai YA User nahi hai -> Default Icon Dikhao */}
+            {/* Agar User hai aur Photo hai -> Photo Dikhao */}
+            
+            {!authLoading && currentUser && userProfile?.photoURL ? (
+                <Image 
+                src={userProfile.photoURL} 
+                alt="Profile" 
+                width={40} 
+                height={40} 
+                className={styles.profileImage}
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)} 
+                />
+            ) : (
+                /* Loading ke time bhi yehi icon dikhega taaki layout na toote */
+                <button 
+                className={styles.profileIcon} 
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                aria-label="Profile menu"
+                >
+                <FaUserCircle /> 
+                </button>
+            )}
+            
+            {profileMenuOpen && (
+                <div className={styles.profileDropdown}>
+                {currentUser ? (
+                    <ul>
+                    {userProfile?.email === 'admin@zorkdi.com' && (
+                        <li><Link href="/admin" onClick={closeMenus}>Admin Dashboard</Link></li>
                     )}
-                    
-                    {profileMenuOpen && (
-                      <div className={styles.profileDropdown}>
-                        {currentUser ? (
-                          <ul>
-                            {userProfile?.email === 'admin@zorkdi.com' && (
-                                <li><Link href="/admin" onClick={closeMenus}>Admin Dashboard</Link></li>
-                            )}
-                            <li><Link href="/profile" onClick={closeMenus}>My Profile</Link></li>
-                            <li><Link href="/my-projects" onClick={closeMenus}>My Projects</Link></li>
-                            <li><button onClick={handleLogout}>Logout</button></li>
-                          </ul>
-                        ) : (
-                          <ul>
-                            {/* --- UPDATE: Removed separate Sign Up link --- */}
-                            <li><Link href="/login" onClick={closeMenus}>Login / Sign Up</Link></li>
-                          </ul>
-                        )}
-                      </div>
-                    )}
-                  </div>
-              </>
-          )}
+                    <li><Link href="/profile" onClick={closeMenus}>My Profile</Link></li>
+                    <li><Link href="/my-projects" onClick={closeMenus}>My Projects</Link></li>
+                    <li><button onClick={handleLogout}>Logout</button></li>
+                    </ul>
+                ) : (
+                    <ul>
+                    <li><Link href="/login" onClick={closeMenus}>Login / Sign Up</Link></li>
+                    </ul>
+                )}
+                </div>
+            )}
+          </div>
         </div>
       </div>
 
       <div className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ''}`}>
-          
           <nav>
             <ul className={styles.mobileNavLinks}>
               <li><Link href="/services" onClick={closeMenus}>Services</Link></li>
