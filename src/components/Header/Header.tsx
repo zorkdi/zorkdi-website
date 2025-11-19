@@ -1,4 +1,4 @@
-// components/Header/Header.tsx
+// src/components/Header/Header.tsx
 
 "use client";
 
@@ -12,23 +12,21 @@ import { FaUserCircle } from "react-icons/fa";
 import { useAuth } from '../../context/AuthContext'; 
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
-// === YAHAN SE 'db' AUR 'getDoc' HATA DIYA GAYA HAI ===
 
 // Global settings data type
 interface BrandingData {
   websiteTitle: string;
   websiteTagline: string; 
-  headerLogoURL: string; // Logo ke liye field
+  headerLogoURL: string; 
 }
 
 // Default/Fallback values
 const defaultBranding: BrandingData = {
     websiteTitle: "ZORK DI",
     websiteTagline: "Empowering Ideas With Technology",
-    headerLogoURL: "/logo.png", // Default logo
+    headerLogoURL: "/logo.png", 
 };
 
-// === YAHAN CHANGE KIYA GAYA HAI (Props receive karne ke liye) ===
 interface HeaderProps {
     globalSettings: BrandingData;
 }
@@ -37,17 +35,11 @@ const Header = ({ globalSettings }: HeaderProps) => {
   const { currentUser, userProfile, loading: authLoading } = useAuth(); 
   const router = useRouter();
   
-  // === YAHAN CHANGE KIYA GAYA HAI (const add kiya) ===
   const [menuOpen, setMenuOpen] = useState(false);
-
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   
-  // === YAHAN CHANGE KIYA GAYA HAI ===
-  // 'branding' state, 'brandingLoading' state, aur 'fetchBranding' useEffect ko poori tarah HATA diya gaya hai
-  // Hum ab 'globalSettings' prop ko direct use karenge
   const branding = globalSettings || defaultBranding;
-  // ===================================
 
   // Function to close both menus
   const closeMenus = () => {
@@ -80,16 +72,16 @@ const Header = ({ globalSettings }: HeaderProps) => {
     // Esc Key Handler
     const handleEsc = (event: KeyboardEvent) => {
         if (event.key === 'Escape') {
-            closeMenus(); // Dono menus ko close karo
+            closeMenus(); 
         }
     };
     
     document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEsc); // Esc key listener add kiya
+    document.addEventListener("keydown", handleEsc); 
     
     return () => {
         document.removeEventListener("mousedown", handleClickOutside);
-        document.removeEventListener("keydown", handleEsc); // Cleanup
+        document.removeEventListener("keydown", handleEsc); 
     };
   }, [profileMenuRef]);
 
@@ -97,28 +89,24 @@ const Header = ({ globalSettings }: HeaderProps) => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      closeMenus(); // Updated to use closeMenus
+      closeMenus(); 
       router.push('/login');
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
 
-  // === YAHAN CHANGE KIYA GAYA HAI ===
-  // Nayi logic yeh check karegi ki logoURL valid hai ya nahi
-  // 'brandingLoading' state ab nahi hai, toh check hata diya
   const logoSrc = (branding.headerLogoURL && branding.headerLogoURL.trim() !== "") 
-        ? branding.headerLogoURL // Agar valid hai, toh database wala URL use karo
-        : defaultBranding.headerLogoURL; // Agar khaali hai, toh default URL use karo
+        ? branding.headerLogoURL 
+        : defaultBranding.headerLogoURL; 
 
   return (
     <header className={styles.header}>
       <div className={styles.container}>
         <div className={styles.logo}>
           <Link href="/">
-            {/* === YAHAN CHANGE KIYA GAYA HAI === */}
             <Image
-              src={logoSrc} // Naya variable yahan use kiya
+              src={logoSrc} 
               alt={`${branding.websiteTitle} Logo`}
               width={55} 
               height={55}
@@ -126,8 +114,6 @@ const Header = ({ globalSettings }: HeaderProps) => {
               className={styles.logoImage}
             />
             <div className={styles.logoTextContainer}>
-              {/* Dynamic Brand Name and Tagline */}
-              {/* === YAHAN CHANGE KIYA GAYA HAI ('brandingLoading' check hataya) === */}
               <span className={styles.brandName}>
                  {branding.websiteTitle}
               </span>
@@ -143,7 +129,6 @@ const Header = ({ globalSettings }: HeaderProps) => {
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
         >
-            {/* NAYA: Icon change hoga state ke basis pe */}
             {menuOpen ? <CgClose /> : <CgMenuRight />}
         </button>
 
@@ -159,7 +144,6 @@ const Header = ({ globalSettings }: HeaderProps) => {
 
         <div className={styles.rightControls}>
           
-          {/* === FIX: NAYA BUTTON STYLE APPLY KIYA === */}
           <Link 
             href="/contact" 
             className={`${styles.headerButtonBase} ${styles.secondaryCtaButton}`}
@@ -167,7 +151,6 @@ const Header = ({ globalSettings }: HeaderProps) => {
             Contact
           </Link>
           
-          {/* === FIX: NAYA BUTTON STYLE APPLY KIYA === */}
           <Link 
             href="/new-project" 
             className={`${styles.headerButtonBase} ${styles.primaryCtaButton}`}
@@ -177,11 +160,11 @@ const Header = ({ globalSettings }: HeaderProps) => {
           
           {!authLoading && (
               <>
-                  {/* YEH LINK AB CSS SE HIDE/SHOW HOGA (Tablet/Mobile) */}
+                  {/* Mobile CTA Button Hidden on Desktop */}
                   <Link 
                       href="/new-project" 
                       className={`${styles.headerButtonBase} ${styles.primaryCtaButton} ${styles.mobileCtaButtonVisible}`} 
-                      style={{ display: 'none' }} /* Extra safety */
+                      style={{ display: 'none' }} 
                   >
                       Start a Project
                   </Link>
@@ -220,8 +203,8 @@ const Header = ({ globalSettings }: HeaderProps) => {
                           </ul>
                         ) : (
                           <ul>
-                            <li><Link href="/login" onClick={closeMenus}>Login</Link></li>
-                            <li><Link href="/signup" onClick={closeMenus}>Sign Up</Link></li>
+                            {/* --- UPDATE: Removed separate Sign Up link --- */}
+                            <li><Link href="/login" onClick={closeMenus}>Login / Sign Up</Link></li>
                           </ul>
                         )}
                       </div>
@@ -232,14 +215,7 @@ const Header = ({ globalSettings }: HeaderProps) => {
         </div>
       </div>
 
-      {/* NAYA CHANGE: Mobile menu ab hamesha DOM mein rahega 
-        aur visibility 'mobileMenuOpen' class se control hogi.
-      */}
       <div className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ''}`}>
-          
-          {/* FIX: Duplicate close button yahan se HATA diya gaya hai.
-              Ab sirf header wala button hi icon change karega.
-          */}
           
           <nav>
             <ul className={styles.mobileNavLinks}>

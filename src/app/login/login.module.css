@@ -1,145 +1,368 @@
-/* Main container to center the form */
+/* src/app/login/login.module.css */
+
+/* --- NEW: VIDEO BACKGROUND STYLES --- */
+.videoBackground {
+  /* CHANGE: 'fixed' se 'absolute' kiya taaki video scroll ke saath move kare */
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  
+  /* Opacity wahi rakhi hai jo blend hone ke liye set ki thi */
+  opacity: 0.3; 
+  
+  z-index: -2; /* Content ke peeche */
+}
+
+.videoOverlay {
+  /* CHANGE: Overlay ko bhi 'absolute' kiya taaki video ke saath rahe */
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  /* Overlay Color & Blur (Aesthetic Feel) */
+  background: rgba(10, 11, 15, 0.4); 
+  backdrop-filter: blur(8px); 
+  -webkit-backdrop-filter: blur(8px);
+  
+  z-index: -1; 
+}
+
+/* --- EXISTING STYLES --- */
+
 .main {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 80vh; 
+  min-height: 100vh; 
   padding: 4rem 2rem;
+  
+  /* CHANGE: 'relative' aur 'overflow: hidden' add kiya */
+  /* Isse video sirf isi section ke andar rahega, footer par nahi chadhega */
+  position: relative;
+  overflow: hidden; 
+  
+  z-index: 1; 
 }
 
-/* The box containing the form */
 .formContainer {
   width: 100%;
-  max-width: 450px;
-  /* NAYA: Glassmorphism Effect */
-  background-color: var(--color-glass-dark);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  padding: 3rem;
-  border-radius: 16px; /* Thoda zyada rounded */
-  border: 1px solid var(--color-glass-light);
+  max-width: 420px;
+  /* Solid Dark Card Style */
+  background-color: rgba(10, 11, 15, 0.95); 
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 3rem 2rem; 
+  border-radius: 24px; 
+  border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
-  /* NAYA: Subtle depth shadow */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+  position: relative;
 }
 
 .formContainer h1 {
-  font-size: 2rem;
-  margin-bottom: 0.75rem;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
   color: var(--color-neon-green);
+  font-weight: 700;
 }
 
 .formContainer p {
-  opacity: 0.8;
-  margin-bottom: 2.5rem;
+  opacity: 0.7;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-/* The form itself */
-.loginForm {
+.backButton {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  background: none;
+  border: none;
+  color: var(--color-off-white);
+  font-size: 1.2rem;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.backButton:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-neon-green);
+}
+
+.authForm {
   display: flex;
   flex-direction: column;
   text-align: left;
+  gap: 1.5rem; 
 }
 
 .formGroup {
-  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  position: relative; 
 }
 
 .formGroup label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  opacity: 0.8;
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.9;
+  margin-left: 0.8rem; 
+  color: var(--color-off-white);
 }
 
-.formGroup input {
-  width: 100%;
-  padding: 1rem;
-  /* NAYA: Deep-blue input background */
+/* --- PILL SHAPE INPUT WRAPPER (Phone/Email) --- */
+.inputWrapper {
+  display: flex;
+  align-items: center;
   background-color: var(--color-deep-blue); 
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
+  border-radius: 50px; 
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+  height: 56px; 
+  padding-right: 1rem;
+}
+
+.inputWrapper:focus-within {
+  border-color: var(--color-neon-green);
+  box-shadow: 0 0 20px rgba(0, 245, 200, 0.25);
+  background-color: #0f1119;
+}
+
+/* --- ANIMATED DROPDOWN LOGIC --- */
+.countrySelectWrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
+}
+
+.countrySelectWrapper.visible {
+  max-width: 110px; 
+  opacity: 1;
+}
+
+.countrySelect {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: transparent;
+  color: var(--color-neon-green);
+  border: none;
+  padding: 0 0.5rem 0 1.2rem; 
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  height: 100%;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.countrySelect option {
+    background-color: #10121A;
+    color: white;
+}
+
+/* Main Input */
+.inputWrapper input {
+  flex: 1;
+  padding: 1rem 1.2rem;
+  background: transparent;
+  border: none;
+  color: var(--color-off-white);
+  font-size: 1.05rem;
+  font-family: inherit;
+  width: 100%;
+  height: 100%;
+}
+.inputWrapper input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+.inputWrapper input:focus {
+  outline: none;
+}
+
+/* --- NEW: PASSWORD INPUT WRAPPER --- */
+.passwordInputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.passwordInputWrapper input.standardInput {
+    width: 100%;
+    padding-right: 3rem; 
+}
+
+/* Eye Button Styling */
+.eyeButton {
+    position: absolute;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--color-off-white);
+    opacity: 0.6;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease, color 0.2s ease;
+    z-index: 10;
+    padding: 5px; 
+}
+.eyeButton:hover {
+    opacity: 1;
+    color: var(--color-neon-green);
+}
+
+
+/* --- STANDARD INPUTS (Name/Pass) --- */
+.formGroup input.standardInput {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background-color: var(--color-deep-blue); 
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
   color: var(--color-off-white);
   font-size: 1rem;
   font-family: inherit;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
 }
-
-.formGroup input:focus {
+.formGroup input.standardInput:focus {
   outline: none;
-  /* NAYA: Neon focus border aur glow */
   border-color: var(--color-neon-green);
-  box-shadow: 0 0 5px var(--color-neon-light);
+  box-shadow: 0 0 15px rgba(0, 245, 200, 0.2);
 }
 
-/* Error message styling */
-.errorText {
-  color: #ff4757;
-  background-color: rgba(255, 71, 87, 0.1);
-  padding: 0.75rem;
-  border-radius: 6px;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-/* Submit button styling */
+/* --- BUTTONS (PILL SHAPE) --- */
 .submitButton {
+  width: 100%;
   padding: 1rem;
+  margin-top: 0.5rem;
   background-color: var(--color-neon-green);
   color: var(--color-dark-navy);
   font-weight: 700;
-  border-radius: 8px;
+  border-radius: 50px;
   border: none;
   cursor: pointer;
   font-size: 1.1rem;
-  /* NAYA: Neon Glow */
-  box-shadow: 0 0 15px rgba(0, 245, 200, 0.5);
+  box-shadow: 0 0 20px rgba(0, 245, 200, 0.3);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin-top: 1rem; /* Added margin-top to make space for forgot password link */
 }
-
 .submitButton:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 5px 20px rgba(0, 245, 200, 0.7);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 245, 200, 0.5);
 }
 .submitButton:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-/* "Don't have an account?" link */
-.signupLink {
-  margin-top: 2rem;
-  opacity: 0.8;
-}
-
-.signupLink a {
-  color: var(--color-neon-green);
+.googleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 1rem;
+  background-color: white;
+  color: #1a1a1a;
   font-weight: 600;
-  text-decoration: none;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.signupLink a:hover {
-    text-decoration: underline;
+.googleButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.15);
 }
 
-/* === YAHAN NAYI CLASS ADD KI HAI === */
-.forgotPasswordLink {
-  display: block;
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 2rem 0;
+  opacity: 0.4;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--color-off-white);
+}
+.divider span {
+  padding: 0 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.forgotPassword {
   text-align: right;
-  margin-top: -0.5rem; /* Form group ke margin ke upar pull karega */
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  margin-top: -0.5rem;
+  margin-right: 0.5rem;
 }
-
-.forgotPasswordLink a {
+.forgotPassword button {
   color: var(--color-neon-light);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   opacity: 0.8;
+  font-family: inherit;
+  font-size: inherit;
   text-decoration: none;
 }
-
-.forgotPasswordLink a:hover {
+.forgotPassword button:hover {
   opacity: 1;
   text-decoration: underline;
+}
+
+.errorText {
+  color: #ff5b5b;
+  background-color: rgba(255, 71, 87, 0.1);
+  padding: 0.8rem;
+  border-radius: 12px;
+  margin-bottom: 1.2rem;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 71, 87, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.successText {
+  color: var(--color-neon-green);
+  background-color: rgba(0, 245, 200, 0.1);
+  padding: 0.8rem;
+  border-radius: 12px;
+  margin-bottom: 1.2rem;
+  font-size: 0.9rem;
+  border: 1px solid rgba(0, 245, 200, 0.2);
 }
