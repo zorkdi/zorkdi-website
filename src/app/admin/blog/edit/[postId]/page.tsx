@@ -2,19 +2,22 @@
 
 "use client"; 
 
-import NewPostForm from '@/app/admin/blog/new/NewPostForm'; // NAYA: NewPostForm component use kiya
+import { use } from 'react'; // NAYA: 'use' hook import kiya params unwrap karne ke liye
+import NewPostForm from '@/app/admin/blog/new/NewPostForm'; 
 
-// Props for the component
+// Props definition update kiya Next.js 15 ke hisaab se
+// Params ab ek Promise hai
 interface EditPostPageProps {
-  params: {
-      postId: string; // ID for edit mode
-  }
+  params: Promise<{
+      postId: string; 
+  }>
 }
 
 const AdminEditPostPage = ({ params }: EditPostPageProps) => {
-  const { postId } = params;
+  // NAYA: Params ko 'use' hook se unwrap kiya (Next.js 15 Requirement)
+  // Isse woh error "params.postId accessed directly" chala jayega
+  const { postId } = use(params);
 
-  // FIX: Saara logic NewPostForm mein hai, isko sirf render karo
   return (
     <NewPostForm postId={postId} />
   );

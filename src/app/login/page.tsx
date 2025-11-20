@@ -52,7 +52,7 @@ export default function LoginPage() {
     
     // UI Control
     const [isPhoneDetected, setIsPhoneDetected] = useState(false);
-    const [showPassword, setShowPassword] = useState(false); // NEW: Toggle Password Visibility
+    const [showPassword, setShowPassword] = useState(false); // Toggle Password Visibility
     
     // Final processing
     const [finalIdentity, setFinalIdentity] = useState(''); 
@@ -122,7 +122,8 @@ export default function LoginPage() {
                     authProvider: 'google'
                 });
             }
-            router.push('/profile'); 
+            // CHANGE: Redirect to Home instead of Profile
+            router.push('/'); 
 
         } catch (error: unknown) {
             const err = error as FirebaseError;
@@ -229,11 +230,13 @@ export default function LoginPage() {
                 // --- LOGIN FLOW ---
                 if (authMode === 'email') {
                     await signInWithEmailAndPassword(auth, finalIdentity, password);
-                    router.push('/profile');
+                    // CHANGE: Redirect to Home instead of Profile
+                    router.push('/');
                 } else {
                     if (!confirmationResult) throw new Error("No OTP session");
                     await confirmationResult.confirm(otp);
-                    router.push('/profile');
+                    // CHANGE: Redirect to Home instead of Profile
+                    router.push('/');
                 }
             } else {
                 // --- SIGNUP FLOW ---
@@ -268,7 +271,9 @@ export default function LoginPage() {
                     createdAt: new Date().toISOString(),
                     authProvider: authMode
                 });
-                router.push('/profile');
+                
+                // CHANGE: Redirect to Home instead of Profile
+                router.push('/');
             }
         } catch (error: unknown) {
             const err = error as FirebaseError;
@@ -494,7 +499,7 @@ export default function LoginPage() {
                 playsInline 
                 className={styles.videoBackground}
             >
-                {/* IMPORTANT: Apne folder mein is naam ki video rakhna */}
+                {/* IMPORTANT: Keep a video file with this name in your public/videos folder */}
                 <source src="/videos/login-bg.mp4" type="video/mp4" />
             </video>
             <div className={styles.videoOverlay}></div>

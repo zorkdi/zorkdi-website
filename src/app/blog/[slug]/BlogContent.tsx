@@ -4,15 +4,16 @@
 
 import Image from 'next/image';
 import { db } from '@/firebase';
-import { Timestamp, collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore'; 
+// CHANGE: 'updateDoc' aur 'increment' import kiya views badhane ke liye
+import { Timestamp, collection, query, where, getDocs, limit, doc, getDoc, updateDoc, increment } from 'firebase/firestore'; 
 import styles from '@/app/blog/[slug]/blog-detail.module.css'; 
-import { useEffect, useState } from 'react'; 
+import { useEffect, useState, useRef } from 'react'; 
 import React from 'react';
-import { FaCalendarAlt, FaTag, FaSpinner } from 'react-icons/fa'; 
+import { FaCalendarAlt, FaTag, FaSpinner, FaEye } from 'react-icons/fa'; // FaEye bhi import kiya (optional agar public dikhana ho, par abhi logic ke liye hai)
 import Link from 'next/link';
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper'; 
 
-// Naya Interface Content Block ke liye
+// Interface Content Block ke liye
 interface ContentBlock {
   id: string;
   headline: string;
@@ -21,19 +22,20 @@ interface ContentBlock {
   layout: 'text-left-image-right' | 'image-left-text-right' | 'text-only' | 'image-only';
 }
 
-// Blog Post structure update kiya
+// Blog Post structure
 interface BlogPost {
   title: string;
   category: string;
-  contentBlocks: ContentBlock[]; // 'content' ko 'contentBlocks' se badla
+  contentBlocks: ContentBlock[]; 
   coverImageURL: string;
   createdAt: Timestamp | null;
   isPublished: boolean; 
+  views?: number; // View count field add kiya (optional in interface)
 }
 
 // Props interface
 interface BlogContentProps {
-  slug: string; // Slug jo Server Component se aayega
+  slug: string; 
 }
 
 // Helper function jo text ko paragraphs mein badlega
@@ -48,6 +50,9 @@ const renderTextWithParagraphs = (text: string) => {
 const BlogContent = ({ slug }: BlogContentProps) => {
     const [post, setPost] = useState<BlogPost | null>(null); 
     const [isLoading, setIsLoading] = useState(true);
+    
+    // NEW: Ref to track if view has been counted in this session/render to avoid double counting
+    const viewCountedRef = useRef(false);
 
     // Fetch data function
     const getBlogPostBySlug = async (postSlug: string): Promise<BlogPost | null> => {
@@ -64,6 +69,7 @@ const BlogContent = ({ slug }: BlogContentProps) => {
         
         if (querySnapshot.empty) {
             try {
+                // Try fetching by ID if slug fails
                 const docRef = doc(db, 'blog', postSlug);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
@@ -76,7 +82,7 @@ const BlogContent = ({ slug }: BlogContentProps) => {
                 console.error("Not found by slug, and failed to find by ID:", idError);
                 return null;
             }
-            return null; // Dono se nahi mila
+            return null; 
         }
 
         const docSnap = querySnapshot.docs[0];
@@ -91,16 +97,58 @@ const BlogContent = ({ slug }: BlogContentProps) => {
       }
     }
 
+    // --- MAIN EFFECT ---
     useEffect(() => {
         if (slug) {
             getBlogPostBySlug(slug).then(fetchedPost => {
                 setPost(fetchedPost);
                 setIsLoading(false);
+                
+                // === NEW: VIEW COUNT LOGIC ===
+                // Agar post exist karta hai aur abhi tak count nahi kiya hai
+                if (fetchedPost && !viewCountedRef.current) {
+                    viewCountedRef.current = true; // Mark as counted
+                    
+                    // Background mein view increment karo
+                    // Note: Hum doc ID dhoondhne ke liye fir se logic lagayenge
+                    // Kyunki fetchedPost mein ID nahi hai, hum slug query ya direct ID use karenge
+                    incrementViewCount(slug);
+                }
             })
         } else {
             setIsLoading(false);
         }
     }, [slug]);
+
+    // Helper Function: Increment View
+    const incrementViewCount = async (postSlug: string) => {
+        try {
+            // Pehle check karo slug se doc ID kya hai
+            const blogCollectionRef = collection(db, 'blog');
+            const q = query(blogCollectionRef, where('slug', '==', postSlug), limit(1));
+            const querySnapshot = await getDocs(q);
+
+            let docRef;
+
+            if (!querySnapshot.empty) {
+                // Agar slug se mila
+                const docId = querySnapshot.docs[0].id;
+                docRef = doc(db, 'blog', docId);
+            } else {
+                // Agar slug se nahi mila, toh shayad postSlug hi ID hai
+                docRef = doc(db, 'blog', postSlug);
+            }
+
+            // Firebase atomic increment (Safe & Accurate)
+            await updateDoc(docRef, {
+                views: increment(1)
+            });
+            // console.log("View counted for:", postSlug); // Debugging ke liye
+        } catch (error) {
+            console.error("Error incrementing view count:", error);
+            // View count fail hone par UI block nahi hona chahiye, isliye silent catch
+        }
+    };
 
 
     // Helper for formatting date
@@ -111,7 +159,6 @@ const BlogContent = ({ slug }: BlogContentProps) => {
     }
 
     if (isLoading) {
-        // Loading state
         return (
             <main className={styles.main} style={{textAlign: 'center', minHeight: '80vh', paddingTop: '10rem'}}>
                 <div style={{color: 'var(--color-neon-green)', fontSize: '2rem'}}>
@@ -123,7 +170,6 @@ const BlogContent = ({ slug }: BlogContentProps) => {
     }
 
     if (!post) {
-        // Custom 404 UI
         return (
             <main className={styles.main} style={{textAlign: 'center', minHeight: '80vh', paddingTop: '10rem'}}>
                 <h1 style={{color: '#ff4757', fontSize: '3rem'}}>404 - Post Not Found</h1>
@@ -162,10 +208,13 @@ const BlogContent = ({ slug }: BlogContentProps) => {
                 <div className={styles.postMeta}>
                     <span style={{ color: 'var(--color-neon-green)' }}><FaTag style={{marginRight: '0.5rem'}}/>{post.category || 'TUTORIAL'}</span>
                     <span><FaCalendarAlt style={{marginRight: '0.5rem'}}/> Published on: {formatDate(post.createdAt)}</span>
+                    
+                    {/* Agar aap chahein toh yahan bhi views dikha sakte hain, par aapne sirf Admin panel ka bola hai isliye main yahan hide rakh raha hoon */}
+                    {/* <span><FaEye style={{marginRight: '0.5rem'}}/> {post.views || 0} Views</span> */}
                 </div>
             </AnimationWrapper>
 
-            {/* Naya Content Blocks Renderer */}
+            {/* Content Blocks Renderer */}
             <div className={styles.postContent}>
                 {(post.contentBlocks || []).map((block, index) => {
                     
@@ -173,7 +222,6 @@ const BlogContent = ({ slug }: BlogContentProps) => {
                     const hasImage = block.imageURL && block.imageURL.trim() !== '';
                     const hasHeadline = block.headline && block.headline.trim() !== '';
 
-                    // Block ke text content ko render karna
                     const textContent = (
                         <div className={styles.textBlock}>
                             <AnimationWrapper delay={index * 0.1}>
@@ -183,7 +231,6 @@ const BlogContent = ({ slug }: BlogContentProps) => {
                         </div>
                     );
                     
-                    // Block ke image content ko render karna
                     const imageContent = (
                         <div className={styles.imageBlock}>
                             <AnimationWrapper delay={index * 0.1 + 0.1}>
@@ -200,10 +247,6 @@ const BlogContent = ({ slug }: BlogContentProps) => {
                         </div>
                     );
 
-                    // === YAHAN CHANGE KIYA GAYA HAI ===
-                    // Ab hum 'className' ko 'div' par laga rahe hain
-                    // Aur element order ko change kar rahe hain
-                    
                     switch (block.layout) {
                         case 'text-left-image-right':
                             return (

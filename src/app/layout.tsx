@@ -15,6 +15,9 @@ import { AuthProvider } from "../context/AuthContext";
 import FloatingActionButtons from "../components/FloatingActionButtons/FloatingActionButtons"; 
 import SmoothScroll from "../components/SmoothScroll"; 
 
+// NEW IMPORT: Profile Reminder Component
+import ProfileCompletionReminder from "../components/ProfileCompletionReminder/ProfileCompletionReminder";
+
 // Firebase Imports
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
@@ -115,8 +118,6 @@ export async function generateMetadata(): Promise<Metadata> {
                 }
             ],
         },
-
-        // NOTE: Icons yahan se hata diye gaye hain taaki src/app/icon.png use ho.
         
         // Google Search Console Verification
         verification: globalSettings.googleSearchConsoleId 
@@ -194,6 +195,8 @@ export default async function RootLayout({
             {children}
             <Footer />
             <FloatingActionButtons />
+            {/* NEW: Added Profile Reminder here */}
+            <ProfileCompletionReminder />
           </SmoothScroll> 
         </AuthProvider>
       </body>

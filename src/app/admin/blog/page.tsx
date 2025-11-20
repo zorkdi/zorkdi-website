@@ -4,12 +4,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-// FIX: useRouter import ki zaroorat nahi hai
 import { db } from '@/firebase';
-import { collection, query, onSnapshot, orderBy, Timestamp } from 'firebase/firestore'; // FIX: Unused 'where' ko hata diya
+import { collection, query, onSnapshot, orderBy, Timestamp } from 'firebase/firestore'; 
 
 import styles from '../admin.module.css';
-import { FaPlus, FaTrashAlt, FaPen } from 'react-icons/fa'; 
+import { FaPlus, FaTrashAlt, FaPen, FaEye } from 'react-icons/fa'; 
 
 // Type definitions
 interface BlogPost {
@@ -18,27 +17,27 @@ interface BlogPost {
   status: 'Draft' | 'Published' | 'Archived';
   category: string;
   createdAt: Date;
+  views: number;
 }
 
-// Dummy/Fallback data for initial display
+// Dummy/Fallback data
 const dummyPosts: BlogPost[] = [
-    { id: '1', title: 'The Future of Next.js 15', status: 'Published', category: 'Web Development', createdAt: new Date(Date.now() - 86400000 * 5) },
-    { id: '2', title: 'Why Choose Firebase for Startups', status: 'Draft', category: 'Backend & Cloud', createdAt: new Date(Date.now() - 86400000 * 2) },
-    { id: '3', title: 'UI/UX Trends in Neo-Brutalism', status: 'Published', category: 'Design', createdAt: new Date(Date.now() - 86400000 * 10) },
-    { id: '4', title: 'Old Post Archive', status: 'Archived', category: 'Miscellaneous', createdAt: new Date(Date.now() - 86400000 * 30) },
+    { id: '1', title: 'The Future of Next.js 15', status: 'Published', category: 'Web Development', createdAt: new Date(Date.now() - 86400000 * 5), views: 1250 },
+    { id: '2', title: 'Why Choose Firebase for Startups', status: 'Draft', category: 'Backend & Cloud', createdAt: new Date(Date.now() - 86400000 * 2), views: 0 },
+    { id: '3', title: 'UI/UX Trends in Neo-Brutalism', status: 'Published', category: 'Design', createdAt: new Date(Date.now() - 86400000 * 10), views: 3400 },
+    { id: '4', title: 'Old Post Archive', status: 'Archived', category: 'Miscellaneous', createdAt: new Date(Date.now() - 86400000 * 30), views: 50 },
 ];
 
 
 const AdminBlogPage = () => {
-  // FIX: useRouter ko hata diya
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // NAYA: Filtering State
+  // Filtering State
   const [activeFilter, setActiveFilter] = useState<'All' | 'Draft' | 'Published' | 'Archived'>('All');
 
-  // 1. Fetch Blog Posts (Real-time)
+  // 1. Fetch Blog Posts
   useEffect(() => {
     setIsLoading(true);
     setError(null);
@@ -49,18 +48,29 @@ const AdminBlogPage = () => {
         orderBy('createdAt', 'desc')
     );
     
-    // Yahan hum filtering ka logic Firestore query mein nahi, client side par rakhenge, 
-    // kyunki hamare paas 'All' ka bhi option hai aur post count kam hoga.
     const unsubscribe = onSnapshot(postsQuery, (snapshot) => {
         const fetchedPosts = snapshot.docs.map(doc => {
             const data = doc.data();
+
+            // === LOGIC FIX: Status Detection ===
+            // Agar 'status' text field hai toh use karo, 
+            // nahi toh 'isPublished' boolean check karo.
+            let derivedStatus: 'Draft' | 'Published' | 'Archived' = 'Draft';
+
+            if (data.status) {
+                derivedStatus = data.status;
+            } else if (data.isPublished === true) {
+                derivedStatus = 'Published';
+            }
+            // ===================================
+
             return {
                 id: doc.id,
                 title: data.title || 'Untitled Post',
-                status: data.status || 'Draft',
+                status: derivedStatus, // Fixed Status here
                 category: data.category || 'Uncategorized',
-                // Firestore Timestamp ko Date mein convert karna
-                createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(), 
+                createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+                views: data.views || 0, 
             } as BlogPost;
         });
         setPosts(fetchedPosts);
@@ -68,7 +78,7 @@ const AdminBlogPage = () => {
     }, (err) => {
         console.error("Error fetching blog posts:", err);
         setError("Failed to load blog posts. Check console.");
-        setPosts(dummyPosts); // Fallback to dummy data on error
+        setPosts(dummyPosts); 
         setIsLoading(false);
     });
 
@@ -85,11 +95,11 @@ const AdminBlogPage = () => {
   const getStatusClass = (status: BlogPost['status']) => {
     switch (status) {
       case 'Published':
-        return styles.statusAccepted; // Status Accepted class use kiya
+        return styles.statusAccepted; 
       case 'Draft':
-        return styles.statusPending; // Status Pending class use kiya
+        return styles.statusPending; 
       case 'Archived':
-        return styles.statusRejected; // Status Rejected class use kiya
+        return styles.statusRejected; 
       default:
         return styles.statusPending;
     }
@@ -112,7 +122,6 @@ const AdminBlogPage = () => {
           <button
             key={status}
             onClick={() => setActiveFilter(status as 'All' | 'Draft' | 'Published' | 'Archived')}
-            // NAYA: Active filter ke liye styling
             className={`${styles.primaryButton} ${activeFilter === status ? styles.activeFilter : ''}`}
             style={{ 
                 padding: '0.6rem 1.2rem', 
@@ -143,6 +152,7 @@ const AdminBlogPage = () => {
                 <th>Title</th>
                 <th>Category</th>
                 <th>Status</th>
+                <th>Views</th>
                 <th>Created Date</th>
                 <th>Actions</th>
               </tr>
@@ -157,12 +167,17 @@ const AdminBlogPage = () => {
                       {post.status}
                     </span>
                   </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-neon-light)', fontWeight: '600' }}>
+                        <FaEye style={{ opacity: 0.7 }} />
+                        {post.views.toLocaleString()}
+                    </div>
+                  </td>
                   <td>{post.createdAt.toLocaleDateString()}</td>
                   <td>
                     <Link href={`/admin/blog/edit/${post.id}`} className={styles.actionLink} style={{marginRight: '1rem'}}>
                        <FaPen /> Edit
                     </Link>
-                    {/* NAYA: Delete action (functional logic baad mein aayega) */}
                     <button 
                         onClick={() => alert(`Deleting post: ${post.title}`)} 
                         className={styles.actionLink} 
