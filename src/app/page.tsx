@@ -17,7 +17,14 @@ import {
     FaAndroid, 
     FaApple, 
     FaDownload,
-    FaTimes
+    FaTimes,
+    // Naye Icons Clean UI ke liye
+    FaBell,
+    FaBolt,
+    FaWallet,
+    FaHome,
+    FaChartPie,
+    FaCog
 } from "react-icons/fa";
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs, Timestamp, where } from 'firebase/firestore';
@@ -178,11 +185,11 @@ const HomePage = () => {
         canvas.style.height = `${height}px`;
 
         // Settings for Sharp Look
-        const particleCount = width < 768 ? 40 : 80; // Thode kam particles for cleaner look
+        const particleCount = width < 768 ? 40 : 80; 
         const connectionDistance = 180; 
         const particles: { x: number; y: number; vx: number; vy: number; size: number; color: string }[] = [];
 
-        // ZORK DI BRAND COLORS (Sharp Neon)
+        // ZORK DI BRAND COLORS
         const colors = ['#00F5C8', '#8b5cf6', '#ffffff']; 
 
         // Create Particles
@@ -190,9 +197,9 @@ const HomePage = () => {
             particles.push({
                 x: Math.random() * width,
                 y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 0.4, // Gentle speed
+                vx: (Math.random() - 0.5) * 0.4, 
                 vy: (Math.random() - 0.5) * 0.4, 
-                size: Math.random() * 1.5 + 0.5, // Small, crisp dots
+                size: Math.random() * 1.5 + 0.5, 
                 color: colors[Math.floor(Math.random() * colors.length)],
             });
         }
@@ -208,16 +215,14 @@ const HomePage = () => {
                 if (p.x < 0 || p.x > width) p.vx *= -1;
                 if (p.y < 0 || p.y > height) p.vy *= -1;
 
-                // Draw Dot (Crisp, no heavy blur shadow here)
+                // Draw Dot
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fillStyle = p.color;
-                // Light glow for neon feel, but keep it tight
                 ctx.shadowBlur = 5; 
                 ctx.shadowColor = p.color;
                 ctx.fill();
-                
-                ctx.shadowBlur = 0; // Reset for lines
+                ctx.shadowBlur = 0; 
 
                 // Connect lines
                 for (let j = index + 1; j < particles.length; j++) {
@@ -228,7 +233,6 @@ const HomePage = () => {
                         ctx.beginPath();
                         const opacity = 1 - dist / connectionDistance;
                         
-                        // Thinner lines for high quality feel (0.3px)
                         ctx.strokeStyle = p.color === '#00F5C8' 
                             ? `rgba(0, 245, 200, ${opacity * 0.5})` 
                             : `rgba(139, 92, 246, ${opacity * 0.5})`; 
@@ -326,7 +330,7 @@ const HomePage = () => {
                     {/* Canvas Background */}
                     <canvas ref={canvasRef} className={styles.plexusCanvas} />
 
-                    {/* SLIDE 1: DEFAULT SERVICES CONTENT (Added style.slideOne) */}
+                    {/* SLIDE 1: DEFAULT SERVICES CONTENT */}
                     <div className={`${styles.heroContentWrapper} ${styles.slideOne} ${currentSlide === 0 ? styles.slideActive : styles.slideHidden}`}> 
                         {currentUser && userProfile?.email === 'admin@zorkdi.com' && (
                             <AnimationWrapper delay={0.1}>
@@ -345,7 +349,7 @@ const HomePage = () => {
                         </AnimationWrapper>
                     </div>
 
-                    {/* SLIDE 2: APP LAUNCH PROMO (Added style.slideTwo) */}
+                    {/* SLIDE 2: APP LAUNCH PROMO (UPDATED LAYOUT) */}
                     <div className={`${styles.heroContentWrapper} ${styles.appSlideWrapper} ${styles.slideTwo} ${currentSlide === 1 ? styles.slideActive : styles.slideHidden}`}>
                         <div className={styles.appSlideText}>
                             <AnimationWrapper delay={0.1}>
@@ -370,19 +374,69 @@ const HomePage = () => {
                             </AnimationWrapper>
                         </div>
 
-                        {/* Visual Mockup (Right Side) */}
+                        {/* Visual Mockup (Right Side) - NEW CLEAN UI */}
                         <div className={styles.appSlideVisual}>
                             <AnimationWrapper delay={0.5}>
                                 <div className={styles.phoneMockup}>
+                                    <div className={`${styles.phoneBtn} ${styles.vol}`}></div>
+                                    <div className={`${styles.phoneBtn} ${styles.pwr}`}></div>
+                                    
                                     <div className={styles.phoneScreen}>
-                                        <div className={styles.appLogoContainer}>
-                                            <span className={styles.appLogoText}>ZD</span>
+                                        {/* Dynamic Island Notch */}
+                                        <div className={styles.notch}>
+                                            <div className={styles.notchCam}></div>
                                         </div>
-                                        <div className={styles.appScreenContent}>
-                                            <div className={styles.mockupBar}></div>
-                                            <div className={styles.mockupBar} style={{width: '60%'}}></div>
-                                            <div className={styles.mockupCard}></div>
-                                            <div className={styles.mockupCard}></div>
+
+                                        <div className={styles.screenContent}>
+                                            <div className={styles.appHeader}>
+                                                <div className={styles.logoBrand}>ZORK<span>DI</span></div>
+                                                <FaBell style={{color: '#fff', fontSize: '1.1rem'}} />
+                                            </div>
+
+                                            {/* Main Glass Card */}
+                                            <div className={styles.statusCard}>
+                                                <div className={styles.cardTitle}>Project Status</div>
+                                                <div className={styles.cardBigNum}>
+                                                    94% <div className={styles.pulseDot}></div>
+                                                </div>
+                                                <div className={styles.graphPlaceholder}>
+                                                    <div className={`${styles.gBar} ${styles.active}`} style={{height: '40%'}}></div>
+                                                    <div className={`${styles.gBar} ${styles.active}`} style={{height: '60%'}}></div>
+                                                    <div className={`${styles.gBar} ${styles.active}`} style={{height: '85%'}}></div>
+                                                    <div className={`${styles.gBar} ${styles.active}`} style={{height: '50%'}}></div>
+                                                    <div className={`${styles.gBar} ${styles.active}`} style={{height: '70%'}}></div>
+                                                </div>
+                                            </div>
+
+                                            {/* Activity List */}
+                                            <div className={styles.activityList}>
+                                                <div className={styles.listItem}>
+                                                    <div className={`${styles.iconBox} ${styles.purple}`}>
+                                                        <FaBolt />
+                                                    </div>
+                                                    <div className={styles.itemText}>
+                                                        <h4>System Live</h4>
+                                                        <p>Deployment successful</p>
+                                                    </div>
+                                                </div>
+                                                <div className={styles.listItem}>
+                                                    <div className={`${styles.iconBox} ${styles.blue}`}>
+                                                        <FaWallet />
+                                                    </div>
+                                                    <div className={styles.itemText}>
+                                                        <h4>Payment Received</h4>
+                                                        <p>Invoice #2024-09</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Bottom Dock */}
+                                            <div className={styles.dock}>
+                                                <div className={`${styles.dockItem} ${styles.active}`}><FaHome /></div>
+                                                <div className={styles.dockItem}><FaChartPie /></div>
+                                                <div className={styles.dockItem}><FaCog /></div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
