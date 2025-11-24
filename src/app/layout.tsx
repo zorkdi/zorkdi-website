@@ -83,6 +83,14 @@ export async function generateMetadata(): Promise<Metadata> {
         },
         description: globalSettings.websiteTagline,
         
+        // FIX: Google Search Logo Issue
+        // Hum explicitly bata rahe hain ki icon kahan hai
+        icons: {
+            icon: '/icon.png', // Ensure this file exists in public folder (192x192px recommended)
+            shortcut: '/favicon.ico',
+            apple: '/apple-icon.png',
+        },
+
         // Canonical URL automatically generate hoga
         alternates: {
             canonical: '/',
@@ -150,12 +158,18 @@ export default async function RootLayout({
       '@type': 'Organization',
       name: globalSettings.websiteTitle,
       url: 'https://www.zorkdi.in',
-      logo: 'https://www.zorkdi.in/icon.png', // Auto-detected icon ka path
+      // Ensure ye file public folder mein ho aur accessible ho
+      logo: 'https://www.zorkdi.in/icon.png', 
       description: globalSettings.websiteTagline,
       address: {
           '@type': 'PostalAddress',
           addressCountry: 'IN', 
       },
+      // SameAs array help karta hai Google ko connect karne mein
+      sameAs: [
+          "https://www.linkedin.com/company/zorkdi", 
+          // Agar twitter/insta hai toh yahan add kar dena
+      ]
   };
 
   return (
