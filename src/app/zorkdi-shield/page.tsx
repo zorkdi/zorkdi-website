@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './page.module.css';
@@ -26,8 +26,6 @@ interface Partner {
 
 export default function ShieldPage() {
     const [partners, setPartners] = useState<Partner[]>([]);
-    const [currentSlide, setCurrentSlide] = useState(0);
-    const slideInterval = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         const fetchPartners = async () => {
@@ -46,39 +44,15 @@ export default function ShieldPage() {
         fetchPartners();
     }, []);
 
-    useEffect(() => {
-        startSlider();
-        return () => stopSlider();
-    }, []);
-
-    const startSlider = () => {
-        if (slideInterval.current) clearInterval(slideInterval.current);
-        slideInterval.current = setInterval(() => {
-            setCurrentSlide(prev => (prev + 1) % 2); 
-        }, 3500); 
-    };
-
-    const stopSlider = () => {
-        if (slideInterval.current) clearInterval(slideInterval.current);
-    };
-
-    const handleDotClick = (index: number) => {
-        stopSlider();
-        setCurrentSlide(index);
-        startSlider();
-    };
-
     return (
         <main className={styles.main}>
-            {/* Background Grid Effect */}
+            {/* Background Grid & Noise Effect */}
             <div className={styles.cyberGrid}></div>
 
-            {/* --- HERO SLIDER SECTION --- */ }
-            <div className={styles.heroSliderContainer}>
-                
-                {/* --- SLIDE 0: PRODUCT HERO --- */}
-                <div className={`${styles.slideWrapper} ${currentSlide === 0 ? styles.slideActive : styles.slideLeft}`}>
-                    <div className={styles.heroContent}>
+            {/* --- 1. HERO SECTION (Main Product) --- */ }
+            <div className={styles.heroSection}>
+                <div className={styles.heroContent}>
+                    <AnimationWrapper>
                         <div className={styles.securityBadge}>
                             <FaShieldAlt /> SYSTEM STATUS: ONLINE
                         </div>
@@ -101,14 +75,16 @@ export default function ShieldPage() {
                                 View Features
                             </Link>
                         </div>
-                    </div>
+                    </AnimationWrapper>
                 </div>
+            </div>
 
-                {/* --- SLIDE 1: DISTRIBUTOR HERO --- */}
-                <div className={`${styles.slideWrapper} ${currentSlide === 1 ? styles.slideActive : styles.slideRight}`}>
-                    <div className={styles.distributorContainer}>
-                        {/* Left: Text & Benefits */}
-                        <div className={styles.distributorText}>
+            {/* --- 2. DISTRIBUTOR SECTION (Business Opportunity) --- */}
+            <section className={styles.distributorSection}>
+                <div className={styles.distributorContainer}>
+                    {/* Left: Text & Benefits */}
+                    <div className={styles.distributorText}>
+                        <AnimationWrapper>
                             <div className={styles.goldHeading}>
                                 <FaMoneyBillWave /> Business Opportunity
                             </div>
@@ -131,14 +107,16 @@ export default function ShieldPage() {
                                     <FaCheckCircle className={styles.checkIcon} /> 24/7 Priority Technical Support
                                 </li>
                             </ul>
-                        </div>
+                        </AnimationWrapper>
+                    </div>
 
-                        {/* Right: Earning Calculation Card */}
-                        <div className={styles.earningCardWrapper}>
+                    {/* Right: Earning Calculation Card */}
+                    <div className={styles.earningCardWrapper}>
+                        <AnimationWrapper delay={0.2}>
                             <div className={styles.earningCard}>
                                 <div className={styles.cardLabel}>Potential Earnings</div>
                                 <div className={styles.bigAmount}>20% Flat</div>
-                                <p style={{color:'#fff', marginBottom:'1.5rem'}}>Commission on every recharge.</p>
+                                <p style={{color:'#94a3b8', marginBottom:'1.5rem'}}>Commission on every recharge.</p>
                                 
                                 <div className={styles.calculationBox}>
                                     <div className={styles.calcRow}>
@@ -147,7 +125,7 @@ export default function ShieldPage() {
                                     </div>
                                     <div className={styles.calcRow}>
                                         <span>Your Margin</span>
-                                        <span style={{color: '#FFD700'}}>20%</span>
+                                        <span style={{color: '#facc15'}}>20%</span>
                                     </div>
                                     <div className={`${styles.calcRow} ${styles.final}`}>
                                         <span>Your Net Profit</span>
@@ -159,23 +137,12 @@ export default function ShieldPage() {
                                     Apply as Distributor
                                 </Link>
                             </div>
-                        </div>
+                        </AnimationWrapper>
                     </div>
                 </div>
+            </section>
 
-                {/* SLIDER DOTS */}
-                <div className={styles.sliderIndicators}>
-                    {[0, 1].map((idx) => (
-                        <div 
-                            key={idx}
-                            className={`${styles.indicatorDot} ${currentSlide === idx ? styles.activeDot : ''}`}
-                            onClick={() => handleDotClick(idx)}
-                        ></div>
-                    ))}
-                </div>
-            </div>
-
-            {/* --- FEATURES GRID --- */}
+            {/* --- 3. FEATURES GRID --- */}
             <section id="features" className={styles.featuresSection}>
                 <div className={styles.sectionHeading}>
                     <AnimationWrapper>
@@ -235,7 +202,7 @@ export default function ShieldPage() {
                 </div>
             </section>
 
-            {/* --- STRATEGIC ALLIANCE (PARTNERS) SECTION --- */}
+            {/* --- 4. STRATEGIC ALLIANCE (PARTNERS) SECTION --- */}
             <section className={styles.partnersSection}>
                 <div className={styles.sectionHeading}>
                     <AnimationWrapper>
@@ -247,7 +214,7 @@ export default function ShieldPage() {
                 <div className={styles.partnersGrid}>
                     {partners.length > 0 ? (
                         partners.map((partner, index) => (
-                            <AnimationWrapper key={partner.id} delay={index * 0.2}>
+                            <AnimationWrapper key={partner.id} delay={index * 0.1}>
                                 <div className={styles.partnerCard}>
                                     <div className={styles.cardHeader}>
                                         <div className={styles.imageFrame}>
@@ -275,7 +242,7 @@ export default function ShieldPage() {
                                                 <FaPhoneAlt /> {partner.contact}
                                             </a>
                                         ) : (
-                                            <div className={styles.callButton} style={{pointerEvents: 'none', borderColor: 'rgba(255,255,255,0.1)', color: '#888'}}>
+                                            <div className={styles.callButton} style={{opacity: 0.5, pointerEvents: 'none'}}>
                                                 <FaCheckCircle /> Verified Partner
                                             </div>
                                         )}
@@ -285,7 +252,7 @@ export default function ShieldPage() {
                         ))
                     ) : (
                         <AnimationWrapper>
-                            <div className={styles.partnerCard} style={{ opacity: 0.9 }}>
+                            <div className={styles.partnerCard} style={{ opacity: 0.8 }}>
                                 <div className={styles.cardHeader}>
                                     <div className={styles.imageFrame}>
                                         <Image 
@@ -294,7 +261,7 @@ export default function ShieldPage() {
                                             width={160} 
                                             height={160} 
                                             className={styles.partnerImage}
-                                            style={{objectFit: 'contain', backgroundColor: 'transparent'}} 
+                                            style={{objectFit: 'contain', backgroundColor: '#000'}} 
                                         />
                                     </div>
                                     <h3 className={styles.partnerName}>ZORK DI SHIELD</h3>
@@ -306,7 +273,7 @@ export default function ShieldPage() {
                                         <FaMapMarkerAlt className={styles.infoIcon} /> 
                                         <span>Enterprise Security</span>
                                     </div>
-                                    <div className={styles.callButton} style={{pointerEvents: 'none', borderColor: '#555', color: '#888'}}>
+                                    <div className={styles.callButton} style={{opacity: 0.5}}>
                                         <FaCheckCircle /> Global Access
                                     </div>
                                 </div>
@@ -316,7 +283,7 @@ export default function ShieldPage() {
                 </div>
             </section>
 
-            {/* --- HOW IT WORKS --- */}
+            {/* --- 5. HOW IT WORKS --- */}
             <section className={styles.stepsSection}>
                 <div className={styles.sectionHeading}>
                     <AnimationWrapper>
@@ -360,7 +327,7 @@ export default function ShieldPage() {
                 </div>
             </section>
 
-            {/* --- CTA SECTION --- */}
+            {/* --- 6. CTA SECTION --- */}
             <section className={styles.ctaSection}>
                 <AnimationWrapper>
                     <div className={styles.ctaBox}>
