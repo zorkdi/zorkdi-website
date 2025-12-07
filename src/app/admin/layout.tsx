@@ -8,7 +8,9 @@ import { useAuth } from '@/context/AuthContext';
 import styles from './admin.module.css';
 import { 
     FaTachometerAlt, FaFeatherAlt, FaUsers, FaTasks, FaCog, FaChartLine, FaSignOutAlt, FaEnvelope, FaUserTie, FaBuilding,
-    FaBookOpen // NAYA ICON: Case Studies ke liye
+    FaBookOpen,
+    FaShieldAlt,
+    FaUserPlus // NAYA ICON: Distributor Leads ke liye
 } from 'react-icons/fa';
 import { CgClose } from 'react-icons/cg';
 import { useState, useEffect } from 'react';
@@ -19,12 +21,12 @@ import { doc, getDoc } from 'firebase/firestore';
 // --- Admin Navigation Links ---
 const navLinks = [
     { name: 'Dashboard', href: '/admin', icon: FaTachometerAlt },
+    { name: 'Distributor Leads', href: '/admin/distributor-requests', icon: FaUserPlus }, // <-- NEW LINK
+    { name: 'Shield Partners', href: '/admin/shield-partners', icon: FaShieldAlt },
+    { name: 'Project Requests', href: '/admin/projects', icon: FaTasks },
     { name: 'Blog Posts', href: '/admin/blog', icon: FaFeatherAlt },
     { name: 'Portfolio', href: '/admin/portfolio', icon: FaChartLine },
-    // === NAYA LINK ADD KIYA GAYA HAI ===
     { name: 'Case Studies', href: '/admin/case-studies', icon: FaBookOpen },
-    // ===================================
-    { name: 'Project Requests', href: '/admin/projects', icon: FaTasks },
     { name: 'Client Chat', href: '/admin/chat', icon: FaUsers },
     { name: 'Client Inbox', href: '/admin/mail', icon: FaEnvelope },
     { name: 'Founder Profile', href: '/admin/founder', icon: FaUserTie },
@@ -47,7 +49,6 @@ export default function AdminLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    // FIX: Destructure se 'userProfile' ko hata diya agar use nahi ho raha
     const { currentUser, loading: authLoading } = useAuth(); 
     const pathname = usePathname();
     const router = useRouter();
@@ -62,13 +63,13 @@ export default function AdminLayout({
                 const docRef = doc(db, 'cms', 'global_settings');
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    setAdminUID(docSnap.data().adminUID || 'eWCjS5yqHvSuafrJ5IbWlT6Kmyf2'); // Fallback to default
+                    setAdminUID(docSnap.data().adminUID || 'eWCjS5yqHvSuafrJ5IbWlT6Kmyf2'); 
                 } else {
-                    setAdminUID('eWCjS5yqHvSuafrJ5IbWlT6Kmyf2'); // Use fallback if CMS doc not found
+                    setAdminUID('eWCjS5yqHvSuafrJ5IbWlT6Kmyf2'); 
                 }
             } catch (error) {
                 console.error("Error fetching admin UID:", error);
-                setAdminUID('eWCjS5yqHvSuafrJ5IbWlT6Kmyf2'); // Use fallback on error
+                setAdminUID('eWCjS5yqHvSuafrJ5IbWlT6Kmyf2'); 
             } finally {
                 setCmsLoading(false);
             }
@@ -120,7 +121,6 @@ export default function AdminLayout({
                 <nav>
                     <ul>
                         {navLinks.map((link) => {
-                            // FIX: Active link check mein startsWith ko better kiya taaki /admin/founder/edit par bhi link active rahe
                             const isActive = pathname === link.href || (link.href !== '/admin' && pathname.startsWith(link.href));
                             return (
                                 <li key={link.name}>

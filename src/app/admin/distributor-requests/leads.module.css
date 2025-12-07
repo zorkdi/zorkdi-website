@@ -1,0 +1,151 @@
+/* app/admin/distributor-requests/leads.module.css */
+
+.container {
+    width: 100%;
+}
+
+.header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header h1 {
+    font-size: 2rem;
+    color: var(--color-off-white);
+}
+
+.leadsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* --- LEAD CARD --- */
+.leadCard {
+    background-color: var(--color-deep-blue);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.leadCard:hover {
+    transform: translateY(-5px);
+    border-color: var(--color-neon-green);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Header: Photo & Name */
+.cardHeader {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.profileImg {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-neon-green);
+}
+
+.headerInfo h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.2rem;
+}
+
+.dateBadge {
+    font-size: 0.75rem;
+    color: #888;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+}
+
+/* Body: Contact & Address */
+.cardBody {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+.infoRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.infoIcon {
+    color: var(--color-neon-green);
+    margin-top: 3px;
+    font-size: 1rem;
+}
+
+.infoText {
+    font-size: 0.9rem;
+    color: #ccc;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+/* Footer: Actions */
+.cardFooter {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    gap: 1rem;
+}
+
+.actionBtn {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.callBtn {
+    background: rgba(0, 245, 200, 0.1);
+    color: var(--color-neon-green);
+    border: 1px solid var(--color-neon-green);
+    text-decoration: none;
+}
+
+.callBtn:hover {
+    background: var(--color-neon-green);
+    color: #000;
+}
+
+.deleteBtn {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.deleteBtn:hover {
+    background: #e74c3c;
+    color: #fff;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 4rem;
+    color: #666;
+    font-size: 1.2rem;
+}

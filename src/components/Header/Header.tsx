@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image'; 
 import styles from './Header.module.css';
 import { CgMenuRight, CgClose } from "react-icons/cg";
-import { FaUserCircle } from "react-icons/fa"; 
+import { FaUserCircle, FaShieldAlt } from "react-icons/fa"; // Added FaShieldAlt
 import { useAuth } from '../../context/AuthContext'; 
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
@@ -20,7 +20,6 @@ interface BrandingData {
   headerLogoURL: string; 
 }
 
-// Default/Fallback values
 const defaultBranding: BrandingData = {
     websiteTitle: "ZORK DI",
     websiteTagline: "Empowering Ideas With Technology",
@@ -41,27 +40,19 @@ const Header = ({ globalSettings }: HeaderProps) => {
   
   const branding = globalSettings || defaultBranding;
 
-  // Function to close both menus
   const closeMenus = () => {
       setMenuOpen(false);
       setProfileMenuOpen(false);
   };
 
-  // Mobile menu toggle hone par profile dropdown close karna
   useEffect(() => {
-    if (menuOpen) {
-      setProfileMenuOpen(false);
-    }
+    if (menuOpen) setProfileMenuOpen(false);
   }, [menuOpen]);
   
-  // Profile menu toggle hone par mobile menu close karna
   useEffect(() => {
-    if (profileMenuOpen) {
-      setMenuOpen(false);
-    }
+    if (profileMenuOpen) setMenuOpen(false);
   }, [profileMenuOpen]); 
 
-  // Esc key listener aur click outside functionality
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
@@ -69,11 +60,8 @@ const Header = ({ globalSettings }: HeaderProps) => {
       }
     };
     
-    // Esc Key Handler
     const handleEsc = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') {
-            closeMenus(); 
-        }
+        if (event.key === 'Escape') closeMenus(); 
     };
     
     document.addEventListener("mousedown", handleClickOutside);
@@ -144,11 +132,12 @@ const Header = ({ globalSettings }: HeaderProps) => {
 
         <div className={styles.rightControls}>
           
+          {/* REPLACED CONTACT WITH ZORK DI SHIELD BUTTON */}
           <Link 
-            href="/contact" 
-            className={`${styles.headerButtonBase} ${styles.secondaryCtaButton}`}
+            href="/zorkdi-shield" 
+            className={`${styles.headerButtonBase} ${styles.shieldCtaButton}`}
           >
-            Contact
+            <FaShieldAlt style={{ fontSize: '1.1em' }} /> SHIELD
           </Link>
           
           <Link 
@@ -158,12 +147,7 @@ const Header = ({ globalSettings }: HeaderProps) => {
             Start a Project
           </Link>
           
-          {/* FIX: Removed the !authLoading wrapper so container always renders */}
           <div className={styles.profileMenuContainer} ref={profileMenuRef}>
-            
-            {/* Logic: Agar Loading hai YA User nahi hai -> Default Icon Dikhao */}
-            {/* Agar User hai aur Photo hai -> Photo Dikhao */}
-            
             {!authLoading && currentUser && userProfile?.photoURL ? (
                 <Image 
                 src={userProfile.photoURL} 
@@ -174,7 +158,6 @@ const Header = ({ globalSettings }: HeaderProps) => {
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)} 
                 />
             ) : (
-                /* Loading ke time bhi yehi icon dikhega taaki layout na toote */
                 <button 
                 className={styles.profileIcon} 
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
@@ -211,6 +194,7 @@ const Header = ({ globalSettings }: HeaderProps) => {
             <ul className={styles.mobileNavLinks}>
               <li><Link href="/services" onClick={closeMenus}>Services</Link></li>
               <li><Link href="/portfolio" onClick={closeMenus}>Portfolio</Link></li>
+              <li><Link href="/zorkdi-shield" onClick={closeMenus} style={{color: 'var(--color-neon-green)'}}>Shield System</Link></li>
               <li><Link href="/about" onClick={closeMenus}>About Us</Link></li>
               <li><Link href="/blog" onClick={closeMenus}>Blog</Link></li>
               <li><Link href="/contact" onClick={closeMenus}>Contact</Link></li>

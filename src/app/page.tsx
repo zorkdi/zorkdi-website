@@ -18,13 +18,15 @@ import {
     FaApple, 
     FaDownload,
     FaTimes,
-    // Naye Icons Clean UI ke liye
     FaBell,
     FaBolt,
     FaWallet,
     FaHome,
     FaChartPie,
-    FaCog
+    FaCog,
+    FaShieldAlt,
+    FaLock,
+    FaCheckCircle
 } from "react-icons/fa";
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs, Timestamp, where } from 'firebase/firestore';
@@ -160,11 +162,15 @@ const HomePage = () => {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
     // --- SLIDER & MODAL STATE ---
-    const [currentSlide, setCurrentSlide] = useState(0); // 0 = Services, 1 = App Promo
+    const [currentSlide, setCurrentSlide] = useState(0); 
     const [isAppModalOpen, setIsAppModalOpen] = useState(false);
     const slideInterval = useRef<NodeJS.Timeout | null>(null);
 
-    // --- PLEXUS CANVAS LOGIC (Sharp & Clean) ---
+    // Touch State for Swipe
+    const [touchStart, setTouchStart] = useState<number | null>(null);
+    const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+    // --- PLEXUS CANVAS LOGIC ---
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -176,7 +182,6 @@ const HomePage = () => {
         let width = window.innerWidth;
         let height = window.innerHeight;
         
-        // FIX: Retina Display Sharpness
         const dpr = window.devicePixelRatio || 1;
         canvas.width = width * dpr;
         canvas.height = height * dpr;
@@ -184,15 +189,11 @@ const HomePage = () => {
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
 
-        // Settings for Sharp Look
         const particleCount = width < 768 ? 40 : 80; 
         const connectionDistance = 180; 
         const particles: { x: number; y: number; vx: number; vy: number; size: number; color: string }[] = [];
-
-        // ZORK DI BRAND COLORS
         const colors = ['#00F5C8', '#8b5cf6', '#ffffff']; 
 
-        // Create Particles
         for (let i = 0; i < particleCount; i++) {
             particles.push({
                 x: Math.random() * width,
@@ -210,12 +211,8 @@ const HomePage = () => {
             particles.forEach((p, index) => {
                 p.x += p.vx;
                 p.y += p.vy;
-
-                // Bounce off edges
                 if (p.x < 0 || p.x > width) p.vx *= -1;
                 if (p.y < 0 || p.y > height) p.vy *= -1;
-
-                // Draw Dot
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fillStyle = p.color;
@@ -224,19 +221,15 @@ const HomePage = () => {
                 ctx.fill();
                 ctx.shadowBlur = 0; 
 
-                // Connect lines
                 for (let j = index + 1; j < particles.length; j++) {
                     const p2 = particles[j];
                     const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-
                     if (dist < connectionDistance) {
                         ctx.beginPath();
                         const opacity = 1 - dist / connectionDistance;
-                        
                         ctx.strokeStyle = p.color === '#00F5C8' 
                             ? `rgba(0, 245, 200, ${opacity * 0.5})` 
                             : `rgba(139, 92, 246, ${opacity * 0.5})`; 
-                        
                         ctx.lineWidth = 0.3; 
                         ctx.moveTo(p.x, p.y);
                         ctx.lineTo(p2.x, p2.y);
@@ -244,10 +237,8 @@ const HomePage = () => {
                     }
                 }
             });
-
             requestAnimationFrame(animate);
         };
-
         animate();
 
         const handleResize = () => {
@@ -259,11 +250,9 @@ const HomePage = () => {
             canvas.style.width = `${width}px`;
             canvas.style.height = `${height}px`;
         };
-
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-    // --- END PLEXUS LOGIC ---
 
     // --- AUTO SLIDER LOGIC ---
     useEffect(() => {
@@ -274,8 +263,9 @@ const HomePage = () => {
     const startSlider = () => {
         if (slideInterval.current) clearInterval(slideInterval.current);
         slideInterval.current = setInterval(() => {
-            setCurrentSlide(prev => (prev === 0 ? 1 : 0));
-        }, 6000); // 6 seconds slide time
+            // CYCLE: 0 -> 1 -> 2 -> 0
+            setCurrentSlide(prev => (prev + 1) % 3);
+        }, 3500); // 3.5 Seconds for better readability
     };
 
     const stopSlider = () => {
@@ -285,9 +275,47 @@ const HomePage = () => {
     const handleDotClick = (index: number) => {
         stopSlider();
         setCurrentSlide(index);
-        startSlider(); // Restart timer after manual click
+        startSlider(); 
     };
-    // --- END SLIDER LOGIC ---
+
+    // --- HELPER FOR SLIDE CLASSES (FIXES OVERLAP) ---
+    const getSlideClass = (index: number) => {
+        if (index === currentSlide) return styles.slideActive;
+        // Logic: Is this the previous slide?
+        // If current is 0, prev is 2. If current is 1, prev is 0.
+        const prevIndex = (currentSlide - 1 + 3) % 3;
+        if (index === prevIndex) return styles.slideLeft;
+        
+        // Otherwise it's the next slide (Right)
+        return styles.slideRight;
+    };
+
+    // --- SWIPE LOGIC ---
+    const handleTouchStart = (e: React.TouchEvent) => {
+        stopSlider(); 
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > 50;
+        const isRightSwipe = distance < -50;
+
+        if (isLeftSwipe) {
+            setCurrentSlide(prev => (prev + 1) % 3);
+        }
+        if (isRightSwipe) {
+            setCurrentSlide(prev => (prev - 1 + 3) % 3);
+        }
+        setTouchStart(null);
+        setTouchEnd(null);
+        startSlider();
+    };
 
     const openReviewModal = () => setIsReviewModalOpen(true);
     const closeReviewModal = () => { setIsReviewModalOpen(false); fetchData(); };
@@ -295,11 +323,11 @@ const HomePage = () => {
     // App Modal Handlers
     const openAppModal = () => {
         setIsAppModalOpen(true);
-        stopSlider(); // Stop slider when modal is open
+        stopSlider(); 
     };
     const closeAppModal = () => {
         setIsAppModalOpen(false);
-        startSlider(); // Resume slider
+        startSlider(); 
     };
 
     const fetchData = async () => {
@@ -325,13 +353,58 @@ const HomePage = () => {
             
             {/* --- HERO SECTION --- */}
             <div className={styles.heroSpacer}>
-                 <section className={styles.heroFixedContent}>
-                    
-                    {/* Canvas Background */}
+                 <section 
+                    className={styles.heroFixedContent}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                 >
                     <canvas ref={canvasRef} className={styles.plexusCanvas} />
 
-                    {/* SLIDE 1: DEFAULT SERVICES CONTENT */}
-                    <div className={`${styles.heroContentWrapper} ${styles.slideOne} ${currentSlide === 0 ? styles.slideActive : styles.slideHidden}`}> 
+                    {/* --- SLIDE 0: ZORK DI SHIELD --- */}
+                    <div className={`${styles.heroContentWrapper} ${styles.shieldSlideWrapper} ${getSlideClass(0)}`}>
+                        <div className={styles.shieldSlideText}>
+                            <AnimationWrapper delay={0.1}>
+                                <div className={styles.newFeatureLozenge} style={{borderColor: 'var(--color-neon-green)', color: 'var(--color-neon-green)'}}>
+                                    <span style={{backgroundColor: 'var(--color-neon-green)', color: 'black'}}>NEW</span> Enterprise Security
+                                </div>
+                            </AnimationWrapper>
+                            <AnimationWrapper delay={0.2}>
+                                <h1 className={styles.heroHeadline} style={{ fontSize: '4rem' }}>ZORK DI Shield</h1>
+                            </AnimationWrapper>
+                            <AnimationWrapper delay={0.3}>
+                                <p className={styles.heroSubheadline}>
+                                    Advanced EMI Locking & MDM System for Finance Companies. Secure your assets with real-time control, anti-fraud protection, and seamless device management.
+                                </p>
+                            </AnimationWrapper>
+                            <AnimationWrapper delay={0.4}>
+                                <div className={styles.heroButtonContainer}>
+                                    <Link href="/zorkdi-shield" className={`${styles.heroButton} ${styles.heroPrimaryButton}`}>
+                                        <FaShieldAlt style={{ marginRight: '0.5rem' }} /> Explore System
+                                    </Link>
+                                    <button className={`${styles.heroButton} ${styles.primaryOutline}`} style={{pointerEvents: 'none', opacity: 0.7}}>
+                                        <FaCheckCircle style={{ marginRight: '0.5rem' }} /> Live Demo
+                                    </button>
+                                </div>
+                            </AnimationWrapper>
+                        </div>
+
+                        <div className={styles.shieldSlideVisual}>
+                            <AnimationWrapper delay={0.5}>
+                                <div className={styles.holographicShield}>
+                                    <div className={styles.shieldLayer}></div>
+                                    <FaLock className={styles.shieldIconMain} />
+                                    <div className={styles.shieldStatusBadge}>
+                                        <div className={styles.pulseDot}></div> SECURE
+                                    </div>
+                                </div>
+                            </AnimationWrapper>
+                        </div>
+                    </div>
+
+
+                    {/* --- SLIDE 1: DEFAULT SERVICES --- */}
+                    <div className={`${styles.heroContentWrapper} ${styles.slideOne} ${getSlideClass(1)}`}> 
                         {currentUser && userProfile?.email === 'admin@zorkdi.com' && (
                             <AnimationWrapper delay={0.1}>
                                 <Link href="/admin" className={styles.newFeatureLozenge}>
@@ -349,8 +422,8 @@ const HomePage = () => {
                         </AnimationWrapper>
                     </div>
 
-                    {/* SLIDE 2: APP LAUNCH PROMO (UPDATED LAYOUT) */}
-                    <div className={`${styles.heroContentWrapper} ${styles.appSlideWrapper} ${styles.slideTwo} ${currentSlide === 1 ? styles.slideActive : styles.slideHidden}`}>
+                    {/* --- SLIDE 2: APP LAUNCH PROMO --- */}
+                    <div className={`${styles.heroContentWrapper} ${styles.appSlideWrapper} ${getSlideClass(2)}`}>
                         <div className={styles.appSlideText}>
                             <AnimationWrapper delay={0.1}>
                                 <div className={styles.newFeatureLozenge} style={{borderColor: 'var(--color-neon-green)', color: 'var(--color-neon-green)'}}>
@@ -374,7 +447,6 @@ const HomePage = () => {
                             </AnimationWrapper>
                         </div>
 
-                        {/* Visual Mockup (Right Side) - NEW CLEAN UI */}
                         <div className={styles.appSlideVisual}>
                             <AnimationWrapper delay={0.5}>
                                 <div className={styles.phoneMockup}>
@@ -382,7 +454,6 @@ const HomePage = () => {
                                     <div className={`${styles.phoneBtn} ${styles.pwr}`}></div>
                                     
                                     <div className={styles.phoneScreen}>
-                                        {/* Dynamic Island Notch */}
                                         <div className={styles.notch}>
                                             <div className={styles.notchCam}></div>
                                         </div>
@@ -393,7 +464,6 @@ const HomePage = () => {
                                                 <FaBell style={{color: '#fff', fontSize: '1.1rem'}} />
                                             </div>
 
-                                            {/* Main Glass Card */}
                                             <div className={styles.statusCard}>
                                                 <div className={styles.cardTitle}>Project Status</div>
                                                 <div className={styles.cardBigNum}>
@@ -408,7 +478,6 @@ const HomePage = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Activity List */}
                                             <div className={styles.activityList}>
                                                 <div className={styles.listItem}>
                                                     <div className={`${styles.iconBox} ${styles.purple}`}>
@@ -430,7 +499,6 @@ const HomePage = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Bottom Dock */}
                                             <div className={styles.dock}>
                                                 <div className={`${styles.dockItem} ${styles.active}`}><FaHome /></div>
                                                 <div className={styles.dockItem}><FaChartPie /></div>
@@ -444,16 +512,15 @@ const HomePage = () => {
                         </div>
                     </div>
 
-                    {/* SLIDER INDICATORS (DOTS) */}
+                    {/* SLIDER INDICATORS */}
                     <div className={styles.sliderIndicators}>
-                        <div 
-                            className={`${styles.indicatorDot} ${currentSlide === 0 ? styles.activeDot : ''}`}
-                            onClick={() => handleDotClick(0)}
-                        ></div>
-                        <div 
-                            className={`${styles.indicatorDot} ${currentSlide === 1 ? styles.activeDot : ''}`}
-                            onClick={() => handleDotClick(1)}
-                        ></div>
+                        {[0, 1, 2].map((idx) => (
+                            <div 
+                                key={idx}
+                                className={`${styles.indicatorDot} ${currentSlide === idx ? styles.activeDot : ''}`}
+                                onClick={() => handleDotClick(idx)}
+                            ></div>
+                        ))}
                     </div>
 
                 </section>
@@ -554,7 +621,6 @@ const HomePage = () => {
                                 <FaAndroid className={styles.platformIcon} style={{color: '#3DDC84'}} />
                                 <h4>Android</h4>
                                 <p>Get APK or Play Store</p>
-                                {/* CHANGE: Replaced Button with Link to public/zorkdi.apk */}
                                 <a 
                                     href="/zorkdi.apk" 
                                     download="zorkdi.apk" 

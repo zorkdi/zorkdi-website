@@ -1,4 +1,4 @@
-/* components/Header/Header.module.css */
+/* src/components/Header/Header.module.css */
 
 .header {
   position: sticky;
@@ -13,16 +13,21 @@
 
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px; /* Thoda width badhaya taaki sab fit ho */
   margin: 0 auto;
-  padding: 1rem 2rem; 
+  padding: 0.8rem 2rem; 
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Items ko faila do */
   align-items: center;
   min-height: 70px; 
+  gap: 1rem; /* Minimum gap between sections */
 }
 
-/* --- LOGO --- */
+/* --- LOGO (Left Side) --- */
+.logo {
+    flex-shrink: 0; /* Logo shrink nahi hoga */
+}
+
 .logo a {
   display: flex;
   align-items: center;
@@ -33,7 +38,7 @@
 }
 
 .logoImage {
-  height: 55px; 
+  height: 50px; 
   width: auto;
   filter: drop-shadow(0 0 5px var(--color-neon-light));
 }
@@ -45,31 +50,33 @@
 }
 
 .brandName {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-neon-green);
+  white-space: nowrap; /* Text tootega nahi */
 }
 
 .brandTagline {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   opacity: 0.7;
   font-weight: 300;
+  white-space: nowrap;
 }
-/* --- END LOGO --- */
 
 
-/* --- Desktop Navigation --- */
+/* --- Desktop Navigation (Center) --- */
+/* FIXED: Removed absolute position to prevent overlap */
 .desktopNav {
   display: flex;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  justify-content: center;
+  flex-grow: 1; /* Ye bachi hui jagah lega */
+  margin: 0 1rem; /* Side items se doori */
 }
 
 .navLinks {
   list-style: none;
   display: flex;
-  gap: 2.5rem; 
+  gap: 2rem; /* Links ke beech gap */
   margin: 0;
   padding: 0;
 }
@@ -81,6 +88,8 @@
   text-decoration: none;
   font-weight: 500;
   padding: 0.2rem 0;
+  font-size: 0.95rem;
+  white-space: nowrap;
   transition: opacity 0.2s ease, color 0.2s ease;
 }
 
@@ -110,22 +119,22 @@
 .rightControls {
   display: flex;
   align-items: center;
-  gap: 1rem; /* Buttons ke beech gap */
+  gap: 1rem; 
+  flex-shrink: 0; /* Ye section shrink nahi hoga */
 }
 
-/* === NAYA BUTTON STYLING === */
-
-/* Base style (dono buttons use karenge) */
+/* === BUTTON STYLING === */
 .headerButtonBase {
-  padding: 0.7rem 1.8rem; /* Padding adjust ki */
+  padding: 0.6rem 1.5rem; /* Thoda compact kiya */
   font-weight: 600; 
-  border-radius: 50px; /* Pill shape */
-  font-size: 0.95rem; 
+  border-radius: 50px; 
+  font-size: 0.9rem; 
   transition: all 0.3s ease;
   border: 2px solid transparent; 
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap; /* Text break nahi hoga */
 }
 
 /* "Start a Project" (Green Outline) */
@@ -142,20 +151,40 @@
     transform: translateY(-3px);
 }
 
-/* "Contact" (Purple Outline) */
-.secondaryCtaButton {
-    background: transparent;
-    border: 2px solid var(--color-secondary-accent);
-    color: var(--color-secondary-accent) !important;
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.4); 
+/* --- NEW ZORK DI SHIELD BUTTON --- */
+.shieldCtaButton {
+    background: rgba(0, 245, 200, 0.05); 
+    border: 1px solid var(--color-neon-green); 
+    color: var(--color-neon-green) !important;
+    box-shadow: 0 0 15px rgba(0, 245, 200, 0.2); 
+    letter-spacing: 1px;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow: hidden;
+    gap: 8px; 
 }
-.secondaryCtaButton:hover {
-    background-color: var(--color-secondary-accent); 
-    color: var(--color-dark-navy) !important; 
-    box-shadow: 0 0 35px rgba(139, 92, 246, 0.9);
-    transform: translateY(-3px);
+
+.shieldCtaButton:hover {
+    background: rgba(0, 245, 200, 0.15);
+    box-shadow: 0 0 30px rgba(0, 245, 200, 0.6);
+    transform: translateY(-2px) scale(1.02);
+    border-color: var(--color-neon-light);
+    color: #fff !important;
 }
-/* === END NAYA BUTTON STYLING === */
+
+.shieldCtaButton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+}
+.shieldCtaButton:hover::after {
+    left: 100%;
+}
 
 
 /* --- Profile Icon --- */
@@ -228,7 +257,6 @@
   background-color: var(--color-dark-navy); 
   color: var(--color-neon-light);
 }
-/* --- End Profile --- */
 
 
 /* --- Mobile Menu --- */
@@ -290,20 +318,17 @@
     padding: 0.8rem 2rem;
     background-color: var(--color-neon-green);
     color: var(--color-dark-navy) !important;
-    border-radius: 50px; /* Pill shape */
+    border-radius: 50px; 
     display: block; 
     font-size: 1.5rem; 
     font-weight: 600;
 }
 
-.mobileCtaButtonVisible {
-    display: none !important; 
-}
+/* --- Responsive Breakpoints --- */
 
-
-/* --- Responsive (Tablet & Mobile) --- */
-
-@media (max-width: 1024px) {
+/* 1. TABLET/SMALL LAPTOP (When content starts to squeeze) */
+@media (max-width: 1150px) {
+  /* Hide desktop nav earlier to avoid crush */
   .desktopNav {
     display: none;
   }
@@ -312,121 +337,52 @@
     display: block !important;
   }
   
+  /* Make sure right controls stay visible */
+  .rightControls {
+      margin-left: auto; /* Push to right */
+  }
+}
+
+/* 2. TABLET PORTRAIT */
+@media (max-width: 1024px) {
   .container {
     padding: 0 1.5rem;
-  }
-  
-  .logo a {
-    gap: 0.5rem;
-  }
-  .logoImage {
-      height: 45px;
-  }
-  .brandName {
-      font-size: 1.4rem;
   }
   
   .brandTagline {
       display: none; 
   }
-
-  .rightControls {
-    gap: 0.8rem; /* Tablet par gap kam */
-  }
-  
-  /* Naye button styles ko tablet par adjust kiya */
-  .headerButtonBase {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-  }
-  .primaryCtaButton {
-    display: block;
-  }
-  .secondaryCtaButton {
-    display: block;
-  }
 }
 
-
-/* --- MOBILE FIX --- */
+/* 3. MOBILE */
 @media (max-width: 768px) {
   .container {
     min-height: 60px;
     padding: 0.5rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    gap: 1rem; 
+    gap: 0.5rem;
   }
   
-  .logo a {
-      width: 100%;
-  }
-
-  .logoImage {
-      height: 40px; 
-  }
-  .brandName {
-      font-size: 1.2rem;
-  }
-  
-  /* Mobile par dono buttons HIDE */
+  /* Hide Buttons on Mobile Header (They are in the menu) */
   .primaryCtaButton {
     display: none;
   }
-  .secondaryCtaButton {
+  .shieldCtaButton {
     display: none;
   }
   
   .logo {
-    order: 2; /* Center */
-    position: static;
-    transform: none;
+    flex-grow: 1;
     display: flex;
     justify-content: center;
-    flex: 1;
-    min-width: 0; 
   }
   
   .logoTextContainer {
       width: 100%;
       overflow: hidden;
+      align-items: center;
   }
 
   .hamburgerButton {
-    order: 1; /* Left */
-    position: static;
-    transform: none;
-    margin: 0;
-    flex-shrink: 0; 
-  }
-  
-  .rightControls {
-    order: 3; /* Right */
-    position: static;
-    transform: none;
-    gap: 1rem; 
-    display: flex;
-    align-items: center;
-    flex-shrink: 0; 
-  }
-
-  .brandTagline {
-    display: inline-block;
-    font-size: 0.7rem; 
-    white-space: nowrap;
-    animation: scrollLeft 10s linear infinite;
-    width: 100%;
-    overflow: hidden;
-  }
-}
-
-@keyframes scrollLeft {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-150%); 
+    order: -1; /* Left side */
   }
 }

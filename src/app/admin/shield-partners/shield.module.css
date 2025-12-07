@@ -1,0 +1,251 @@
+/* app/admin/shield-partners/shield.module.css */
+
+.container {
+    width: 100%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header h1 {
+    font-size: 2rem;
+    color: var(--color-off-white);
+}
+
+/* --- ADD / EDIT FORM --- */
+.addForm {
+    background-color: var(--color-deep-blue);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 3rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    transition: border-color 0.3s ease;
+}
+
+/* Highlight form when editing */
+.editingMode {
+    border-color: #f39c12; /* Orange border indicating edit mode */
+    background-color: rgba(243, 156, 18, 0.05);
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label {
+    font-size: 0.9rem;
+    color: #aaa;
+    font-weight: 500;
+}
+
+.input, .fileInput {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.8rem;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.3s;
+}
+
+.input:focus {
+    border-color: var(--color-neon-green);
+    background: rgba(0, 245, 200, 0.05);
+}
+
+.fileInput {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.buttonGroup {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.submitBtn {
+    background-color: var(--color-neon-green);
+    color: #000;
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.submitBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 245, 200, 0.4);
+}
+
+.submitBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Edit Mode Update Button Color */
+.updateBtn {
+    background-color: #f39c12; /* Orange */
+    color: #fff;
+}
+.updateBtn:hover {
+    box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
+}
+
+.cancelBtn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ccc;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.cancelBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* --- PARTNERS LIST --- */
+.listHeading {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-neon-light);
+}
+
+.partnersGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.partnerCard {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.partnerCard:hover {
+    border-color: var(--color-neon-green);
+    background: rgba(0, 245, 200, 0.02);
+    transform: translateY(-5px);
+}
+
+.imgContainer {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    border: 2px solid var(--color-neon-green);
+    position: relative;
+}
+
+.pImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pName {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.2rem;
+}
+
+.pRole {
+    font-size: 0.9rem;
+    color: var(--color-neon-green);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.pLocation {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 1.5rem;
+}
+
+.cardActions {
+    display: flex;
+    gap: 0.8rem;
+    width: 100%;
+    margin-top: auto;
+}
+
+.actionBtn {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.editBtn {
+    background: rgba(243, 156, 18, 0.15);
+    color: #f39c12;
+    border: 1px solid #f39c12;
+}
+
+.editBtn:hover {
+    background: #f39c12;
+    color: #fff;
+}
+
+.deleteBtn {
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.deleteBtn:hover {
+    background: #e74c3c;
+    color: #fff;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+}

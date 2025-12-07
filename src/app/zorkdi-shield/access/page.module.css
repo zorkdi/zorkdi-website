@@ -1,0 +1,269 @@
+/* app/zorkdi-shield/access/page.module.css */
+
+.main {
+    min-height: 100vh;
+    background-color: #050505; /* Pure Deep Black */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Background Ambient Glow (Subtle) */
+.ambientGlow {
+    position: absolute;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(0, 245, 200, 0.03) 0%, transparent 60%);
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    z-index: 10;
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- THE CARD --- */
+.formCard {
+    background: #0A0A0A;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 0 0 1px rgba(0,0,0,1), 0 20px 60px rgba(0, 0, 0, 0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Top Green Line Accent */
+.formCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-neon-green), transparent);
+    opacity: 0.8;
+}
+
+.header {
+    text-align: left;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.header p {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+/* --- IMAGE UPLOAD (The "IT God" Touch) --- */
+.imageSection {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.uploadCircle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #111;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.uploadCircle:hover {
+    border-color: var(--color-neon-green);
+    background: rgba(0, 245, 200, 0.02);
+}
+
+.previewImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.uploadIcon {
+    font-size: 1.5rem;
+    color: #444;
+    margin-bottom: 5px;
+    transition: color 0.3s;
+}
+
+.uploadCircle:hover .uploadIcon {
+    color: var(--color-neon-green);
+}
+
+.uploadLabel {
+    font-size: 0.65rem;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.warningText {
+    font-size: 0.7rem;
+    color: #dcb148; /* Goldish warning */
+    text-align: center;
+    margin-top: 0.8rem;
+    opacity: 0.8;
+}
+
+/* --- INPUT FIELDS --- */
+.inputGroup {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.inputLabel {
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background: #0A0A0A;
+    padding: 0 5px;
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.inputGroup:focus-within .inputLabel {
+    color: var(--color-neon-green);
+}
+
+.inputField, .textArea {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    color: #fff;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.inputField:focus, .textArea:focus {
+    outline: none;
+    border-color: var(--color-neon-green);
+    box-shadow: 0 0 0 1px rgba(0, 245, 200, 0.1);
+}
+
+.textArea {
+    min-height: 100px;
+    resize: none;
+}
+
+/* --- SUBMIT BUTTON --- */
+.submitBtn {
+    width: 100%;
+    background: var(--color-neon-green);
+    color: #000;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.submitBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 245, 200, 0.3);
+}
+
+.submitBtn:disabled {
+    background: #222;
+    color: #555;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* --- SUCCESS STATE --- */
+.successCard {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.successIconCircle {
+    width: 70px;
+    height: 70px;
+    background: rgba(0, 245, 200, 0.1);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 1.5rem auto;
+    color: var(--color-neon-green);
+    font-size: 1.8rem;
+    box-shadow: 0 0 30px rgba(0, 245, 200, 0.15);
+}
+
+.successTitle {
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+}
+
+.successText {
+    color: #888;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.backLink {
+    color: #fff;
+    font-size: 0.9rem;
+    text-decoration: none;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+.backLink:hover { opacity: 1; }
+
+.hiddenInput { display: none; }
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+    .container { padding: 0 1rem; }
+    .formCard { padding: 2rem 1.5rem; }
+}
