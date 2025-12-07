@@ -254,8 +254,8 @@ export default function ShieldPage() {
                                             <Image 
                                                 src={partner.photoUrl} 
                                                 alt={partner.name} 
-                                                width={100} 
-                                                height={100} 
+                                                width={160} 
+                                                height={160} 
                                                 className={styles.partnerImage} 
                                             />
                                         </div>
@@ -272,7 +272,7 @@ export default function ShieldPage() {
                                         
                                         {partner.contact ? (
                                             <a href={`tel:${partner.contact}`} className={styles.callButton}>
-                                                <FaPhoneAlt /> Call Partner
+                                                <FaPhoneAlt /> {partner.contact}
                                             </a>
                                         ) : (
                                             <div className={styles.callButton} style={{pointerEvents: 'none', borderColor: 'rgba(255,255,255,0.1)', color: '#888'}}>
@@ -291,8 +291,8 @@ export default function ShieldPage() {
                                         <Image 
                                             src="/logo.png" 
                                             alt="ZORK DI Shield" 
-                                            width={100} 
-                                            height={100} 
+                                            width={160} 
+                                            height={160} 
                                             className={styles.partnerImage}
                                             style={{objectFit: 'contain', backgroundColor: 'transparent'}} 
                                         />
