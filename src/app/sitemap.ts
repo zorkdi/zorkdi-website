@@ -12,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 1. Static Routes (Jo hamesha rahenge)
   const routes = [
     '',
+    '/zorkdi-shield', // ADDED: ZORK DI Shield (High Priority)
     '/about',
     '/services',
     '/portfolio',
@@ -24,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${BASE_URL}${route}`,
     lastModified: new Date(),
     changeFrequency: 'monthly' as const,
-    priority: route === '' ? 1 : 0.8,
+    priority: route === '/zorkdi-shield' ? 1.0 : (route === '' ? 1.0 : 0.8), // Shield aur Home ki priority Highest
   }));
 
   // 2. Dynamic Blogs Fetch karo (Firebase se)

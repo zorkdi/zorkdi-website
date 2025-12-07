@@ -1,0 +1,208 @@
+/* app/zorkdi-shield/faq/faq.module.css */
+
+/* --- CORE LAYOUT --- */
+.main {
+    min-height: 100vh;
+    background-color: #030712; /* Dark Navy/Black */
+    color: #f8fafc;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    padding-bottom: 5rem;
+}
+
+/* --- BACKGROUND EFFECTS (Same as Shield Page) --- */
+.cyberGrid {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: 
+        radial-gradient(circle at 10% 20%, rgba(0, 245, 200, 0.05), transparent 30%),
+        radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05), transparent 30%);
+    filter: blur(60px);
+}
+
+.main::after {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+/* --- HEADER SECTION --- */
+.headerSection {
+    position: relative;
+    z-index: 1;
+    padding: 8rem 2rem 4rem 2rem;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.badge {
+    display: inline-block;
+    background: rgba(0, 245, 200, 0.1);
+    border: 1px solid rgba(0, 245, 200, 0.3);
+    color: #2dd4bf;
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    letter-spacing: -1px;
+    line-height: 1.2;
+}
+
+.title span {
+    background: linear-gradient(135deg, #fff 30%, #2dd4bf 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    color: #94a3b8;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* --- FAQ CONTAINER --- */
+.faqContainer {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* --- FAQ ITEM (Glass Card) --- */
+.faqItem {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.faqItem:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(0, 245, 200, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.faqItem.active {
+    background: rgba(0, 245, 200, 0.03);
+    border-color: rgba(0, 245, 200, 0.4);
+    box-shadow: 0 0 20px rgba(0, 245, 200, 0.05);
+}
+
+/* --- QUESTION HEADER --- */
+.questionHeader {
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.questionText {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    transition: color 0.3s;
+}
+
+.faqItem.active .questionText {
+    color: #2dd4bf; /* Neon Green Active */
+}
+
+.icon {
+    font-size: 1.2rem;
+    color: #64748b;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.faqItem.active .icon {
+    transform: rotate(180deg);
+    color: #2dd4bf;
+}
+
+/* --- ANSWER BODY --- */
+.answerBody {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
+}
+
+.faqItem.active .answerBody {
+    max-height: 500px; /* Arbitrary large height for transition */
+    transition: max-height 0.4s ease-in-out;
+}
+
+.answerContent {
+    padding: 0 2rem 2rem 2rem;
+    color: #94a3b8;
+    line-height: 1.7;
+    font-size: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 1.5rem;
+}
+
+/* --- CTA AT BOTTOM --- */
+.ctaWrapper {
+    margin-top: 4rem;
+    text-align: center;
+    z-index: 2;
+    position: relative;
+}
+
+.backBtn {
+    display: inline-block;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 1rem 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    transition: all 0.3s;
+}
+
+.backBtn:hover {
+    background: #fff;
+    color: #000;
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2.5rem;
+    }
+    .questionHeader {
+        padding: 1.2rem;
+    }
+    .questionText {
+        font-size: 1rem;
+    }
+    .answerContent {
+        padding: 0 1.2rem 1.5rem 1.2rem;
+    }
+}
