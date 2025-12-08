@@ -1,94 +1,93 @@
 // src/app/blog/[slug]/page.tsx
 
-import type { Metadata } from "next";
-import BlogContent from "./BlogContent"; // Client Component
-import { db } from "@/firebase";
-import { collection, query, where, getDocs, limit } from "firebase/firestore";
+import React from 'react';
+import { Metadata } from 'next';
+import BlogContent from './BlogContent';
+import { db } from '@/firebase';
+import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
 
-// --- Helper Function: Data Fetching for SEO ---
-// Yeh function server par run karega aur SEO data layega
-async function getBlogPostSEO(slug: string) {
+// Next.js 15 mein params ab Promise hota hai
+type Props = {
+  params: Promise<{ slug: string }>;
+};
+
+// SEO ke liye Data Fetch Helper
+async function getBlogPostForSEO(postSlug: string) {
   try {
-    // Slug se blog dhoondo
-    const q = query(collection(db, "blog"), where("slug", "==", slug), limit(1));
-    const querySnapshot = await getDocs(q);
+    const blogCollectionRef = collection(db, 'blog');
     
+    // 1. Try finding by slug field
+    const q = query(
+        blogCollectionRef, 
+        where('slug', '==', postSlug), 
+        limit(1)
+    );
+    const querySnapshot = await getDocs(q);
+
     if (!querySnapshot.empty) {
       return querySnapshot.docs[0].data();
     }
+
+    // 2. Fallback: Try finding by Doc ID (agar slug match nahi hua)
+    const docRef = doc(db, 'blog', postSlug);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return docSnap.data();
+    }
+
     return null;
   } catch (error) {
-    console.error("SEO Fetch Error:", error);
+    console.error("Error fetching SEO data:", error);
     return null;
   }
 }
 
-// --- SEO ENGINE: DYNAMIC METADATA GENERATION ---
-// Yeh sabse important part hai Google Ranking ke liye
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = await getBlogPostSEO(params.slug);
+// Dynamic SEO Metadata Generator
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  // Await params (Next.js 15 Requirement)
+  const { slug } = await params;
+  
+  const post = await getBlogPostForSEO(slug);
 
-  // Agar post nahi mili
   if (!post) {
     return {
-      title: "Post Not Found | ZORK DI",
-      description: "The requested blog post could not be found.",
+      title: 'Post Not Found | ZORK DI Blog',
+      description: 'The blog post you are looking for does not exist.',
     };
   }
 
-  // 1. SEO Title (Agar custom SEO Title nahi hai, toh Main Title use karo)
-  const title = post.seoTitle || post.title || "ZORK DI Blog";
-
-  // 2. Meta Description (Fallback to Summary or generic text)
-  const description = post.metaDescription || post.summary || `Read ${post.title} on ZORK DI - Custom Software Development Company.`;
-
-  // 3. Canonical URL (Duplicate content se bachne ke liye)
-  const pageUrl = `https://www.zorkdi.in/blog/${params.slug}`;
-  const canonical = post.canonicalUrl || pageUrl;
-
-  // 4. Open Graph Image (Social Media par share karne ke liye)
-  const images = post.coverImageURL 
-    ? [{ url: post.coverImageURL, width: 1200, height: 630, alt: title }] 
-    : [];
-
-  // 5. Keywords (String to Array)
-  const keywords = post.focusKeywords 
-    ? post.focusKeywords.split(',').map((k: string) => k.trim()) 
-    : ['Software Development', 'ZORK DI', 'Tech Blog'];
-
   return {
-    title: title,
-    description: description,
-    keywords: keywords,
-    
-    // Canonical Tag
-    alternates: {
-      canonical: canonical,
-    },
-
-    // Facebook / LinkedIn Preview
+    title: `${post.title} | ZORK DI Blog`,
+    description: post.summary || post.title,
     openGraph: {
-      title: title,
-      description: description,
-      url: pageUrl,
-      type: "article",
-      publishedTime: post.createdAt?.toDate().toISOString(),
-      images: images,
-      siteName: "ZORK DI",
+      title: post.title,
+      description: post.summary || 'Read this article on ZORK DI Blog.',
+      url: `https://zorkdi.com/blog/${slug}`, // Apna domain replace kar lena agar alag ho
+      siteName: 'ZORK DI',
+      images: [
+        {
+          url: post.coverImageURL || '/images/default-blog-cover.jpg', // Fallback image
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+      type: 'article',
     },
-
-    // Twitter Preview
     twitter: {
-      card: "summary_large_image",
-      title: title,
-      description: description,
-      images: images,
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.summary || 'Read this article on ZORK DI Blog.',
+      images: [post.coverImageURL || '/images/default-blog-cover.jpg'],
     },
   };
 }
 
-// --- MAIN PAGE COMPONENT ---
-// Yeh sirf Client Component ko call karega jo UI dikhayega
-export default function Page({ params }: { params: { slug: string } }) {
-  return <BlogContent slug={params.slug} />;
+// Main Page Component
+export default async function Page({ params }: Props) {
+  // Await params here as well (Crucial fix for your error)
+  const { slug } = await params;
+
+  return <BlogContent slug={slug} />;
 }

@@ -3,8 +3,8 @@
 // Cache settings: 5 minute baad data refresh hoga
 export const revalidate = 300; 
 
-import type { Metadata } from "next";
-import { Poppins } from "next/font/google"; 
+import type { Metadata, Viewport } from "next"; // Viewport import add kiya
+import { Inter } from "next/font/google"; // Inter font use kar rahe hain (Premium tech look)
 import "./globals.css";
 import Script from "next/script";
 
@@ -14,18 +14,18 @@ import Footer from "../components/Footer/Footer";
 import { AuthProvider } from "../context/AuthContext";
 import FloatingActionButtons from "../components/FloatingActionButtons/FloatingActionButtons"; 
 import SmoothScroll from "../components/SmoothScroll"; 
-
-// NEW IMPORT: Profile Reminder Component
 import ProfileCompletionReminder from "../components/ProfileCompletionReminder/ProfileCompletionReminder";
 
 // Firebase Imports
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 
-const poppins = Poppins({
+// Font Configuration
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: '--font-poppins',
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: '--font-inter',
+  display: 'swap',
 });
 
 // --- Settings Interface ---
@@ -36,16 +36,20 @@ interface GlobalSettings {
   googleAnalyticsId?: string; 
   googleSearchConsoleId?: string; 
   heroBackgroundURL?: string; 
+  contactEmail?: string; // Contact info add kiya SEO ke liye
+  contactPhone?: string;
 }
 
 // --- Default Values ---
 const defaultSettings: GlobalSettings = {
     websiteTitle: "ZORK DI", 
-    websiteTagline: "Empowering Ideas With Technology - Premium IT Solutions", 
+    websiteTagline: "Global Leader in Software Engineering, AI & Enterprise Security Solutions", 
     headerLogoURL: "/logo.png", 
     googleAnalyticsId: "", 
     googleSearchConsoleId: "", 
-    heroBackgroundURL: "", 
+    heroBackgroundURL: "",
+    contactEmail: "contact@zorkdi.com",
+    contactPhone: "+91-9876543210"
 };
 
 // --- Firebase Data Fetcher ---
@@ -66,11 +70,18 @@ async function getGlobalSettings(): Promise<GlobalSettings> {
     }
 }
 
-// --- METADATA GENERATION (SEO ENGINE) ---
+// --- Viewport Settings (Next.js 14+ Standard) ---
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5, // Accessibility ke liye zoom allow kiya
+  userScalable: true,
+  themeColor: '#0A0B0F', // Browser bar ka color dark theme match
+};
+
+// --- METADATA GENERATION (SEO ENGINE - WORLD CLASS) ---
 export async function generateMetadata(): Promise<Metadata> {
     const globalSettings = await getGlobalSettings();
-    
-    // Domain set kiya (Important for SEO)
     const siteBaseUrl = 'https://www.zorkdi.in'; 
     const isProduction = process.env.VERCEL_ENV === 'production';
 
@@ -79,24 +90,49 @@ export async function generateMetadata(): Promise<Metadata> {
 
         title: {
             default: globalSettings.websiteTitle,
-            template: `%s | ${globalSettings.websiteTitle}` 
+            template: `%s | ${globalSettings.websiteTitle} - Top Rated Software Company` 
         },
         description: globalSettings.websiteTagline,
         
-        // FIX: Google Search Logo Issue
-        // Hum explicitly bata rahe hain ki icon kahan hai
+        // --- POWERFUL KEYWORDS INJECTION ---
+        keywords: [
+            "ZORK DI",
+            "Software Company",
+            "IT Solutions",
+            "Mobile App Development",
+            "Web Development",
+            "Enterprise Software",
+            "Cyber Security",
+            "Fintech Solutions",
+            "EMI Locking System",
+            "Digital Engineering",
+            "SaaS Development",
+            "Cloud Computing",
+            "Artificial Intelligence",
+            "React Native Developers",
+            "Next.js Experts",
+            "Custom Software India",
+            "Global IT Services"
+        ],
+
+        // Authors & Creator info
+        authors: [{ name: "ZORK DI Team", url: siteBaseUrl }],
+        creator: "ZORK DI",
+        publisher: "ZORK DI",
+        
+        // Icons
         icons: {
-            icon: '/icon.png', // Ensure this file exists in public folder (192x192px recommended)
+            icon: '/icon.png', 
             shortcut: '/favicon.ico',
             apple: '/apple-icon.png',
         },
 
-        // Canonical URL automatically generate hoga
+        // Canonical URL
         alternates: {
             canonical: '/',
         },
 
-        // Robots.txt control
+        // Robots Control
         robots: {
             index: isProduction,
             follow: isProduction,
@@ -114,23 +150,34 @@ export async function generateMetadata(): Promise<Metadata> {
             title: globalSettings.websiteTitle,
             description: globalSettings.websiteTagline,
             url: siteBaseUrl,
-            siteName: 'ZORK DI',
+            siteName: 'ZORK DI - Premium Software Solutions',
             locale: 'en_US',
             type: 'website',
             images: [
                 {
                     url: globalSettings.headerLogoURL || '/logo.png', 
-                    width: 800,
-                    height: 600,
-                    alt: globalSettings.websiteTitle,
+                    width: 1200, // Standard social share size
+                    height: 630,
+                    alt: `${globalSettings.websiteTitle} Banner`,
                 }
             ],
         },
+
+        // Twitter Card
+        twitter: {
+            card: 'summary_large_image',
+            title: globalSettings.websiteTitle,
+            description: "Building the future with advanced software, security, and AI solutions.",
+            images: [globalSettings.headerLogoURL || '/logo.png'],
+            creator: '@zorkdi', // Agar handle hai toh yahan update karna
+        },
         
-        // Google Search Console Verification
+        // Verification
         verification: globalSettings.googleSearchConsoleId 
             ? { google: globalSettings.googleSearchConsoleId } 
             : {},
+            
+        category: 'technology',
     };
 }
 
@@ -151,32 +198,86 @@ export default async function RootLayout({
       '--hero-bg-image': heroBackground,
   };
 
-  // --- JSON-LD Schema (Organization) ---
-  // Yeh Google ko structured data dega
+  // --- ADVANCED JSON-LD SCHEMA (THE SECRET WEAPON) ---
+  // Yeh Google ko batayega ki hum exactly kya karte hain
   const jsonLd = {
       '@context': 'https://schema.org',
-      '@type': 'Organization',
+      '@type': 'Corporation', // Organization se bada level
       name: globalSettings.websiteTitle,
+      alternateName: "ZORK DI Technology",
       url: 'https://www.zorkdi.in',
-      // Ensure ye file public folder mein ho aur accessible ho
       logo: 'https://www.zorkdi.in/icon.png', 
       description: globalSettings.websiteTagline,
-      address: {
-          '@type': 'PostalAddress',
-          addressCountry: 'IN', 
+      slogan: "Empowering Ideas With Technology",
+      
+      // Contact Point
+      contactPoint: {
+          '@type': 'ContactPoint',
+          telephone: globalSettings.contactPhone || '+91-0000000000',
+          contactType: 'customer service',
+          areaServed: 'World',
+          availableLanguage: ['English', 'Hindi']
       },
-      // SameAs array help karta hai Google ko connect karne mein
+
+      // Social Profiles (Graph)
       sameAs: [
-          "https://www.linkedin.com/company/zorkdi", 
-          // Agar twitter/insta hai toh yahan add kar dena
-      ]
+          "https://www.linkedin.com/company/zorkdi",
+          "https://www.instagram.com/zorkdi",
+          "https://twitter.com/zorkdi",
+          "https://github.com/zorkdi"
+      ],
+      
+      // Specialized Knowledge (Power Move for SEO)
+      knowsAbout: [
+          "Software Engineering",
+          "Mobile Application Development",
+          "Enterprise Resource Planning",
+          "Cyber Security",
+          "Artificial Intelligence",
+          "Cloud Infrastructure",
+          "Fintech Technology"
+      ],
+
+      // Services Offer Catalog
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        "name": "Software Development Services",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Custom Web Application Development"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Mobile App Development (iOS & Android)"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Enterprise Security & EMI Locking Systems"
+            }
+          },
+           {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "UI/UX Design & Branding"
+            }
+          }
+        ]
+      }
   };
 
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable}>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        
         {/* Schema Injection */}
         <script
           type="application/ld+json"
@@ -202,14 +303,13 @@ export default async function RootLayout({
         </>
       )}
 
-      <body className={poppins.className} style={heroBackground ? (customCssVars as React.CSSProperties) : undefined}>
+      <body className={inter.className} style={heroBackground ? (customCssVars as React.CSSProperties) : undefined}>
         <AuthProvider>
           <SmoothScroll> 
             <Header globalSettings={globalSettings} />
             {children}
             <Footer />
             <FloatingActionButtons />
-            {/* NEW: Added Profile Reminder here */}
             <ProfileCompletionReminder />
           </SmoothScroll> 
         </AuthProvider>
