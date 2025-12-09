@@ -8,30 +8,29 @@ import Link from 'next/link';
 import Image from 'next/image'; 
 import React from 'react';
 
-// === YAHAN CHANGE KIYA GAYA HAI ===
-// Interface for Global Settings data structure
+// Interface
 interface GlobalSettings {
   websiteTitle: string; 
   websiteTagline: string; 
-  headerLogoURL: string; // NAYA FIELD LOGO KE LIYE
+  headerLogoURL: string; 
   socialLinkedin: string;
   socialTwitter: string;
   socialInstagram: string;
   socialFacebook: string;
 }
 
-// Default/Fallback social links
+// Default values
 const defaultSocials: GlobalSettings = {
     websiteTitle: "ZORK DI",
     websiteTagline: "Empowering Ideas With Technology.", 
-    headerLogoURL: "/logo.png", // NAYA DEFAULT VALUE
+    headerLogoURL: "/logo.png", 
     socialLinkedin: "#",
     socialTwitter: "#",
     socialInstagram: "#",
     socialFacebook: "#",
 };
 
-// Server Component to fetch global settings
+// Fetcher
 async function getGlobalSettings(): Promise<GlobalSettings> {
     try {
         const docRef = doc(db, 'cms', 'global_settings');
@@ -52,50 +51,47 @@ async function getGlobalSettings(): Promise<GlobalSettings> {
             return defaultSocials;
         }
     } catch (error) {
-        console.error("FOOTER ERROR: Failed to fetch Global Settings from Firestore.", error); 
+        console.error("FOOTER ERROR:", error); 
         return defaultSocials; 
     }
 }
 
-
-// Component ko async Server Component rakha gaya hai
 const Footer = async () => {
     const settings = await getGlobalSettings(); 
 
     const logoSrc = (settings.headerLogoURL && settings.headerLogoURL.trim() !== "")
         ? settings.headerLogoURL
-        : defaultSocials.headerLogoURL; // Fallback to default logo
+        : defaultSocials.headerLogoURL; 
 
     return (
         <footer className={styles.footer}>
             <div className={styles.container}>
                 <div className={styles.footerTop}>
                     
-                    {/* NAYA: Column 1: Brand Info (Logo, Title, Tagline) */}
+                    {/* Column 1: Brand Info & Video */}
                     <div className={styles.footerBrand}>
-                        <Link href="/" className={styles.logoLink} aria-label={`${settings.websiteTitle} Home`}>
+                        <Link href="/" className={styles.logoLink} aria-label="Home">
                             <Image
                                 src={logoSrc} 
-                                alt={`${settings.websiteTitle} Logo`}
+                                alt="Logo"
                                 className={styles.logoImage} 
-                                width={40} 
-                                height={40}
+                                width={50} 
+                                height={50}
                                 priority 
                             />
                             <h3 className={styles.brandTitle}>{settings.websiteTitle}</h3>
                         </Link>
                         
-                        {/* FIX: Tagline ke liye naya wrapper add kiya hai */}
                         <div className={styles.taglineWrapper}>
                             <p className={styles.tagline}>
                                 {settings.websiteTagline}
                             </p>
                         </div>
 
-                        {/* === NAYA: FOOTER VIDEO SCREEN === */}
+                        {/* Video Holographic Card */}
                         <div className={styles.footerVideoScreen}>
                             <video
-                                src="/videos/footer.mp4" // Path to your video
+                                src="/videos/footer.mp4" 
                                 autoPlay
                                 loop
                                 muted
@@ -103,13 +99,10 @@ const Footer = async () => {
                                 className={styles.footerVideo}
                             />
                         </div>
-                        {/* === END OF NAYA SECTION === */}
-
                     </div>
                     
-                    {/* NAYA: Column 2 & 3 - Links Grid */}
+                    {/* Columns 2 & 3: Links */}
                     <div className={styles.footerLinksGrid}>
-                        {/* Column 2: Company */}
                         <div className={styles.footerLinkColumn}>
                             <h3>Company</h3>
                             <ul>
@@ -120,18 +113,18 @@ const Footer = async () => {
                             </ul>
                         </div>
                         
-                        {/* Column 3: Resources */}
                         <div className={styles.footerLinkColumn}>
                             <h3>Resources</h3>
                             <ul>
-                                <li><Link href="/blog">Blog</Link></li>
-                                <li><Link href="/faq">FAQ</Link></li>
+                                <li><Link href="/blog">Tech Insights</Link></li>
+                                <li><Link href="/zorkdi-shield">ZORK DI Shield</Link></li>
                                 <li><Link href="/case-studies">Case Studies</Link></li>
+                                <li><Link href="/faq">FAQ</Link></li>
                             </ul>
                         </div>
                     </div>
 
-                    {/* FIX: NAYA COLUMN 4: CONNECT (Socials) */}
+                    {/* Column 4: Socials */}
                     <div className={styles.footerSocial}>
                         <h3>Connect</h3>
                         <ul className={styles.socialList}>
@@ -160,9 +153,13 @@ const Footer = async () => {
 
                 </div>
                 
-                {/* FIX: Bottom Bar ab sirf copyright dikhayega */}
+                {/* Bottom Bar */}
                 <div className={styles.footerBottom}>
                     <p>© 2025 {settings.websiteTitle}. All Rights Reserved.</p>
+                    <div className={styles.footerBottomLinks}>
+                        <Link href="/privacy">Privacy Policy</Link>
+                        <Link href="/terms">Terms of Service</Link>
+                    </div>
                 </div>
             </div>
         </footer>

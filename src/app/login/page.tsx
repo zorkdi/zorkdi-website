@@ -122,7 +122,6 @@ export default function LoginPage() {
                     authProvider: 'google'
                 });
             }
-            // CHANGE: Redirect to Home instead of Profile
             router.push('/'); 
 
         } catch (error: unknown) {
@@ -149,7 +148,6 @@ export default function LoginPage() {
         let detectedType: AuthMode = 'email';
         let processedIdentity = rawValue;
 
-        // Validation logic
         if (rawValue.includes('@') || /[a-zA-Z]/.test(rawValue)) {
             detectedType = 'email';
             processedIdentity = rawValue.toLowerCase(); 
@@ -168,30 +166,26 @@ export default function LoginPage() {
         try {
             let userExists = false;
 
-            // 1. Check Firestore Database First
             if (detectedType === 'email') {
                 const q = query(collection(db, 'users'), where('email', '==', processedIdentity));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) userExists = true;
                 
-                // Fallback: Check Auth System
                 if (!userExists) {
                      const methods = await fetchSignInMethodsForEmail(auth, processedIdentity);
                      if (methods.length > 0) userExists = true;
                 }
             } else {
-                // Phone check
                 const q = query(collection(db, 'users'), where('phone', '==', processedIdentity));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) userExists = true;
             }
 
-            // 2. Set Flow Type based on Existence
             if (userExists) {
-                setFlowType('login'); // User found -> Login
+                setFlowType('login'); 
                 if (detectedType === 'phone') await sendOtp(processedIdentity);
             } else {
-                setFlowType('signup'); // User not found -> Create Account
+                setFlowType('signup'); 
             }
             setStep(2); 
 
@@ -227,19 +221,15 @@ export default function LoginPage() {
 
         try {
             if (flowType === 'login') {
-                // --- LOGIN FLOW ---
                 if (authMode === 'email') {
                     await signInWithEmailAndPassword(auth, finalIdentity, password);
-                    // CHANGE: Redirect to Home instead of Profile
                     router.push('/');
                 } else {
                     if (!confirmationResult) throw new Error("No OTP session");
                     await confirmationResult.confirm(otp);
-                    // CHANGE: Redirect to Home instead of Profile
                     router.push('/');
                 }
             } else {
-                // --- SIGNUP FLOW ---
                 if (!fullName) {
                     setError("Please enter your full name.");
                     setLoading(false);
@@ -261,7 +251,6 @@ export default function LoginPage() {
                     user = cred.user;
                 }
                 
-                // Save User Data to Firestore
                 await setDoc(doc(db, 'users', user.uid), {
                     uid: user.uid,
                     fullName: fullName,
@@ -272,7 +261,6 @@ export default function LoginPage() {
                     authProvider: authMode
                 });
                 
-                // CHANGE: Redirect to Home instead of Profile
                 router.push('/');
             }
         } catch (error: unknown) {
@@ -311,14 +299,13 @@ export default function LoginPage() {
     const renderStep1 = () => (
         <>
             <h1>Welcome Back</h1>
-            <p>Enter details to access your account.</p>
+            <p>Access your digital empire.</p>
 
             <form className={styles.authForm} onSubmit={handleContinue}>
                 <div className={styles.formGroup}>
                     <label>Email or Phone Number</label>
                     
                     <div className={styles.inputWrapper}>
-                        {/* Country Dropdown */}
                         <div className={`${styles.countrySelectWrapper} ${isPhoneDetected ? styles.visible : ''}`}>
                             <select 
                                 className={styles.countrySelect}
@@ -353,7 +340,7 @@ export default function LoginPage() {
             </form>
 
             <div className={styles.divider}>
-                <span>OR</span>
+                <span>OR ACCESS WITH</span>
             </div>
 
             <button 
@@ -376,20 +363,19 @@ export default function LoginPage() {
                 <FaArrowLeft />
             </button>
 
-            <h1>{flowType === 'login' ? 'Welcome Back' : 'Create Account'}</h1>
+            <h1>{flowType === 'login' ? 'Verify Identity' : 'Initialize Account'}</h1>
             <p>
-                {flowType === 'login' ? 'Logging in as ' : 'Signing up as '} 
-                <span style={{color: 'var(--color-neon-green)', fontWeight: 'bold'}}>
+                {flowType === 'login' ? 'Authenticating: ' : 'Setting up: '} 
+                <span className={styles.identityHighlight}>
                     {finalIdentity}
                 </span>
             </p>
 
             <form className={styles.authForm} onSubmit={handleFinalSubmit}>
                 
-                {/* Full Name only for Signup */}
                 {flowType === 'signup' && (
                     <div className={styles.formGroup}>
-                        <label>Full Name</label>
+                        <label>Full Designation (Name)</label>
                         <input 
                             type="text" 
                             className={styles.standardInput}
@@ -401,15 +387,13 @@ export default function LoginPage() {
                     </div>
                 )}
 
-                {/* --- PASSWORD FIELD WITH EYE BUTTON --- */}
                 {authMode === 'email' ? (
                     <>
                         <div className={styles.formGroup}>
                             <label>
-                                {flowType === 'login' ? 'Password' : 'Create Password'}
+                                {flowType === 'login' ? 'Access Key (Password)' : 'Set Access Key'}
                             </label>
                             
-                            {/* NEW: Password Wrapper */}
                             <div className={styles.passwordInputWrapper}>
                                 <input 
                                     type={showPassword ? "text" : "password"} 
@@ -419,7 +403,6 @@ export default function LoginPage() {
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
-                                {/* NEW: Eye Button */}
                                 <button 
                                     type="button"
                                     className={styles.eyeButton}
@@ -433,33 +416,27 @@ export default function LoginPage() {
                         {flowType === 'login' && (
                             <div className={styles.forgotPassword}>
                                 <button type="button" onClick={handleForgotPassword}>
-                                    Forgot Password?
+                                    Reset Access Key?
                                 </button>
                             </div>
                         )}
                     </>
                 ) : (
-                    // --- OTP MODE ---
                     <>
                         {flowType === 'signup' && !confirmationResult && (
                             <button 
                                 type="button"
-                                className={styles.submitButton}
+                                className={styles.secondaryButton}
                                 onClick={handleSendOtpForSignup}
                                 disabled={loading}
-                                style={{
-                                    background: 'var(--color-deep-blue)', 
-                                    border: '1px solid var(--color-neon-green)', 
-                                    color: 'var(--color-neon-green)'
-                                }}
                             >
-                                {loading ? 'Sending...' : 'Get OTP'}
+                                {loading ? 'Transmitting...' : 'Request OTP'}
                             </button>
                         )}
 
                         {(flowType === 'login' || confirmationResult) && (
                             <div className={styles.formGroup}>
-                                <label>Enter OTP</label>
+                                <label>One-Time Protocol (OTP)</label>
                                 <input 
                                     type="text" 
                                     className={styles.standardInput}
@@ -474,14 +451,13 @@ export default function LoginPage() {
                     </>
                 )}
 
-                {/* Submit Button */}
                 {(authMode === 'email' || (authMode === 'phone' && (flowType === 'login' || confirmationResult))) && (
                     <button 
                         type="submit" 
                         className={styles.submitButton}
                         disabled={loading}
                     >
-                        {loading ? 'Processing...' : (flowType === 'login' ? 'Login' : 'Create Account')}
+                        {loading ? 'Authenticating...' : (flowType === 'login' ? 'Establish Connection' : 'Initialize')}
                     </button>
                 )}
 
@@ -491,20 +467,8 @@ export default function LoginPage() {
 
     return (
         <main className={styles.main}>
-            {/* --- ADDED: Background Video & Overlay --- */}
-            <video 
-                autoPlay 
-                loop 
-                muted 
-                playsInline 
-                className={styles.videoBackground}
-            >
-                {/* IMPORTANT: Keep a video file with this name in your public/videos folder */}
-                <source src="/videos/login-bg.mp4" type="video/mp4" />
-            </video>
-            <div className={styles.videoOverlay}></div>
+            {/* Removed Video Elements, now handled by CSS */}
             
-            {/* Main Form Card */}
             <div className={styles.formContainer}>
                 <div id="recaptcha-container"></div>
                 {error && <div className={styles.errorText}>{error}</div>}

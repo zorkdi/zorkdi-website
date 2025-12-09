@@ -1,31 +1,36 @@
 /* src/components/Header/Header.module.css */
 
+/* --- HEADER CONTAINER (Optimized Glass) --- */
 .header {
   position: sticky;
   top: 0;
   width: 100%;
   z-index: 1000;
-  background-color: var(--color-deep-blue);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(15, 5, 24, 0.9); /* Thoda solid kiya performance ke liye */
+  backdrop-filter: blur(10px); /* Blur thoda kam kiya taaki lag na ho */
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding: 0; 
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  transition: background-color 0.3s ease;
 }
 
 .container {
   width: 100%;
-  max-width: 1400px; /* Thoda width badhaya taaki sab fit ho */
+  max-width: 1400px; 
   margin: 0 auto;
   padding: 0.8rem 2rem; 
   display: flex;
-  justify-content: space-between; /* Items ko faila do */
+  justify-content: space-between; 
   align-items: center;
-  min-height: 70px; 
-  gap: 1rem; /* Minimum gap between sections */
+  min-height: 80px; 
+  gap: 1rem; 
 }
 
-/* --- LOGO (Left Side) --- */
+/* --- LOGO (Fixed Z-Index) --- */
 .logo {
-    flex-shrink: 0; /* Logo shrink nahi hoga */
+    flex-shrink: 0; 
+    z-index: 1002; /* Logo menu ke upar dikhega, par content overlap nahi hoga */
+    position: relative;
 }
 
 .logo a {
@@ -34,13 +39,17 @@
   gap: 0.8rem;
   text-decoration: none;
   color: var(--color-off-white);
-  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
 }
 
 .logoImage {
   height: 50px; 
   width: auto;
-  filter: drop-shadow(0 0 5px var(--color-neon-light));
+  filter: drop-shadow(0 0 8px rgba(212, 20, 90, 0.5));
+  transition: transform 0.3s ease;
+}
+
+.logo:hover .logoImage {
+    transform: rotate(10deg) scale(1.1);
 }
 
 .logoTextContainer {
@@ -50,140 +59,144 @@
 }
 
 .brandName {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-neon-green);
-  white-space: nowrap; /* Text tootega nahi */
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap; 
+  letter-spacing: -0.5px;
 }
 
 .brandTagline {
-  font-size: 0.65rem;
-  opacity: 0.7;
-  font-weight: 300;
+  font-size: 0.7rem;
+  opacity: 0.9;
+  font-weight: 400;
   white-space: nowrap;
+  color: #ffffff; 
+  letter-spacing: 0.5px;
 }
 
 
-/* --- Desktop Navigation (Center) --- */
-/* FIXED: Removed absolute position to prevent overlap */
+/* --- Desktop Navigation --- */
 .desktopNav {
   display: flex;
   justify-content: center;
-  flex-grow: 1; /* Ye bachi hui jagah lega */
-  margin: 0 1rem; /* Side items se doori */
+  flex-grow: 1; 
+  margin: 0 1rem; 
 }
 
 .navLinks {
   list-style: none;
   display: flex;
-  gap: 2rem; /* Links ke beech gap */
+  gap: 2rem; 
   margin: 0;
-  padding: 0;
+  background: rgba(255, 255, 255, 0.03); 
+  border: 1px solid rgba(255, 255, 255, 0.08); 
+  border-radius: 50px; 
+  padding: 0.7rem 2.5rem; 
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.navLinks:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 25px rgba(212, 20, 90, 0.1);
 }
 
 .navLinks a {
   position: relative;
-  color: var(--color-off-white);
-  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   font-weight: 500;
-  padding: 0.2rem 0;
   font-size: 0.95rem;
   white-space: nowrap;
-  transition: opacity 0.2s ease, color 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .navLinks a::after {
     content: '';
     position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -5px;
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-neon-green); 
+    border-radius: 50%;
+    bottom: -8px;
     left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--color-neon-green);
-    transition: width 0.3s ease-out;
+    transform: translateX(-50%) scale(0);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .navLinks a:hover {
-  opacity: 1;
-  color: var(--color-neon-light);
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .navLinks a:hover::after {
-    width: 100%;
+    transform: translateX(-50%) scale(1);
 }
 
 
-/* --- Right Controls (Buttons + Profile) --- */
+/* --- Right Controls --- */
 .rightControls {
   display: flex;
   align-items: center;
   gap: 1rem; 
-  flex-shrink: 0; /* Ye section shrink nahi hoga */
+  flex-shrink: 0; 
 }
 
 /* === BUTTON STYLING === */
 .headerButtonBase {
-  padding: 0.6rem 1.5rem; /* Thoda compact kiya */
+  padding: 0.7rem 1.5rem; 
   font-weight: 600; 
   border-radius: 50px; 
   font-size: 0.9rem; 
   transition: all 0.3s ease;
-  border: 2px solid transparent; 
+  border: none; 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  white-space: nowrap; /* Text break nahi hoga */
+  white-space: nowrap; 
+  cursor: pointer;
 }
 
-/* "Start a Project" (Green Outline) */
-.primaryCtaButton {
-    background: transparent;
-    border: 2px solid var(--color-neon-green); 
-    color: var(--color-neon-green) !important; 
-    box-shadow: 0 0 10px rgba(0, 245, 200, 0.3);
-}
-.primaryCtaButton:hover {
-    background-color: var(--color-neon-green); 
-    color: var(--color-dark-navy) !important; 
-    box-shadow: 0 0 35px rgba(0, 245, 200, 0.7);
-    transform: translateY(-3px);
-}
-
-/* --- NEW ZORK DI SHIELD BUTTON --- */
-.shieldCtaButton {
-    background: rgba(0, 245, 200, 0.05); 
-    border: 1px solid var(--color-neon-green); 
-    color: var(--color-neon-green) !important;
-    box-shadow: 0 0 15px rgba(0, 245, 200, 0.2); 
-    letter-spacing: 1px;
-    font-family: 'Inter', sans-serif;
+.contactButton {
+    background: var(--gradient-primary);
+    color: #fff !important;
+    box-shadow: 0 5px 15px rgba(212, 20, 90, 0.3);
     position: relative;
     overflow: hidden;
-    gap: 8px; 
+}
+.contactButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212, 20, 90, 0.5);
 }
 
-.shieldCtaButton:hover {
-    background: rgba(0, 245, 200, 0.15);
-    box-shadow: 0 0 30px rgba(0, 245, 200, 0.6);
-    transform: translateY(-2px) scale(1.02);
+.primaryCtaButton {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    color: #fff !important; 
+}
+.primaryCtaButton:hover {
     border-color: var(--color-neon-light);
-    color: #fff !important;
+    color: var(--color-neon-light) !important;
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.shieldCtaButton::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: 0.5s;
+.shieldCtaButton {
+    background: rgba(142, 45, 226, 0.1); 
+    border: 1px solid var(--color-secondary-accent); 
+    color: var(--color-secondary-accent) !important;
+    gap: 8px; 
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.5px;
 }
-.shieldCtaButton:hover::after {
-    left: 100%;
+.shieldCtaButton:hover {
+    background: rgba(142, 45, 226, 0.2);
+    box-shadow: 0 0 20px rgba(142, 45, 226, 0.4);
+    transform: translateY(-2px);
+    color: #fff !important;
+    border-color: #fff;
 }
 
 
@@ -192,83 +205,93 @@
   position: relative;
   display: flex;
   align-items: center;
+  margin-left: 0.5rem;
+  z-index: 1002; /* Ensure clickable */
 }
 
 .profileIcon {
   background: none;
   border: none;
-  color: var(--color-neon-green);
+  color: #fff;
   font-size: 2rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
+  transition: color 0.3s ease;
+}
+.profileIcon:hover {
+    color: var(--color-neon-light);
 }
 
 .profileImage {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--color-neon-green);
+  border: 2px solid var(--color-secondary-accent);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
 .profileImage:hover {
-  transform: scale(1.05);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(142, 45, 226, 0.5);
 }
 
 .profileDropdown {
   position: absolute;
-  top: 150%;
+  top: 160%;
   right: 0;
-  background-color: var(--color-deep-blue); 
-  border: 1px solid var(--color-glass-light);
-  border-radius: 8px;
+  background-color: #1A0B2E; 
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   padding: 0.5rem;
-  width: 180px;
+  width: 200px;
   z-index: 1001;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-  opacity: 1; 
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  animation: fadeIn 0.2s ease-out;
 }
 
-.profileDropdown ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+.profileDropdown ul { list-style: none; padding: 0; margin: 0; }
 
 .profileDropdown a, .profileDropdown button {
   display: block;
   width: 100%;
   text-align: left;
-  padding: 0.75rem 1rem;
-  color: var(--color-off-white);
+  padding: 0.8rem 1rem;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1rem;
-  font-family: inherit;
-  border-radius: 4px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  transition: all 0.2s;
 }
 
 .profileDropdown a:hover, .profileDropdown button:hover {
-  background-color: var(--color-dark-navy); 
-  color: var(--color-neon-light);
+  background: var(--gradient-primary);
+  color: #fff;
 }
 
 
-/* --- Mobile Menu --- */
+/* --- MOBILE MENU & CONTROLS --- */
 .hamburgerButton {
   display: none;
-  background: none;
-  border: none;
-  color: var(--color-neon-green);
-  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.05); 
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1.5rem;
   cursor: pointer;
-  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
-  z-index: 1001; 
+  z-index: 1003; /* Highest priority to ensure clicking works */
+  padding: 0.5rem;
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
+}
+
+.hamburgerButton:active {
+    transform: scale(0.95);
+    background: rgba(212, 20, 90, 0.2);
 }
 
 .mobileMenu {
@@ -277,112 +300,98 @@
   left: 0;
   width: 100%;
   height: 100vh;
-  background-color: var(--color-dark-navy);
+  background-color: #0F0518; /* Solid base color to prevent transparency glitches */
+  background-image: linear-gradient(135deg, #0F0518 0%, #2D1B4E 100%);
   display: flex;
   flex-direction: column; 
-  justify-content: center;
+  /* FIX: Start content from top instead of center */
+  justify-content: flex-start; 
   align-items: center;
   z-index: 999;
-  transform: translateY(-100%);
-  opacity: 0;
-  transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+  /* FIX: Add top padding so content starts BELOW the header/logo */
+  padding-top: 120px; 
+  transform: translateX(-100%); /* Use Slide instead of Fade for better performance */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform; /* Hint to browser for performance */
 }
 
 .mobileMenuOpen {
-  transform: translateY(0);
-  opacity: 1;
+  transform: translateX(0); /* Slide in */
 }
 
 .mobileNavLinks {
   list-style: none;
   padding: 0;
   text-align: center;
-}
-
-.mobileNavLinks li {
-  margin-bottom: 2.5rem; 
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Reduced gap slightly */
+  width: 100%;
+  overflow-y: auto; /* Allow scrolling if screen is short */
+  padding-bottom: 2rem;
 }
 
 .mobileNavLinks a {
-  color: var(--color-off-white);
+  color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
-  font-size: 1.8rem; 
-  font-weight: 600;
+  font-size: 1.8rem; /* Slightly smaller for better fit */
+  font-weight: 700;
   transition: color 0.2s ease;
+  display: block;
 }
 .mobileNavLinks a:hover {
-    color: var(--color-neon-green);
+    color: var(--color-neon-light);
+    text-shadow: 0 0 20px rgba(212, 20, 90, 0.5);
 }
 
 .mobileCta {
-    padding: 0.8rem 2rem;
-    background-color: var(--color-neon-green);
-    color: var(--color-dark-navy) !important;
+    width: 80%;
+    margin: 1rem auto 0 auto;
+    padding: 1rem 3rem;
+    background: var(--gradient-primary);
+    color: #fff !important;
     border-radius: 50px; 
-    display: block; 
-    font-size: 1.5rem; 
+    font-size: 1.2rem; 
     font-weight: 600;
+    box-shadow: 0 10px 40px rgba(212, 20, 90, 0.4);
 }
 
 /* --- Responsive Breakpoints --- */
 
-/* 1. TABLET/SMALL LAPTOP (When content starts to squeeze) */
-@media (max-width: 1150px) {
-  /* Hide desktop nav earlier to avoid crush */
-  .desktopNav {
-    display: none;
-  }
-  
-  .hamburgerButton {
-    display: block !important;
-  }
-  
-  /* Make sure right controls stay visible */
-  .rightControls {
-      margin-left: auto; /* Push to right */
-  }
+@media (max-width: 1250px) {
+  .desktopNav { display: none; }
+  .hamburgerButton { display: flex; align-items: center; justify-content: center; } 
+  .rightControls { margin-left: auto; }
+  .primaryCtaButton { display: none; } 
+  .contactButton { display: none; } 
 }
 
-/* 2. TABLET PORTRAIT */
-@media (max-width: 1024px) {
-  .container {
-    padding: 0 1.5rem;
-  }
-  
-  .brandTagline {
-      display: none; 
-  }
-}
-
-/* 3. MOBILE */
 @media (max-width: 768px) {
-  .container {
-    min-height: 60px;
-    padding: 0.5rem 1.5rem;
-    gap: 0.5rem;
+  .container { 
+      min-height: 70px; 
+      padding: 0.5rem 1.2rem; 
+      gap: 0.5rem; 
   }
   
-  /* Hide Buttons on Mobile Header (They are in the menu) */
-  .primaryCtaButton {
-    display: none;
-  }
-  .shieldCtaButton {
-    display: none;
+  .primaryCtaButton, .shieldCtaButton, .contactButton { display: none; }
+  
+  .logo { 
+      flex-grow: 1; 
+      display: flex; 
+      justify-content: center; 
+      margin-left: -40px; /* Adjust centering to account for hamburger */
   }
   
-  .logo {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-  }
+  .logoImage { height: 40px; } 
   
-  .logoTextContainer {
-      width: 100%;
-      overflow: hidden;
-      align-items: center;
-  }
-
-  .hamburgerButton {
-    order: -1; /* Left side */
-  }
+  .brandName { font-size: 1.2rem; } 
+  .brandTagline { display: none; } 
+  
+  .hamburgerButton { order: -1; width: 45px; height: 45px; }
+  
+  .profileMenuContainer { margin-left: 0; }
+  .profileImage { width: 38px; height: 38px; }
+  .profileIcon { font-size: 1.8rem; }
 }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

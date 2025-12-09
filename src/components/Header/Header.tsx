@@ -8,12 +8,11 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image'; 
 import styles from './Header.module.css';
 import { CgMenuRight, CgClose } from "react-icons/cg";
-import { FaUserCircle, FaShieldAlt } from "react-icons/fa"; // Added FaShieldAlt
+import { FaUserCircle, FaShieldAlt, FaEnvelope } from "react-icons/fa"; // Added FaEnvelope
 import { useAuth } from '../../context/AuthContext'; 
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 
-// Global settings data type
 interface BrandingData {
   websiteTitle: string;
   websiteTagline: string; 
@@ -53,23 +52,16 @@ const Header = ({ globalSettings }: HeaderProps) => {
     if (profileMenuOpen) setMenuOpen(false);
   }, [profileMenuOpen]); 
 
+  // Click outside listener
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
         setProfileMenuOpen(false);
       }
     };
-    
-    const handleEsc = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') closeMenus(); 
-    };
-    
     document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEsc); 
-    
     return () => {
         document.removeEventListener("mousedown", handleClickOutside);
-        document.removeEventListener("keydown", handleEsc); 
     };
   }, [profileMenuRef]);
 
@@ -91,13 +83,15 @@ const Header = ({ globalSettings }: HeaderProps) => {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
+        
+        {/* --- LEFT: LOGO --- */}
         <div className={styles.logo}>
           <Link href="/">
             <Image
               src={logoSrc} 
               alt={`${branding.websiteTitle} Logo`}
-              width={55} 
-              height={55}
+              width={50} 
+              height={50}
               priority
               className={styles.logoImage}
             />
@@ -112,6 +106,7 @@ const Header = ({ globalSettings }: HeaderProps) => {
           </Link>
         </div>
         
+        {/* --- MOBILE: HAMBURGER BUTTON --- */}
         <button 
             className={styles.hamburgerButton} 
             onClick={() => setMenuOpen(!menuOpen)}
@@ -120,40 +115,52 @@ const Header = ({ globalSettings }: HeaderProps) => {
             {menuOpen ? <CgClose /> : <CgMenuRight />}
         </button>
 
-
+        {/* --- CENTER: DESKTOP NAV --- */}
         <nav className={styles.desktopNav}>
           <ul className={styles.navLinks}>
+            <li><Link href="/">Home</Link></li>
             <li><Link href="/services">Services</Link></li>
             <li><Link href="/portfolio">Portfolio</Link></li>
-            <li><Link href="/about">About Us</Link></li>
+            <li><Link href="/about">About</Link></li>
             <li><Link href="/blog">Blog</Link></li>
           </ul>
         </nav>
 
+        {/* --- RIGHT: CONTROLS --- */}
         <div className={styles.rightControls}>
           
-          {/* REPLACED CONTACT WITH ZORK DI SHIELD BUTTON */}
+          {/* 1. Shield Button */}
           <Link 
             href="/zorkdi-shield" 
             className={`${styles.headerButtonBase} ${styles.shieldCtaButton}`}
           >
-            <FaShieldAlt style={{ fontSize: '1.1em' }} /> SHIELD
+            <FaShieldAlt /> SHIELD
           </Link>
           
+          {/* 2. Start Project Button */}
           <Link 
             href="/new-project" 
             className={`${styles.headerButtonBase} ${styles.primaryCtaButton}`}
           >
-            Start a Project
+            Start Project
+          </Link>
+
+          {/* 3. NEW: CONTACT BUTTON */}
+          <Link 
+            href="/contact" 
+            className={`${styles.headerButtonBase} ${styles.contactButton}`}
+          >
+            <FaEnvelope style={{marginRight: '8px'}}/> Contact
           </Link>
           
+          {/* 4. PROFILE DROPDOWN */}
           <div className={styles.profileMenuContainer} ref={profileMenuRef}>
             {!authLoading && currentUser && userProfile?.photoURL ? (
                 <Image 
                 src={userProfile.photoURL} 
                 alt="Profile" 
-                width={40} 
-                height={40} 
+                width={42} 
+                height={42} 
                 className={styles.profileImage}
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)} 
                 />
@@ -176,7 +183,7 @@ const Header = ({ globalSettings }: HeaderProps) => {
                     )}
                     <li><Link href="/profile" onClick={closeMenus}>My Profile</Link></li>
                     <li><Link href="/my-projects" onClick={closeMenus}>My Projects</Link></li>
-                    <li><button onClick={handleLogout}>Logout</button></li>
+                    <li><button onClick={handleLogout} style={{color: '#ff4d4d'}}>Logout</button></li>
                     </ul>
                 ) : (
                     <ul>
@@ -189,15 +196,16 @@ const Header = ({ globalSettings }: HeaderProps) => {
         </div>
       </div>
 
+      {/* --- MOBILE FULLSCREEN MENU --- */}
       <div className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ''}`}>
           <nav>
             <ul className={styles.mobileNavLinks}>
+              <li><Link href="/" onClick={closeMenus}>Home</Link></li>
               <li><Link href="/services" onClick={closeMenus}>Services</Link></li>
               <li><Link href="/portfolio" onClick={closeMenus}>Portfolio</Link></li>
-              <li><Link href="/zorkdi-shield" onClick={closeMenus} style={{color: 'var(--color-neon-green)'}}>Shield System</Link></li>
-              <li><Link href="/about" onClick={closeMenus}>About Us</Link></li>
+              <li><Link href="/zorkdi-shield" onClick={closeMenus} style={{color: '#8E2DE2'}}>Shield System</Link></li>
               <li><Link href="/blog" onClick={closeMenus}>Blog</Link></li>
-              <li><Link href="/contact" onClick={closeMenus}>Contact</Link></li>
+              <li><Link href="/contact" onClick={closeMenus}>Contact Us</Link></li>
               <li><Link href="/new-project" className={styles.mobileCta} onClick={closeMenus}>Start a Project</Link></li> 
             </ul>
           </nav>

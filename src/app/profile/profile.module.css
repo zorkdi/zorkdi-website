@@ -1,178 +1,351 @@
-/* Main container to center the content */
+/* src/app/profile/profile.module.css */
+
+/* --- GLOBAL ANIMATIONS --- */
+@keyframes gradientBreath {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes liquidShine {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes floatUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 10px rgba(0, 245, 200, 0.1); }
+    50% { box-shadow: 0 0 25px rgba(0, 245, 200, 0.3); }
+    100% { box-shadow: 0 0 10px rgba(0, 245, 200, 0.1); }
+}
+
+/* --- MAIN CONTAINER --- */
 .main {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  min-height: 80vh;
-  padding: 4rem 2rem;
+  align-items: flex-start; /* Start se align taaki scroll kar sakein agar lamba ho */
+  min-height: 100vh;
+  padding: 6rem 2rem;
+  position: relative;
+  overflow-x: hidden;
+  
+  /* ALIVE BACKGROUND */
+  background: linear-gradient(
+      -45deg, 
+      #050508, 
+      #1a0b2e, 
+      #0f172a, 
+      #050508
+  );
+  background-size: 400% 400%;
+  animation: gradientBreath 15s ease infinite;
 }
 
-/* The box containing the profile form */
+/* Ambient Floating Glows */
+.main::before {
+    content: '';
+    position: fixed;
+    top: -20%; right: -20%;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(142, 45, 226, 0.08) 0%, transparent 70%);
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
+    animation: gradientBreath 20s ease-in-out infinite alternate;
+}
+
+.main::after {
+    content: '';
+    position: fixed;
+    bottom: -20%; left: -20%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0, 245, 200, 0.05) 0%, transparent 70%);
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
+    animation: gradientBreath 25s ease-in-out infinite alternate;
+}
+
+/* --- PROFILE CONTAINER (Glass Console) --- */
 .profileContainer {
   width: 100%;
-  max-width: 700px;
-  /* NAYA: Glassmorphism Effect */
-  background-color: var(--color-glass-dark);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  padding: 3rem;
-  border-radius: 16px;
-  border: 1px solid var(--color-glass-light);
-  /* NAYA: Subtle depth shadow */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  max-width: 750px;
+  position: relative;
+  z-index: 2;
+  
+  /* Premium Glassmorphism */
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  
+  padding: 4rem 3rem;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+  
+  animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Top Glow Line */
+.profileContainer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 150px; height: 3px;
+    background: var(--gradient-primary);
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 0 20px rgba(212, 20, 90, 0.5);
 }
 
 .profileContainer h1 {
-  font-size: 2.5rem;
-  margin-bottom: 2.5rem;
+  font-size: 2.8rem;
+  margin-bottom: 3rem;
   text-align: center;
-  color: var(--color-neon-green);
+  font-weight: 800;
+  letter-spacing: -1px;
+  
+  /* Liquid Metal Text */
+  background: linear-gradient(90deg, #ffffff 0%, #c4b5fd 50%, #ffffff 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: liquidShine 8s linear infinite;
 }
 
-/* NAYA: Profile Picture Section */
+/* --- PROFILE PICTURE SECTION --- */
 .profilePictureSection {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 3rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 2rem;
+  margin-bottom: 3.5rem;
+  position: relative;
 }
 
+/* Rotating Energy Ring Wrapper */
 .imageWrapper {
-  width: 150px;
-  height: 150px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
-  overflow: hidden;
-  /* NAYA: Neon border aur drop-shadow */
-  border: 3px solid var(--color-neon-green);
-  box-shadow: 0 0 10px rgba(0, 245, 200, 0.5);
-  margin-bottom: 1rem;
-  transition: transform 0.3s ease;
+  position: relative;
+  margin-bottom: 1.5rem;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.imageWrapper:hover {
-    transform: scale(1.05);
+/* Outer Rotating Ring */
+.imageWrapper::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    border: 2px dashed rgba(212, 20, 90, 0.3); /* Pink Dashed */
+    animation: spinSlow 20s linear infinite;
+    pointer-events: none;
 }
 
-.imageWrapper img {
+/* Inner Glow Ring */
+.imageWrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.imageWrapper img, .imagePlaceholder {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   object-fit: cover;
+  position: relative;
+  z-index: 2;
+  border: 4px solid rgba(255, 255, 255, 0.05); /* Inner border */
 }
 
 .imagePlaceholder {
-  width: 100%;
-  height: 100%;
   background-color: var(--color-deep-blue);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1rem;
-  opacity: 0.6;
+  color: rgba(255, 255, 255, 0.3);
 }
 
-.fileInput {
-  display: none;
-}
+.fileInput { display: none; }
 
+/* Upload Button (Neon Outline) */
 .uploadButton {
-  padding: 0.6rem 1.5rem;
-  background-color: transparent;
+  padding: 0.7rem 1.5rem;
+  background: transparent;
   color: var(--color-neon-green);
   border: 1px solid var(--color-neon-green);
-  border-radius: 6px;
+  border-radius: 50px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
 }
 
 .uploadButton:hover {
-  background-color: rgba(0, 245, 200, 0.1);
-  box-shadow: 0 0 8px rgba(0, 245, 200, 0.3);
+  background: rgba(0, 245, 200, 0.1);
+  box-shadow: 0 0 15px rgba(0, 245, 200, 0.3);
+  transform: translateY(-2px);
 }
 
 .uploadProgress {
   margin-top: 1rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-off-white);
-  opacity: 0.9;
+  opacity: 0.7;
+  font-family: monospace;
 }
 
-/* Form Group styling */
+/* --- FORM GROUP --- */
 .formGroup {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
 }
 
 .formGroup label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  opacity: 0.8;
+  margin-bottom: 0.8rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-left: 0.5rem;
 }
 
+/* Inputs (Cyber Slots) */
 .formGroup input,
-.formGroup select { /* NAYA: Select added for consistency */
+.formGroup select {
   width: 100%;
-  padding: 1rem;
-  /* NAYA: Deep-blue input background */
-  background-color: var(--color-deep-blue);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  color: var(--color-off-white);
+  padding: 1.2rem 1.5rem;
+  
+  /* Dark Glass Input */
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  
+  color: #fff;
   font-size: 1rem;
   font-family: inherit;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
+  
+  /* Inner shadow */
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
 }
 
-.formGroup input:disabled {
+.formGroup input:disabled, 
+.formGroup select:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
 .formGroup input:focus,
 .formGroup select:focus {
   outline: none;
-  /* NAYA: Neon focus border aur glow */
   border-color: var(--color-neon-green);
-  box-shadow: 0 0 5px var(--color-neon-light);
+  box-shadow: 0 0 20px rgba(0, 245, 200, 0.15), inset 0 2px 5px rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
 }
 
-/* Save button styling */
+/* Custom Select Arrow */
+.formGroup select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1.5rem center;
+    background-size: 1em;
+}
+.formGroup select option { background-color: #050508; color: white; }
+
+/* --- BUTTONS --- */
 .saveButton {
-  width: 100%; /* NAYA: Full width kiya */
-  margin-top: 1rem;
-  padding: 1rem 2.5rem;
-  background-color: var(--color-neon-green);
-  color: var(--color-dark-navy);
-  font-weight: 700;
-  border-radius: 8px;
+  width: 100%;
+  margin-top: 2rem;
+  padding: 1.4rem;
+  
+  /* Gradient Button */
+  background: var(--gradient-primary);
+  color: #fff;
+  
+  font-weight: 800;
+  border-radius: 16px;
   border: none;
   cursor: pointer;
   font-size: 1.1rem;
-  /* NAYA: Neon Glow */
-  box-shadow: 0 0 15px rgba(0, 245, 200, 0.5);
-  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  
+  /* Alive Pulse */
+  animation: glowPulse 3s infinite ease-in-out;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.saveButton::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
 }
 
 .saveButton:hover {
   transform: translateY(-4px);
-  box-shadow: 0 5px 20px rgba(0, 245, 200, 0.7);
+  box-shadow: 0 15px 40px rgba(212, 20, 90, 0.5);
 }
+.saveButton:hover::before { left: 100%; }
 
 .saveButton:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+  animation: none;
+  background: rgba(255, 255, 255, 0.1);
 }
 
-/* Success message styling */
-.successMessage {
+/* --- MESSAGES --- */
+.successMessage, .errorMessage {
   margin-top: 1.5rem;
-  color: var(--color-neon-green);
+  padding: 1rem;
+  border-radius: 12px;
   text-align: center;
   font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.successMessage {
+  color: var(--color-neon-green);
+  background: rgba(0, 245, 200, 0.1);
+  border: 1px dashed var(--color-neon-green);
+}
+
+.errorMessage {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px dashed #ff6b6b;
 }
 
 .loading {
@@ -180,16 +353,22 @@
   justify-content: center;
   align-items: center;
   min-height: 80vh;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: var(--color-neon-green);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  animation: glowPulse 2s infinite;
 }
 
-/* Mobile Responsive */
+/* --- MOBILE RESPONSIVE --- */
 @media (max-width: 768px) {
   .profileContainer {
-    padding: 2rem;
+    padding: 3rem 1.5rem;
+    border-radius: 20px;
   }
-  .profileContainer h1 {
-    font-size: 2rem;
+  .profileContainer h1 { font-size: 2.2rem; }
+  
+  .imageWrapper {
+      width: 130px; height: 130px;
   }
 }

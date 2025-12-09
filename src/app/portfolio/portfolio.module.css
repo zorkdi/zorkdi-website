@@ -1,204 +1,362 @@
 /* src/app/portfolio/portfolio.module.css */
 
+/* --- GLOBAL ANIMATIONS --- */
+@keyframes liquidShine {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes floatUp {
+    0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes grain {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-5%, -10%); }
+    20% { transform: translate(-15%, 5%); }
+    30% { transform: translate(7%, -25%); }
+    40% { transform: translate(-5%, 25%); }
+    50% { transform: translate(-15%, 10%); }
+    60% { transform: translate(15%, 0%); }
+    70% { transform: translate(0%, 15%); }
+    80% { transform: translate(3%, 35%); }
+    90% { transform: translate(-10%, 10%); }
+}
+
+/* --- MAIN CONTAINER --- */
 .main {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 5rem 2rem;
-}
-
-.hero {
-  text-align: center;
-  padding-bottom: 4rem;
-  /* High Tech: Border ko thoda bright kiya */
-  border-bottom: 2px solid var(--color-neon-green); 
-  margin-bottom: 3rem;
-}
-
-.hero h1 {
-  font-size: 3.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: var(--color-neon-green);
-  /* UI/UX Tweak: Stronger Neon Glow */
-  text-shadow: 0 0 10px rgba(0, 245, 200, 0.7), 0 0 20px rgba(0, 245, 200, 0.4); 
-}
-
-.hero p {
-  font-size: 1.5rem;
-  opacity: 0.95; /* Text visibility badhai */
-}
-
-/* NAYA: Filters ko Futuristic look */
-.filters {
-  display: flex;
-  justify-content: center;
-  gap: 1.25rem; /* Gap badhaya */
-  margin-bottom: 4rem;
-  flex-wrap: wrap;
-}
-
-.filters button {
-  background-color: var(--color-deep-blue);
-  color: var(--color-off-white);
-  /* UI/UX Tweak: Border ko Neon diya */
-  border: 1px solid var(--color-secondary-accent); 
-  padding: 0.75rem 1.75rem;
-  border-radius: 2rem;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.filters button:hover {
-  background-color: var(--color-dark-navy);
-  border-color: var(--color-neon-light);
-  transform: translateY(-3px);
-  /* Subtle Neon glow on hover */
-  box-shadow: 0 0 8px rgba(0, 245, 200, 0.4); 
-}
-
-.filters .activeFilter {
-  background-color: var(--color-neon-green);
-  color: var(--color-dark-navy);
-  border-color: var(--color-neon-green);
-  /* UI/UX Tweak: Stronger Neon glow on active filter */
-  box-shadow: 0 0 15px rgba(0, 245, 200, 0.8); 
-  font-weight: 700;
-}
-
-/* CRITICAL FIX: Grid ko 3-column layout enforce kiya */
-.portfolioGrid {
-  display: grid;
-  /* Desktop par Explicitly 3-column */
-  grid-template-columns: repeat(3, 1fr); 
-  gap: 2rem; 
-  width: 100%; 
-}
-
-/* NAYA: Advanced Portfolio Item Card (High-Tech Glass Card) */
-.portfolioItem {
-  display: flex;
-  flex-direction: column; 
-  flex-grow: unset;
-  flex-shrink: unset;
-  width: 100%; 
-  
-  /* UI/UX Tweak: Deeper Glass Effect */
-  background-color: rgba(22, 33, 62, 0.85); /* Thoda aur dark kiya */
-  backdrop-filter: blur(12px); /* Blur badhaya */
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 16px;
+  padding: 8rem 2rem;
+  min-height: 100vh;
+  position: relative;
+  background-color: #050508; /* Darker than navy for contrast */
   overflow: hidden;
-  /* UI/UX Tweak: Border ko thoda neon tint diya */
-  border: 1px solid rgba(139, 92, 246, 0.3); 
-  text-decoration: none;
-  color: var(--color-off-white);
-  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.6); /* Shadow badhaya */
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-
-  transform-style: preserve-3d;
-}
-
-.portfolioItem:hover {
-  /* UI/UX Tweak: Stronger 3D lift/tilt */
-  transform: translateY(-10px) rotateX(1deg) rotateY(1deg); 
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 15px var(--color-neon-green); /* Hover glow badhaya */
-}
-
-/* Image container */
-.portfolioImagePlaceholder {
-  width: 100%;
-  aspect-ratio: 16 / 9; 
-  position: relative; 
-  background-color: var(--color-deep-blue);
-  overflow: hidden; 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.portfolioImagePlaceholder img {
-    object-fit: cover;
-    transition: transform 0.4s ease;
-}
-
-.portfolioItem:hover .portfolioImagePlaceholder img {
-    transform: scale(1.1); /* Zoom effect badhaya */
-}
-
-/* Image Placeholder Text ki Styling */
-.imagePlaceholderText {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.6);
-    padding: 2rem;
-    text-align: center;
-}
-
-/* NAYA: Text Info Container */
-.portfolioItemInfo {
-  padding: 1.5rem; 
-  flex-grow: 1; 
   display: flex;
   flex-direction: column;
 }
 
-.portfolioItemInfo h3 {
-  font-size: 1.4rem; 
+/* Ambient Grain Texture (Cinematic Feel) */
+.main::before {
+    content: "";
+    position: fixed;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    animation: grain 8s steps(10) infinite;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+}
+
+/* Deep Space Glow */
+.main::after {
+    content: '';
+    position: fixed;
+    top: 20%; left: 50%; transform: translateX(-50%);
+    width: 80vw; height: 60vh;
+    background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15), transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(100px);
+}
+
+/* --- HERO SECTION --- */
+.hero {
+  text-align: center;
+  padding-bottom: 5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+  animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.hero h1 {
+  font-size: 5rem;
+  font-weight: 900;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+  letter-spacing: -2px;
+  
+  /* Liquid Metal Gradient */
+  background: linear-gradient(
+    90deg, 
+    #ffffff 0%, 
+    #a78bfa 25%, 
+    #ffffff 50%, 
+    #2dd4bf 75%, 
+    #ffffff 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: liquidShine 5s linear infinite;
+  text-shadow: 0 0 40px rgba(167, 139, 250, 0.3);
+}
+
+.hero p {
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 750px;
+  margin: 0 auto;
+  line-height: 1.7;
+  font-weight: 400;
+}
+
+/* --- FILTERS (Floating Glass Dock) --- */
+.filters {
+  display: inline-flex;
+  justify-content: center;
+  align-self: center; /* Center the dock itself */
+  gap: 0.5rem;
+  margin-bottom: 6rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+  
+  /* The Dock Look */
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.8rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  
+  animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s forwards;
+  opacity: 0;
+}
+
+.filters button {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 40px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.filters button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.filters .activeFilter {
+  background: var(--color-deep-blue); /* Fallback */
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  color: #fff;
   font-weight: 700;
-  margin: 0 0 0.5rem 0;
-  color: var(--color-off-white); /* Ensure title is bright */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Neon dot for active filter */
+.filters .activeFilter::after {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    background-color: var(--color-neon-green);
+    border-radius: 50%;
+    margin-left: 8px;
+    box-shadow: 0 0 10px var(--color-neon-green);
+}
+
+/* --- PORTFOLIO GRID --- */
+.portfolioGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Strict 3-Column */
+  gap: 3rem; /* Wider Gap for Premium Feel */
+  width: 100%;
+  position: relative;
+  z-index: 2;
+  animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s forwards;
+  opacity: 0;
+}
+
+/* --- PORTFOLIO CARD (Obsidian Glass) --- */
+.portfolioItem {
+  display: flex;
+  flex-direction: column; 
+  width: 100%;
+  
+  /* Obsidian Glass Effect */
+  background: linear-gradient(180deg, rgba(30, 30, 40, 0.7) 0%, rgba(10, 10, 15, 0.9) 100%);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  
+  border-radius: 24px;
+  overflow: hidden;
+  /* Ultra-thin premium border */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-decoration: none;
+  
+  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Inner Glow on Hover */
+.portfolioItem::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 1px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.2), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
+    transition: opacity 0.5s;
+}
+
+.portfolioItem:hover {
+  transform: translateY(-15px) scale(1.02);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 20, 90, 0.3);
+  border-color: rgba(212, 20, 90, 0.4);
+}
+
+/* Image Container */
+.portfolioImagePlaceholder {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  position: relative; 
+  background-color: #000;
+  overflow: hidden; 
+}
+
+/* Image Overlay (Darken initially) */
+.portfolioImagePlaceholder::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%);
+    opacity: 0.6;
+    transition: opacity 0.5s;
+    z-index: 1;
+}
+
+.portfolioItem:hover .portfolioImagePlaceholder::after {
+    opacity: 0; /* Reveal full brightness on hover */
+}
+
+.portfolioImagePlaceholder img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.portfolioItem:hover .portfolioImagePlaceholder img {
+    transform: scale(1.1);
+}
+
+/* Text Info Container */
+.portfolioItemInfo {
+  padding: 2.5rem; 
+  flex-grow: 1; 
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.portfolioItemInfo h3 {
+  font-size: 1.6rem; 
+  font-weight: 700;
+  margin: 0 0 0.8rem 0;
+  color: #fff;
+  transition: color 0.3s;
+}
+
+.portfolioItem:hover .portfolioItemInfo h3 {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .portfolioItemInfo p {
   font-size: 0.9rem; 
-  color: var(--color-neon-green); /* Category color maintain */
-  opacity: 1;
+  color: rgba(255, 255, 255, 0.5);
   margin: 0;
-  margin-top: 0.5rem; 
+  text-transform: uppercase;
+  letter-spacing: 2px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
+/* Category Dot */
+.portfolioItemInfo p::before {
+    content: '';
+    display: block;
+    width: 6px; height: 6px;
+    background-color: var(--color-secondary-accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--color-secondary-accent);
+}
 
-/* General Loading/Error/No Projects styles (can be shared) */
+/* --- STATES --- */
 .loading, .errorMessage, .noProjects {
     grid-column: 1 / -1; 
     text-align: center;
-    padding: 3rem 1rem;
-    font-size: 1.2rem;
-    opacity: 0.8;
+    padding: 6rem 1rem;
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 20px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    letter-spacing: 1px;
 }
+.loading { color: var(--color-neon-light); }
+.errorMessage { color: #ff6b6b; border-color: #ff6b6b; }
 
-.errorMessage { 
-    color: #ff4757; 
-    background-color: rgba(255, 71, 87, 0.15);
-    border-radius: 8px;
-    border: 1px solid #e74c3c;
-}
-.loading {
-    color: var(--color-neon-green);
-}
-.noProjects {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border: 1px solid var(--color-glass-light);
-}
 
+/* --- MOBILE RESPONSIVE --- */
+
+@media (max-width: 1024px) {
+    .portfolioGrid {
+        grid-template-columns: repeat(2, 1fr); /* 2 Columns on Tablet */
+        gap: 2rem;
+    }
+}
 
 @media (max-width: 768px) {
   .main {
-    padding: 2rem 1.5rem;
+    padding: 6rem 1.5rem 3rem 1.5rem;
   }
-  .hero h1 { font-size: 2.5rem; }
-  .filters button { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
   
-  /* Mobile par auto-fit, taaki 1 ya 2 card dikh sakein */
+  .hero h1 { font-size: 3rem; }
+  .hero p { font-size: 1rem; }
+  
+  /* Stack Filters on Mobile */
+  .filters {
+      flex-direction: row; /* Keep row but wrap */
+      border-radius: 20px;
+      width: 100%;
+      margin-bottom: 4rem;
+  }
+  .filters button {
+      flex: 1 1 auto; /* Grow to fill space */
+      text-align: center;
+      padding: 0.8rem 1rem;
+      font-size: 0.85rem;
+  }
+  
+  /* Grid Mobile */
   .portfolioGrid { 
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-      gap: 1.5rem;
+      grid-template-columns: 1fr; /* 1 Column on Mobile */
+      gap: 2.5rem;
   } 
   
   .portfolioItem:hover {
     transform: translateY(-5px); 
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); 
   }
 }

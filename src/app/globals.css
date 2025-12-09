@@ -1,36 +1,41 @@
-/* NAYA: Google Font "Inter" import kiya */
+/* src/app/globals.css */
+
+/* Google Font "Inter" import (Video jaisa clean look) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* Custom Color Variables for Ultra-Premium Tech Theme */
+/* --- UBIK VR INSPIRED THEME VARIABLES --- */
 :root {
-  /* CHANGE 1: Base Colors ko aur dark/premium kiya */
-  --color-dark-navy: #0A0B0F; /* Primary Background (Near-Black) */
-  --color-deep-blue: #10121A; /* Secondary Background / Card Base (Slightly lighter than bg) */
-  --color-off-white: #EFEFEF; /* Primary Text */
+  /* BACKGROUNDS: Deep Void Purple (Video Theme) */
+  --color-dark-navy: #0F0518; /* Main Background - Very Dark Purple */
+  --color-deep-blue: #1A0B2E; /* Card Background - Slightly Lighter Purple */
+  --color-off-white: #FFFFFF; /* Text Color */
   
-  /* Accent Colors (Yeh waise hi rahenge) */
-  --color-neon-green: #00F5C8; /* Primary Accent */
-  --color-neon-light: #2dffc9; /* Lighter Neon for Glow */
-  --color-secondary-accent: #8b5cf6; /* Secondary, Deep Purple/Violet Accent */
+  /* ACCENTS: Neon Magenta & Purple Gradients */
+  --color-neon-green: #D4145A; /* Primary Accent (Pink/Magenta) - Replaces Green */
+  --color-neon-light: #F94D86; /* Lighter Pink for Hovers */
+  --color-secondary-accent: #8E2DE2; /* Deep Violet Accent */
+
+  /* NEW: Gradient jo video mein buttons par hai */
+  --gradient-primary: linear-gradient(135deg, #D4145A 0%, #8E2DE2 100%);
+  --gradient-hover: linear-gradient(135deg, #F94D86 0%, #A64BF4 100%);
   
-  /* CHANGE 2: Glass ko naye dark theme se match kiya */
-  --color-glass-dark: rgba(16, 18, 26, 0.75); /* Darker glass background */
+  /* GLASS EFFECTS (Purple Tinted) */
+  --color-glass-dark: rgba(26, 11, 46, 0.85); 
   --color-glass-light: rgba(255, 255, 255, 0.05);
 
-  /* Shadows/Glows (Yeh waise hi rahenge) */
-  --shadow-neon: 0 0 15px rgba(0, 245, 200, 0.4);
-  --shadow-subtle: 0 5px 15px rgba(0, 0, 0, 0.3);
+  /* SHADOWS (Pink Glows) */
+  --shadow-neon: 0 0 20px rgba(212, 20, 90, 0.4);
+  --shadow-subtle: 0 10px 30px rgba(0, 0, 0, 0.5);
   
-  /* FIX 1: CSS Variable for Hero Background (FALLBACK) */
-  --hero-bg-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25%' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); 
+  /* BACKGROUND TEXTURE (Subtle Noise overlay for premium feel) */
+  --hero-bg-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25%' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); 
 }
 
-/* Hum yahan saari default browser styling ko reset kar rahe hain */
+/* Reset Defaults */
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  /* Font smoothing for better text appearance */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -39,26 +44,28 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  /* CHANGE 3: Naya "Inter" font apply kiya */
   font-family: 'Inter', sans-serif;
 }
 
-/* Yahan hum apni premium theme apply kar rahe hain */
 body {
-  /* Yeh hai hamara NAYA Near-Black background color */
   background-color: var(--color-dark-navy); 
-
-  /* Yeh hai hamara Off-White text color */
   color: var(--color-off-white); 
-  background-size: 100px 100px;
-  
-  /* NAYA: Thodi better line height di */
+  /* Background Gradient Mesh (Optional subtle effect behind everything) */
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(142, 45, 226, 0.08), transparent 25%), 
+    radial-gradient(circle at 85% 30%, rgba(212, 20, 90, 0.08), transparent 25%);
+  background-attachment: fixed;
   line-height: 1.6;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--color-neon-light);
 }
 
 button {
@@ -66,15 +73,19 @@ button {
   border: none;
   background: none;
   color: inherit;
+  font-family: inherit;
 }
 
-/* CRITICAL FIX: Select tags inherit font family properly */
 select {
     font-family: inherit;
+    background: var(--color-deep-blue);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 5px;
+    border-radius: 4px;
 }
 
-
-/* --- NAYA: Custom Scrollbar Styling (Modern/Minimal) --- */
+/* --- CUSTOM SCROLLBAR (Pink/Purple Theme) --- */
 
 /* For Webkit Browsers (Chrome, Safari) */
 ::-webkit-scrollbar {
@@ -86,22 +97,22 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--color-deep-blue);
+  background: var(--color-secondary-accent); /* Violet thumb */
   border-radius: 20px;
   border: 2px solid var(--color-dark-navy);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-neon-green);
+  background: var(--color-neon-green); /* Turns Pink on hover */
 }
 
 /* For Firefox */
 * {
-  scrollbar-color: var(--color-deep-blue) var(--color-dark-navy);
+  scrollbar-color: var(--color-secondary-accent) var(--color-dark-navy);
   scrollbar-width: thin;
 }
 
-/* --- NAYA: Floating Chat Button Styling --- */
+/* --- FLOATING CHAT BUTTON (Updated to Gradient) --- */
 
 .floatingChatButton {
     position: fixed;
@@ -109,7 +120,6 @@ select {
     right: 30px;
     z-index: 999;
     
-    /* Neo-Tech Look */
     width: 60px;
     height: 60px;
     display: flex;
@@ -117,19 +127,20 @@ select {
     align-items: center;
     border-radius: 50%;
     
-    background-color: var(--color-neon-green);
-    color: var(--color-dark-navy) !important;
+    /* Using the new gradient */
+    background: var(--gradient-primary);
+    color: white !important;
     font-size: 1.5rem;
     
-    /* Neon Glow */
-    box-shadow: 0 0 15px rgba(0, 245, 200, 0.7);
+    box-shadow: 0 0 20px rgba(212, 20, 90, 0.5);
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .floatingChatButton:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 25px rgba(0, 245, 200, 0.9);
+    transform: scale(1.1) rotate(10deg);
+    box-shadow: 0 0 30px rgba(212, 20, 90, 0.8);
+    background: var(--gradient-hover);
 }
 
 /* Mobile Adjustments */
@@ -143,11 +154,10 @@ select {
     }
 }
 
-/* --- NAYA: Lenis Smooth Scroll CSS --- */
+/* --- LENIS SMOOTH SCROLL CSS (Required for smooth scrolling) --- */
 html.lenis {
   height: auto;
 }
 .lenis.lenis-smooth {
   scroll-behavior: auto !important;
 }
-/* Khaali ruleset ( .lenis.lenis-stopping... ) yahan se hata diya gaya hai */

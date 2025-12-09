@@ -1,44 +1,148 @@
 /* app/new-project/new-project.module.css */
 
+/* --- GLOBAL ANIMATIONS --- */
+@keyframes gradientBreath {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes liquidShine {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes floatUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 10px rgba(0, 245, 200, 0.1); }
+    50% { box-shadow: 0 0 25px rgba(0, 245, 200, 0.3); }
+    100% { box-shadow: 0 0 10px rgba(0, 245, 200, 0.1); }
+}
+
+/* --- MAIN CONTAINER --- */
 .main {
   width: 100%;
-  max-width: 900px; /* Thoda aur zyada spacious feel ke liye */
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 4rem 2rem;
+  padding: 6rem 2rem;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  /* ALIVE BACKGROUND */
+  background: linear-gradient(
+      -45deg, 
+      #050508, 
+      #1a0b2e, 
+      #0f172a, 
+      #050508
+  );
+  background-size: 400% 400%;
+  animation: gradientBreath 15s ease infinite;
 }
 
+/* Ambient Floating Glows */
+.main::before {
+    content: '';
+    position: fixed;
+    top: -20%; left: -20%;
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(142, 45, 226, 0.08) 0%, transparent 70%);
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
+    animation: gradientBreath 20s ease-in-out infinite alternate;
+}
+
+.main::after {
+    content: '';
+    position: fixed;
+    bottom: -20%; right: -20%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0, 245, 200, 0.05) 0%, transparent 70%);
+    filter: blur(80px);
+    z-index: 0;
+    pointer-events: none;
+    animation: gradientBreath 25s ease-in-out infinite alternate;
+}
+
+/* --- FORM CONTAINER (Glass Console) --- */
 .formContainer {
-  /* NAYA: Refined Glassmorphism - Thoda light background aur zyada border highlight */
-  background-color: var(--color-glass-dark);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  padding: 3.5rem; /* Zyaada padding */
-  border-radius: 20px; /* Aur zyaada rounded */
-  border: 1px solid var(--color-glass-light);
-  /* NAYA: Stronger depth shadow */
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  
+  /* Premium Glassmorphism */
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  
+  padding: 4rem;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+  
+  animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
+/* Top Accent Line */
+.formContainer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 150px; height: 4px;
+    background: var(--gradient-primary);
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 0 20px rgba(212, 20, 90, 0.5);
+}
+
+/* --- HEADINGS --- */
 .formContainer h1 {
-  font-size: 2.8rem; /* Thoda bada heading */
-  font-weight: 700;
+  font-size: 3.5rem;
+  font-weight: 800;
   text-align: center;
-  margin-bottom: 0.5rem;
-  color: var(--color-neon-green);
-  text-shadow: 0 0 5px rgba(0, 245, 200, 0.3);
+  margin-bottom: 1rem;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  
+  /* Liquid Metal Text */
+  background: linear-gradient(90deg, #ffffff 0%, #c4b5fd 50%, #ffffff 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: liquidShine 8s linear infinite;
+  
+  filter: drop-shadow(0 0 30px rgba(142, 45, 226, 0.3));
 }
 
 .formContainer p {
   text-align: center;
-  opacity: 0.9;
-  margin-bottom: 3rem;
-  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 4rem;
+  font-size: 1.15rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
 }
 
+/* --- FORM GRID --- */
 .projectForm {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 2-column layout */
-  gap: 2rem 3rem; /* Spacing increased */
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
 }
 
 .formGroup {
@@ -46,167 +150,201 @@
   flex-direction: column;
 }
 
-.fullWidth {
-  grid-column: 1 / -1;
-}
-
+/* --- LABELS --- */
 .formGroup label {
-  margin-bottom: 0.75rem; /* Increased margin */
-  font-weight: 600; /* Bolder label */
-  opacity: 0.9;
-  font-size: 1.05rem;
-  transition: color 0.2s ease;
-}
-
-/* Budget label ke liye alag style */
-.budgetLabel {
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
-  gap: 0.5rem; 
+  gap: 0.5rem;
 }
 
 .currencySymbol {
+  color: var(--color-neon-green);
   font-weight: 700;
-  color: var(--color-neon-light); 
-  font-size: 1.1rem;
 }
 
+/* --- INPUTS (Cyber Slots) --- */
 .formGroup input,
 .formGroup select,
 .formGroup textarea {
   width: 100%;
-  padding: 1.1rem; /* Increased padding for better field height */
-  /* NAYA: Cleaner deep-blue input background */
-  background-color: var(--color-deep-blue);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px; /* Slightly more rounded inputs */
-  color: var(--color-off-white);
+  padding: 1.2rem 1.5rem;
+  
+  /* Dark Glass Input */
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  
+  color: #fff;
   font-size: 1rem;
   font-family: inherit;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
+  
+  /* Inner shadow for depth */
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
 }
 
+/* Focus State - Neon Glow */
 .formGroup input:focus,
 .formGroup select:focus,
 .formGroup textarea:focus {
   outline: none;
-  /* NAYA: Stronger Neon focus border aur glow */
   border-color: var(--color-neon-green);
-  box-shadow: 0 0 10px var(--color-neon-light);
+  box-shadow: 0 0 20px rgba(0, 245, 200, 0.15), inset 0 2px 5px rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
 }
 
 .formGroup textarea {
-  min-height: 180px; /* Thodi zyaada height */
+  min-height: 150px;
   resize: vertical;
 }
 
+/* Custom Select Styling fix for standard select */
+.formGroup select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1.5rem center;
+    background-size: 1em;
+}
+
+/* --- SUBMIT BUTTON (Power Button) --- */
 .submitButton {
   grid-column: 1 / -1; 
-  margin-top: 1.5rem; /* Zyaada space button ke upar */
-  padding: 1.2rem;
-  background-color: var(--color-neon-green);
-  color: var(--color-dark-navy);
-  font-weight: 700;
-  border-radius: 10px;
+  margin-top: 2rem;
+  padding: 1.4rem;
+  
+  /* Gradient Button */
+  background: var(--gradient-primary);
+  color: #fff;
+  
+  font-weight: 800;
+  border-radius: 16px;
   border: none;
   cursor: pointer;
-  font-size: 1.2rem;
-  /* NAYA: Strong Neon Glow and lift */
-  box-shadow: 0 0 20px rgba(0, 245, 200, 0.6);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  
+  /* Alive Pulse */
+  animation: glowPulse 3s infinite ease-in-out;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.submitButton::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
 }
 
 .submitButton:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 245, 200, 0.8);
+  box-shadow: 0 15px 40px rgba(212, 20, 90, 0.5);
+}
+
+.submitButton:hover::before {
+    left: 100%;
 }
 
 .submitButton:disabled {
-  opacity: 0.5;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.3);
   cursor: not-allowed;
-  transform: none;
+  animation: none;
   box-shadow: none;
+  transform: none;
 }
 
+/* --- MESSAGES --- */
 .successMessage {
   grid-column: 1 / -1;
   text-align: center;
-  margin-top: 1rem;
   color: var(--color-neon-green);
-  background-color: rgba(0, 245, 200, 0.15); /* Thoda dark background */
-  padding: 1.2rem;
-  border-radius: 10px;
-  border: 1px solid var(--color-neon-green);
+  background: rgba(0, 245, 200, 0.1);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px dashed var(--color-neon-green);
   font-weight: 600;
-  font-size: 1.1rem;
 }
 
-.errorMessage { /* Error message style update for consistency */
+.errorMessage {
     grid-column: 1 / -1;
     text-align: center;
-    margin-top: 1rem;
-    color: #ff4757;
-    background-color: rgba(255, 71, 87, 0.15);
-    padding: 1.2rem;
-    border-radius: 10px;
-    border: 1px solid #e74c3c;
-    font-weight: 600;
-    font-size: 1.1rem;
-}
-
-/* NAYA: Login/Signup Prompt box styling */
-.authPrompt {
-    grid-column: 1 / -1;
-    margin-bottom: 2rem;
-    text-align: center;
-    background-color: rgba(255, 255, 255, 0.08); /* Thoda brighter background */
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
     padding: 1.5rem;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: var(--shadow-subtle);
+    border: 1px dashed #ff6b6b;
+    font-weight: 600;
+}
+
+/* --- AUTH PROMPT --- */
+.authPrompt {
+    grid-column: 1 / -1;
+    margin-bottom: 3rem;
+    text-align: center;
+    background: rgba(139, 92, 246, 0.1);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(139, 92, 246, 0.3);
 }
 .authPrompt p {
     margin: 0;
-    opacity: 1; /* Text zyaada visible */
+    color: #fff;
+    font-size: 1.1rem;
 }
 .authPrompt a {
-    color: var(--color-neon-light);
+    color: var(--color-neon-green);
     font-weight: 700;
-    text-decoration: underline;
-    transition: color 0.2s ease;
+    text-decoration: none;
+    margin: 0 5px;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s;
 }
 .authPrompt a:hover {
-    color: var(--color-neon-green);
+    border-bottom-color: var(--color-neon-green);
+    text-shadow: 0 0 10px rgba(0, 245, 200, 0.5);
 }
 
 
-/* Mobile Responsive Styles */
+/* --- MOBILE RESPONSIVE --- */
 @media (max-width: 768px) {
   .main {
-    padding: 2rem 1.5rem;
+    padding: 4rem 1rem;
   }
   
   .formContainer {
-    padding: 2rem;
+    padding: 2.5rem 1.5rem;
+    border-radius: 20px;
   }
 
   .formContainer h1 {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
   }
   
   .formContainer p {
     font-size: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
   }
 
-  /* Make form 1-column on mobile */
+  /* 1 Column on Mobile */
   .projectForm {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
   
-  .formGroup label {
-      margin-bottom: 0.5rem;
-      font-size: 1rem;
+  .submitButton {
+      margin-top: 1rem;
+      padding: 1.2rem;
   }
 }
