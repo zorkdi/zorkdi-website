@@ -5,22 +5,22 @@
 import React, { useRef } from 'react';
 import styles from '../../app/page.module.css';
 import { FaQuoteLeft, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { Timestamp } from 'firebase/firestore'; // Timestamp import jo pehle fix kiya tha
+// Note: Timestamp import hata diya kyunki ab hum String use kar rahe hain
 
-// Review Interface (page.tsx se copy kiya)
+// Review Interface (Updated to match HomeClient & page.tsx)
 interface Review {
     id: string;
     userName: string;
     rating: number;
     comment: string;
-    createdAt: Timestamp; // Pehle fix kiya tha
+    createdAt: string | null; // FIXED: Changed from Timestamp to string to fix error
 }
 
 interface TestimonialSliderProps {
     reviews: Review[];
 }
 
-// Function to render Star Rating (page.tsx se copy kiya)
+// Function to render Star Rating
 const StarRating = ({ rating }: { rating: number }) => {
     const totalStars = 5;
     const filledStars = Math.round(rating);
@@ -54,7 +54,6 @@ const TestimonialSlider: React.FC<TestimonialSliderProps> = ({ reviews }) => {
         }
     };
     
-    // === YAHAN NAYA FUNCTION ADD KIYA GAYA HAI ===
     /**
      * Formats the username. If it's an email, it shows the part before the @.
      * @param name The username string from the database.
@@ -69,7 +68,7 @@ const TestimonialSlider: React.FC<TestimonialSliderProps> = ({ reviews }) => {
         return name;
     };
 
-    if (reviews.length === 0) {
+    if (!reviews || reviews.length === 0) {
         return <p style={{ textAlign: 'center', opacity: 0.8 }}>No approved testimonials yet. Be the first to rate us!</p>;
     }
 
@@ -89,7 +88,6 @@ const TestimonialSlider: React.FC<TestimonialSliderProps> = ({ reviews }) => {
             {/* Scrollable Track */}
             <div className={styles.sliderTrackWrapper}>
                 <div className={styles.sliderTrack} ref={scrollRef}>
-                    {/* Unused 'index' hata diya tha (pichla fix) */}
                     {reviews.map((review) => (
                         <div key={review.id} className={styles.testimonialCard}>
                             <FaQuoteLeft className={styles.quoteIcon} />
@@ -99,7 +97,6 @@ const TestimonialSlider: React.FC<TestimonialSliderProps> = ({ reviews }) => {
                             </p>
                             
                             <div className={styles.reviewFooter}>
-                                {/* === YAHAN CHANGE KIYA GAYA HAI === */}
                                 <div className={styles.reviewerName}>{formatUserName(review.userName)}</div>
                                 <StarRating rating={review.rating} />
                             </div>
