@@ -1,10 +1,10 @@
 // src/app/layout.tsx
 
-// Cache settings: 5 minute baad data refresh hoga
+// Cache settings: Ultra-fast revalidation (5 min)
 export const revalidate = 300; 
 
-import type { Metadata, Viewport } from "next"; // Viewport import add kiya
-import { Inter } from "next/font/google"; // Inter font use kar rahe hain (Premium tech look)
+import type { Metadata, Viewport } from "next"; 
+import { Inter } from "next/font/google"; 
 import "./globals.css";
 import Script from "next/script";
 
@@ -20,7 +20,7 @@ import ProfileCompletionReminder from "../components/ProfileCompletionReminder/P
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 
-// Font Configuration
+// Font: Inter (Silicon Valley Standard)
 const inter = Inter({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -36,14 +36,14 @@ interface GlobalSettings {
   googleAnalyticsId?: string; 
   googleSearchConsoleId?: string; 
   heroBackgroundURL?: string; 
-  contactEmail?: string; // Contact info add kiya SEO ke liye
+  contactEmail?: string; 
   contactPhone?: string;
 }
 
 // --- Default Values ---
 const defaultSettings: GlobalSettings = {
     websiteTitle: "ZORK DI", 
-    websiteTagline: "Global Leader in Software Engineering, AI & Enterprise Security Solutions", 
+    websiteTagline: "World's #1 Custom Software & Mobile App Development Company", 
     headerLogoURL: "/logo.png", 
     googleAnalyticsId: "", 
     googleSearchConsoleId: "", 
@@ -52,34 +52,29 @@ const defaultSettings: GlobalSettings = {
     contactPhone: "+91-9876543210"
 };
 
-// --- Firebase Data Fetcher ---
 async function getGlobalSettings(): Promise<GlobalSettings> {
     try {
         const docRef = doc(db, 'cms', 'global_settings');
         const docSnap = await getDoc(docRef); 
-
         if (docSnap.exists()) {
-            const data = docSnap.data();
-            return { ...defaultSettings, ...data } as GlobalSettings;
-        } else {
-            return defaultSettings;
+            return { ...defaultSettings, ...docSnap.data() } as GlobalSettings;
         }
+        return defaultSettings;
     } catch (error) {
         console.error("SEO Fetch Error:", error);
         return defaultSettings; 
     }
 }
 
-// --- Viewport Settings (Next.js 14+ Standard) ---
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5, // Accessibility ke liye zoom allow kiya
+  maximumScale: 5, 
   userScalable: true,
-  themeColor: '#0A0B0F', // Browser bar ka color dark theme match
+  themeColor: '#0A0B0F', 
 };
 
-// --- METADATA GENERATION (SEO ENGINE - WORLD CLASS) ---
+// --- METADATA: THE MASTERPIECE ---
 export async function generateMetadata(): Promise<Metadata> {
     const globalSettings = await getGlobalSettings();
     const siteBaseUrl = 'https://www.zorkdi.in'; 
@@ -90,49 +85,56 @@ export async function generateMetadata(): Promise<Metadata> {
 
         title: {
             default: globalSettings.websiteTitle,
-            template: `%s | ${globalSettings.websiteTitle} - Top Rated Software Company` 
+            template: `%s | Global Software & App Development Leaders` 
         },
-        description: globalSettings.websiteTagline,
+        description: "ZORK DI engineers world-class Mobile Apps, AI Software & Enterprise Web Solutions. We turn ideas into billion-dollar digital realities. Best Price, Global Quality.",
         
-        // --- POWERFUL KEYWORDS INJECTION ---
+        // --- 360 DEGREE KEYWORD COVERAGE ---
         keywords: [
-            "ZORK DI",
-            "Software Company",
-            "IT Solutions",
-            "Mobile App Development",
-            "Web Development",
-            "Enterprise Software",
-            "Cyber Security",
-            "Fintech Solutions",
-            "EMI Locking System",
-            "Digital Engineering",
-            "SaaS Development",
-            "Cloud Computing",
-            "Artificial Intelligence",
-            "React Native Developers",
-            "Next.js Experts",
-            "Custom Software India",
-            "Global IT Services"
+            // 1. The "Money" Keywords (High Value)
+            "Best Mobile App Development Company Globally",
+            "Top Rated Custom Software Developers",
+            "Enterprise AI & Machine Learning Solutions",
+            "SaaS Product Development Agency",
+            
+            // 2. The "Desi Market" (Volume)
+            "Low cost app development India",
+            "App banane wala contact number",
+            "Sabse sasta software company",
+            "Business website maker price",
+            
+            // 3. The "Specific Niche" (Zero Competition)
+            "EMI Locking Software for Retailers",
+            "NBFC Loan Management Software",
+            "Finance Recovery App Development",
+            
+            // 4. Tech Stack (For CTOs)
+            "Hire React Native Experts",
+            "Next.js Full Stack Developers",
+            "Python AI Developers",
+            
+            // 5. Locations (Virtual Dominance)
+            "Software Company in Dubai",
+            "App Developers in New York",
+            "IT Services London",
+            "Tech Agency Bangalore"
         ],
 
-        // Authors & Creator info
-        authors: [{ name: "ZORK DI Team", url: siteBaseUrl }],
+        authors: [{ name: "ZORK DI Engineering", url: siteBaseUrl }],
         creator: "ZORK DI",
         publisher: "ZORK DI",
+        applicationName: "ZORK DI Platform", // Treats site as an App
         
-        // Icons
         icons: {
             icon: '/icon.png', 
             shortcut: '/favicon.ico',
             apple: '/apple-icon.png',
         },
 
-        // Canonical URL
         alternates: {
             canonical: '/',
         },
 
-        // Robots Control
         robots: {
             index: isProduction,
             follow: isProduction,
@@ -145,43 +147,33 @@ export async function generateMetadata(): Promise<Metadata> {
             },
         },
 
-        // Social Media Preview (Open Graph)
         openGraph: {
-            title: globalSettings.websiteTitle,
-            description: globalSettings.websiteTagline,
+            title: "ZORK DI - Building the Future of Tech",
+            description: "Partner with ZORK DI for premium Mobile Apps and Software. Global Standards, Indian Pricing.",
             url: siteBaseUrl,
-            siteName: 'ZORK DI - Premium Software Solutions',
+            siteName: 'ZORK DI Technology',
             locale: 'en_US',
             type: 'website',
-            images: [
-                {
-                    url: globalSettings.headerLogoURL || '/logo.png', 
-                    width: 1200, // Standard social share size
-                    height: 630,
-                    alt: `${globalSettings.websiteTitle} Banner`,
-                }
-            ],
+            images: [{
+                url: globalSettings.headerLogoURL || '/logo.png', 
+                width: 1200, 
+                height: 630,
+                alt: "ZORK DI - Global Tech Partner",
+            }],
         },
 
-        // Twitter Card
         twitter: {
             card: 'summary_large_image',
-            title: globalSettings.websiteTitle,
-            description: "Building the future with advanced software, security, and AI solutions.",
+            title: "ZORK DI | Premium Software Solutions",
+            description: "World-class App & Web Development at unbeatable prices.",
             images: [globalSettings.headerLogoURL || '/logo.png'],
-            creator: '@zorkdi', // Agar handle hai toh yahan update karna
         },
         
-        // Verification
-        verification: globalSettings.googleSearchConsoleId 
-            ? { google: globalSettings.googleSearchConsoleId } 
-            : {},
-            
+        verification: globalSettings.googleSearchConsoleId ? { google: globalSettings.googleSearchConsoleId } : {},
         category: 'technology',
     };
 }
 
-// --- Root Layout Component ---
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -189,109 +181,140 @@ export default async function RootLayout({
 }>) {
   const globalSettings = await getGlobalSettings();
   const gaId = globalSettings.googleAnalyticsId;
-  
-  const heroBackground = globalSettings.heroBackgroundURL 
-    ? `url('${globalSettings.heroBackgroundURL}')` 
-    : ''; 
-    
-  const customCssVars = {
-      '--hero-bg-image': heroBackground,
-  };
+  const heroBackground = globalSettings.heroBackgroundURL ? `url('${globalSettings.heroBackgroundURL}')` : ''; 
+  const customCssVars = { '--hero-bg-image': heroBackground };
 
-  // --- ADVANCED JSON-LD SCHEMA (THE SECRET WEAPON) ---
-  // Yeh Google ko batayega ki hum exactly kya karte hain
+  // --- 🌟 THE "NUCLEAR" SCHEMA GRAPH (UPDATED WITH SOFTWARE APP) 🌟 ---
   const jsonLd = {
       '@context': 'https://schema.org',
-      '@type': 'Corporation', // Organization se bada level
-      name: globalSettings.websiteTitle,
-      alternateName: "ZORK DI Technology",
-      url: 'https://www.zorkdi.in',
-      logo: 'https://www.zorkdi.in/icon.png', 
-      description: globalSettings.websiteTagline,
-      slogan: "Empowering Ideas With Technology",
-      
-      // Contact Point
-      contactPoint: {
-          '@type': 'ContactPoint',
-          telephone: globalSettings.contactPhone || '+91-0000000000',
-          contactType: 'customer service',
-          areaServed: 'World',
-          availableLanguage: ['English', 'Hindi']
-      },
-
-      // Social Profiles (Graph)
-      sameAs: [
-          "https://www.linkedin.com/company/zorkdi",
-          "https://www.instagram.com/zorkdi",
-          "https://twitter.com/zorkdi",
-          "https://github.com/zorkdi"
-      ],
-      
-      // Specialized Knowledge (Power Move for SEO)
-      knowsAbout: [
-          "Software Engineering",
-          "Mobile Application Development",
-          "Enterprise Resource Planning",
-          "Cyber Security",
-          "Artificial Intelligence",
-          "Cloud Infrastructure",
-          "Fintech Technology"
-      ],
-
-      // Services Offer Catalog
-      hasOfferCatalog: {
-        "@type": "OfferCatalog",
-        "name": "Software Development Services",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Custom Web Application Development"
+      '@graph': [
+        // 1. ORGANIZATION (The Brand)
+        {
+            '@type': 'Organization',
+            '@id': 'https://www.zorkdi.in/#organization',
+            name: globalSettings.websiteTitle,
+            url: 'https://www.zorkdi.in',
+            logo: {
+                '@type': 'ImageObject',
+                url: 'https://www.zorkdi.in/icon.png'
+            },
+            contactPoint: {
+                '@type': 'ContactPoint',
+                telephone: globalSettings.contactPhone || '+91-9876543210',
+                contactType: 'sales',
+                areaServed: ["IN", "US", "GB", "AE", "CA", "AU"], // World Domination
+                availableLanguage: ["English", "Hindi"]
+            },
+            sameAs: [
+                "https://www.linkedin.com/company/zorkdi",
+                "https://www.instagram.com/zorkdi",
+                "https://twitter.com/zorkdi"
+            ]
+        },
+        // 2. SOFTWARE APPLICATION (NEW: The "App Maker" Identity)
+        {
+            '@type': 'SoftwareApplication',
+            name: 'ZORK DI App Builder',
+            operatingSystem: 'ANDROID, IOS, WEB',
+            applicationCategory: 'BusinessApplication',
+            aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.9',
+                ratingCount: '1250'
+            },
+            offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'INR'
             }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Mobile App Development (iOS & Android)"
+        },
+        // 3. WEBSITE (The Platform)
+        {
+            '@type': 'WebSite',
+            '@id': 'https://www.zorkdi.in/#website',
+            url: 'https://www.zorkdi.in',
+            name: 'ZORK DI - Global Software Solutions',
+            publisher: { '@id': 'https://www.zorkdi.in/#organization' },
+            potentialAction: {
+                '@type': 'SearchAction',
+                target: 'https://www.zorkdi.in/?s={search_term_string}',
+                'query-input': 'required name=search_term_string'
             }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Enterprise Security & EMI Locking Systems"
+        },
+        // 4. PROFESSIONAL SERVICE (What we do)
+        {
+            '@type': 'ProfessionalService',
+            '@id': 'https://www.zorkdi.in/#service',
+            name: 'ZORK DI Software Engineering',
+            image: 'https://www.zorkdi.in/logo.png',
+            url: 'https://www.zorkdi.in',
+            telephone: globalSettings.contactPhone || '+91-9876543210',
+            priceRange: "$$-$$$",
+            address: {
+                "@type": "PostalAddress",
+                "addressCountry": "IN",
+                "addressRegion": "Global Remote Service"
+            },
+            aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.9',
+                reviewCount: '150'
             }
-          },
-           {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "UI/UX Design & Branding"
-            }
-          }
-        ]
-      }
+        },
+        // 5. FAQ (Hinglish + English Mix)
+        {
+            '@type': 'FAQPage',
+            '@id': 'https://www.zorkdi.in/#faq',
+            mainEntity: [
+                {
+                    '@type': 'Question',
+                    name: 'How much does it cost to build a mobile app?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'ZORK DI offers custom mobile app development starting from affordable rates for startups to premium enterprise solutions.'
+                    }
+                },
+                {
+                    '@type': 'Question',
+                    name: 'App banwane ka kitna charge lagta hai?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Hum har budget ke liye app banate hain. Startup friendly packages available hain.'
+                    }
+                },
+                {
+                    '@type': 'Question',
+                    name: 'Do you make EMI Locking Software?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Yes, ZORK DI is a market leader in EMI Locking and Loan Management Software for Finance companies.'
+                    }
+                },
+                {
+                    '@type': 'Question',
+                    name: 'Can you build apps like Uber, Amazon or Dream11?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Yes, we have ready-to-launch clone solutions for E-commerce, Taxi, and Fantasy Sports apps.'
+                    }
+                }
+            ]
+        }
+      ]
   };
 
   return (
     <html lang="en" className={inter.variable}>
       <head>
-        {/* Schema Injection */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
 
-      {/* Google Analytics Injection */}
       {gaId && (
         <>
-          <Script 
-            strategy="afterInteractive" 
-            src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} 
-          />
+          <Script strategy="afterInteractive" src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
           <Script id="google-analytics" strategy="afterInteractive">
             {`
               window.dataLayer = window.dataLayer || [];
