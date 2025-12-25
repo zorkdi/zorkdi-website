@@ -184,7 +184,7 @@ export default async function RootLayout({
   const heroBackground = globalSettings.heroBackgroundURL ? `url('${globalSettings.heroBackgroundURL}')` : ''; 
   const customCssVars = { '--hero-bg-image': heroBackground };
 
-  // --- 🌟 THE "NUCLEAR" SCHEMA GRAPH (UPDATED WITH SOFTWARE APP) 🌟 ---
+  // --- 🌟 THE "NUCLEAR" SCHEMA GRAPH (FIXED: Removing Illegal Ratings) 🌟 ---
   const jsonLd = {
       '@context': 'https://schema.org',
       '@graph': [
@@ -211,7 +211,8 @@ export default async function RootLayout({
                 "https://twitter.com/zorkdi"
             ]
         },
-        // 2. SOFTWARE APPLICATION (NEW: The "App Maker" Identity)
+        // 2. SOFTWARE APPLICATION (VALID RATING ✅)
+        // Google products ke liye khud ki rating allow karta hai
         {
             '@type': 'SoftwareApplication',
             name: 'ZORK DI App Builder',
@@ -241,7 +242,8 @@ export default async function RootLayout({
                 'query-input': 'required name=search_term_string'
             }
         },
-        // 4. PROFESSIONAL SERVICE (What we do)
+        // 4. PROFESSIONAL SERVICE (FIXED: Rating Removed ❌)
+        // Yahan se rating hata di hai taaki Google ka 'Self-Serving' rule break na ho
         {
             '@type': 'ProfessionalService',
             '@id': 'https://www.zorkdi.in/#service',
@@ -254,12 +256,8 @@ export default async function RootLayout({
                 "@type": "PostalAddress",
                 "addressCountry": "IN",
                 "addressRegion": "Global Remote Service"
-            },
-            aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.9',
-                reviewCount: '150'
             }
+            // aggregateRating hataya gaya hai to fix error
         },
         // 5. FAQ (Hinglish + English Mix)
         {
