@@ -268,7 +268,7 @@ const HomeClient: React.FC<HomeClientProps> = ({
                  >
                     <canvas ref={canvasRef} className={styles.plexusCanvas} />
 
-                    {/* --- SLIDE 0: ZORK DI SHIELD --- */}
+                    {/* --- SLIDE 0: iSHIELD LOCK (Updated Name & Link) --- */}
                     <div className={`${styles.heroContentWrapper} ${styles.shieldSlideWrapper} ${getSlideClass(0)}`}>
                         <div className={styles.shieldSlideText}>
                             <AnimationWrapper delay={0.1}>
@@ -277,7 +277,8 @@ const HomeClient: React.FC<HomeClientProps> = ({
                                 </div>
                             </AnimationWrapper>
                             <AnimationWrapper delay={0.2}>
-                                <h1 className={styles.heroHeadline}>ZORK DI Shield</h1>
+                                {/* CHANGED: ZORK DI Shield -> iShield Lock */}
+                                <h1 className={styles.heroHeadline}>iShield Lock</h1>
                             </AnimationWrapper>
                             <AnimationWrapper delay={0.3}>
                                 <p className={styles.heroSubheadline}>
@@ -286,12 +287,19 @@ const HomeClient: React.FC<HomeClientProps> = ({
                             </AnimationWrapper>
                             <AnimationWrapper delay={0.4}>
                                 <div className={styles.heroButtonContainer}>
-                                    <Link href="/zorkdi-shield" className={`${styles.heroButton} ${styles.heroPrimaryButton}`}>
-                                        <FaShieldAlt style={{ marginRight: '0.6rem' }} /> Explore System
+                                    {/* CHANGED: Link updated to /ishield-lock */}
+                                    <Link href="/ishield-lock" className={`${styles.heroButton} ${styles.heroPrimaryButton}`}>
+                                        <FaShieldAlt style={{ marginRight: '0.6rem' }} /> Explore iShield
                                     </Link>
-                                    <button className={`${styles.heroButton} ${styles.primaryOutline}`} style={{pointerEvents: 'none', opacity: 0.8}}>
-                                        <FaCheckCircle style={{ marginRight: '0.6rem' }} /> Live Demo
-                                    </button>
+                                    {/* CHANGED: Replaced Live Demo with Direct Download Link */}
+                                    <a 
+                                        href="/ishield-lock.apk" 
+                                        download="ishield-lock.apk"
+                                        className={`${styles.heroButton} ${styles.primaryOutline}`}
+                                        style={{textDecoration: 'none'}}
+                                    >
+                                        <FaDownload style={{ marginRight: '0.6rem' }} /> Download App
+                                    </a>
                                 </div>
                             </AnimationWrapper>
                         </div>

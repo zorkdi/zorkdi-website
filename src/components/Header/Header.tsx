@@ -129,12 +129,12 @@ const Header = ({ globalSettings }: HeaderProps) => {
         {/* --- RIGHT: CONTROLS --- */}
         <div className={styles.rightControls}>
           
-          {/* 1. Shield Button */}
+          {/* 1. Shield Button (UPDATED to iShield Lock) */}
           <Link 
-            href="/zorkdi-shield" 
+            href="/ishield-lock" 
             className={`${styles.headerButtonBase} ${styles.shieldCtaButton}`}
           >
-            <FaShieldAlt /> SHIELD
+            <FaShieldAlt /> iShield Lock
           </Link>
           
           {/* 2. Start Project Button */}
@@ -203,7 +203,8 @@ const Header = ({ globalSettings }: HeaderProps) => {
               <li><Link href="/" onClick={closeMenus}>Home</Link></li>
               <li><Link href="/services" onClick={closeMenus}>Services</Link></li>
               <li><Link href="/portfolio" onClick={closeMenus}>Portfolio</Link></li>
-              <li><Link href="/zorkdi-shield" onClick={closeMenus} style={{color: '#8E2DE2'}}>Shield System</Link></li>
+              {/* Updated Link and Text for Mobile */}
+              <li><Link href="/ishield-lock" onClick={closeMenus} style={{color: '#8E2DE2'}}>iShield Lock</Link></li>
               <li><Link href="/blog" onClick={closeMenus}>Blog</Link></li>
               <li><Link href="/contact" onClick={closeMenus}>Contact Us</Link></li>
               <li><Link href="/new-project" className={styles.mobileCta} onClick={closeMenus}>Start a Project</Link></li> 
