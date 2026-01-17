@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image'; 
 import styles from './Header.module.css';
 import { CgMenuRight, CgClose } from "react-icons/cg";
-import { FaUserCircle, FaShieldAlt, FaEnvelope } from "react-icons/fa"; // Added FaEnvelope
+import { FaUserCircle, FaShieldAlt, FaEnvelope } from "react-icons/fa"; 
 import { useAuth } from '../../context/AuthContext'; 
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
@@ -129,9 +129,9 @@ const Header = ({ globalSettings }: HeaderProps) => {
         {/* --- RIGHT: CONTROLS --- */}
         <div className={styles.rightControls}>
           
-          {/* 1. Shield Button (UPDATED to iShield Lock) */}
+          {/* 1. Shield Button (Link Fixed: /zorkdi-shield) */}
           <Link 
-            href="/ishield-lock" 
+            href="/zorkdi-shield" 
             className={`${styles.headerButtonBase} ${styles.shieldCtaButton}`}
           >
             <FaShieldAlt /> iShield Lock
@@ -203,8 +203,8 @@ const Header = ({ globalSettings }: HeaderProps) => {
               <li><Link href="/" onClick={closeMenus}>Home</Link></li>
               <li><Link href="/services" onClick={closeMenus}>Services</Link></li>
               <li><Link href="/portfolio" onClick={closeMenus}>Portfolio</Link></li>
-              {/* Updated Link and Text for Mobile */}
-              <li><Link href="/ishield-lock" onClick={closeMenus} style={{color: '#8E2DE2'}}>iShield Lock</Link></li>
+              {/* Mobile Link Fixed */}
+              <li><Link href="/zorkdi-shield" onClick={closeMenus} style={{color: '#8E2DE2'}}>iShield Lock</Link></li>
               <li><Link href="/blog" onClick={closeMenus}>Blog</Link></li>
               <li><Link href="/contact" onClick={closeMenus}>Contact Us</Link></li>
               <li><Link href="/new-project" className={styles.mobileCta} onClick={closeMenus}>Start a Project</Link></li> 

@@ -48,10 +48,8 @@ const FeatureIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
 // --- Interfaces (UPDATED: Dates are now strings) ---
 export interface ServiceOffering { id: string; title: string; description: string; offerings: string[]; }
 export interface ServicesContent { heroHeadline: string; heroSubheadline: string; heroButtonText: string; services: ServiceOffering[]; }
-// Changed createdAt to string | null
 export interface BlogPreview { id: string; title: string; slug: string; coverImageURL: string; summary: string; createdAt: string | null; }
 export interface PortfolioPreview { id: string; title: string; category: string; coverImageURL: string; content: string; }
-// Changed createdAt to string | null
 export interface Review { id: string; userName: string; rating: number; comment: string; createdAt: string | null; }
 export interface GlobalSettings { statProjects: string; statTeam: string; statClients: string; statYears: string; }
 
@@ -268,7 +266,7 @@ const HomeClient: React.FC<HomeClientProps> = ({
                  >
                     <canvas ref={canvasRef} className={styles.plexusCanvas} />
 
-                    {/* --- SLIDE 0: iSHIELD LOCK (Updated Name & Link) --- */}
+                    {/* --- SLIDE 0: iSHIELD LOCK (Updated Name & Fixed Link) --- */}
                     <div className={`${styles.heroContentWrapper} ${styles.shieldSlideWrapper} ${getSlideClass(0)}`}>
                         <div className={styles.shieldSlideText}>
                             <AnimationWrapper delay={0.1}>
@@ -277,7 +275,7 @@ const HomeClient: React.FC<HomeClientProps> = ({
                                 </div>
                             </AnimationWrapper>
                             <AnimationWrapper delay={0.2}>
-                                {/* CHANGED: ZORK DI Shield -> iShield Lock */}
+                                {/* Name Change: iShield Lock */}
                                 <h1 className={styles.heroHeadline}>iShield Lock</h1>
                             </AnimationWrapper>
                             <AnimationWrapper delay={0.3}>
@@ -287,11 +285,11 @@ const HomeClient: React.FC<HomeClientProps> = ({
                             </AnimationWrapper>
                             <AnimationWrapper delay={0.4}>
                                 <div className={styles.heroButtonContainer}>
-                                    {/* CHANGED: Link updated to /ishield-lock */}
-                                    <Link href="/ishield-lock" className={`${styles.heroButton} ${styles.heroPrimaryButton}`}>
+                                    {/* Link Reverted: /zorkdi-shield */}
+                                    <Link href="/zorkdi-shield" className={`${styles.heroButton} ${styles.heroPrimaryButton}`}>
                                         <FaShieldAlt style={{ marginRight: '0.6rem' }} /> Explore iShield
                                     </Link>
-                                    {/* CHANGED: Replaced Live Demo with Direct Download Link */}
+                                    {/* New Download Link (Kept as requested) */}
                                     <a 
                                         href="/ishield-lock.apk" 
                                         download="ishield-lock.apk"
