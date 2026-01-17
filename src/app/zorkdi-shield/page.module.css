@@ -194,6 +194,32 @@
 }
 .primaryBtn:hover::before { left: 100%; }
 
+/* --- NEW DOWNLOAD BUTTON STYLE --- */
+.downloadBtn {
+    background: #2dd4bf; /* Neon Green */
+    color: #000; 
+    padding: 1.2rem 3rem;
+    font-weight: 800; font-size: 1rem; 
+    border-radius: 4px; 
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease; 
+    text-decoration: none; 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 0 25px rgba(45, 212, 191, 0.4);
+    position: relative;
+    overflow: hidden;
+    border: none;
+}
+.downloadBtn:hover { 
+    transform: translateY(-3px); 
+    box-shadow: 0 0 40px rgba(45, 212, 191, 0.6); 
+    background: #fff; /* Hover to white */
+}
+
 .secondaryBtn {
     background: rgba(255, 255, 255, 0.05); 
     color: #fff; 
@@ -458,5 +484,5 @@
     .ctaBox { padding: 4rem 1.5rem; }
     
     .buttonGroup { flex-direction: column; width: 100%; }
-    .primaryBtn, .secondaryBtn { width: 100%; text-align: center; }
+    .primaryBtn, .secondaryBtn, .downloadBtn { width: 100%; text-align: center; }
 }

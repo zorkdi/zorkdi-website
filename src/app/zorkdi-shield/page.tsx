@@ -8,7 +8,7 @@ import Image from 'next/image';
 import styles from './page.module.css';
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
 import { 
-    FaShieldAlt, FaLock, FaMapMarkedAlt, FaUserSecret, FaKey, FaUndo, FaServer, FaFingerprint, FaMobileAlt, FaMapMarkerAlt, FaMoneyBillWave, FaCheckCircle, FaPhoneAlt
+    FaShieldAlt, FaLock, FaMapMarkedAlt, FaUserSecret, FaKey, FaUndo, FaServer, FaFingerprint, FaMobileAlt, FaMapMarkerAlt, FaMoneyBillWave, FaCheckCircle, FaPhoneAlt, FaAndroid
 } from 'react-icons/fa';
 
 // Firebase
@@ -58,7 +58,7 @@ export default function ShieldPage() {
                         </div>
                         
                         <h1 className={styles.heroTitle}>
-                            ZORK DI <span>SHIELD</span>
+                            iShield <span>Lock</span>
                         </h1>
 
                         <p className={styles.heroSubtitle}>
@@ -71,6 +71,18 @@ export default function ShieldPage() {
                             <Link href="/zorkdi-shield/access" className={styles.primaryBtn}>
                                 Get Access Now
                             </Link>
+                            
+                            {/* UPDATED DOWNLOAD BUTTON WITH YOUR LINK */}
+                            <a 
+                                href="https://storage.googleapis.com/zork-di-shield.firebasestorage.app/Project_iShield/iShield_Biz_V2.0.3.apk" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className={styles.downloadBtn}
+                                download
+                            >
+                                <FaAndroid size={20} /> Download App
+                            </a>
+
                             <Link href="#features" className={styles.secondaryBtn}>
                                 View Features
                             </Link>
@@ -89,7 +101,7 @@ export default function ShieldPage() {
                                 <FaMoneyBillWave /> Business Opportunity
                             </div>
                             <h2 className={styles.mainHeading}>
-                                Become a ZORK DI Shield <br/> <span>Distributor</span>
+                                Become a iShield Lock <br/> <span>Distributor</span>
                             </h2>
                             <p className={styles.descText}>
                                 Join our network and generate a recurring passive income stream. 
@@ -180,7 +192,7 @@ export default function ShieldPage() {
                         <div className={styles.featureCard}>
                             <div className={styles.iconWrapper}><FaUserSecret /></div>
                             <h3>Hidden Admin App</h3>
-                            <p>The ZORK DI Shield application remains hidden on the user&apos;s device. They cannot uninstall or tamper with it.</p>
+                            <p>The iShield Lock application remains hidden on the user&apos;s device. They cannot uninstall or tamper with it.</p>
                         </div>
                     </AnimationWrapper>
                     
@@ -207,7 +219,7 @@ export default function ShieldPage() {
                 <div className={styles.sectionHeading}>
                     <AnimationWrapper>
                         <h2>Strategic Alliance</h2>
-                        <p>Meet the leaders driving ZORK DI Shield across the nation.</p>
+                        <p>Meet the leaders driving iShield Lock across the nation.</p>
                     </AnimationWrapper>
                 </div>
 
@@ -257,14 +269,14 @@ export default function ShieldPage() {
                                     <div className={styles.imageFrame}>
                                         <Image 
                                             src="/logo.png" 
-                                            alt="ZORK DI Shield" 
+                                            alt="iShield Lock" 
                                             width={160} 
                                             height={160} 
                                             className={styles.partnerImage}
                                             style={{objectFit: 'contain', backgroundColor: '#000'}} 
                                         />
                                     </div>
-                                    <h3 className={styles.partnerName}>ZORK DI SHIELD</h3>
+                                    <h3 className={styles.partnerName}>iShield Lock</h3>
                                     <p className={styles.partnerRole}>Official Product</p>
                                     <div className={styles.divider}></div>
                                 </div>
@@ -298,7 +310,7 @@ export default function ShieldPage() {
                             <div className={styles.stepContent}>
                                 <div className={styles.stepIcon}><FaServer /></div>
                                 <h3>Create Account</h3>
-                                <p>Get your retailer or admin account on the ZORK DI Shield panel.</p>
+                                <p>Get your retailer or admin account on the iShield Lock panel.</p>
                             </div>
                         </div>
                     </AnimationWrapper>
@@ -332,7 +344,7 @@ export default function ShieldPage() {
                 <AnimationWrapper>
                     <div className={styles.ctaBox}>
                         <h2>Ready to Secure Your Finance Business?</h2>
-                        <p>Join 50+ finance companies already using ZORK DI Shield to recover loans.</p>
+                        <p>Join 50+ finance companies already using iShield Lock to recover loans.</p>
                         <Link href="/zorkdi-shield/access" className={styles.primaryBtn}>
                             Request Demo Access
                         </Link>

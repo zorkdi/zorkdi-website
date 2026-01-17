@@ -2,32 +2,33 @@
 
 import type { Metadata } from "next";
 
-// --- ULTIMATE SEO MASTER KEYWORDS ---
+// --- ULTIMATE SEO MASTER KEYWORDS (REBRANDED FOR iSHIELD LOCK) ---
 // Humne yahan har angle cover kiya hai: Retailer, Wholesaler, Defaulter, aur Technical.
 export const metadata: Metadata = {
-  title: "ZORK DI Shield | #1 EMI Locker Software & Finance MDM for Retailers",
-  description: "India's Best Mobile Finance Lock. Prevent EMI default with Hard Reset Protection. Remote Lock, GPS Tracking, & SIM Alert. Get Retailer Admin Panel ID today.",
+  title: "iShield Lock | #1 EMI Locker Software & Finance MDM for Retailers",
+  description: "India's Best Mobile Finance Lock. Prevent EMI default with Hard Reset Protection. Remote Lock, GPS Tracking, & SIM Alert. Get iShield Lock Retailer Admin Panel ID today.",
   
   keywords: [
     // --- TOP LEVEL (BUSINESS) ---
-    "EMI Locker App",
+    "iShield Lock",
+    "iShield App",
+    "iShield EMI Locker",
     "Finance Lock Software",
     "Mobile EMI Lock India",
     "Best EMI Recovery App",
     "Retailer Mobile Security",
     "Finance MDM System",
     "Mobile Finance Lock APK",
-    "EMI Locker Admin Panel",
-    "ZORK DI Shield",
+    "iShield Admin Panel",
     
     // --- RETAILER & DISTRIBUTOR SPECIFIC ---
     "EMI Locker Distributor ID",
-    "How to get Finance Lock Admin Panel",
+    "How to get iShield Admin Panel",
     "Mobile Finance Business Franchise",
     "Bulk EMI Locker Key Price",
     "Retailer Lock App for Android",
     "EMI Lock Agency Registration",
-    "ZORK DI Retailer Login",
+    "iShield Retailer Login",
     
     // --- TECHNICAL & FEATURES ---
     "Hard Reset Protection App",
@@ -51,7 +52,7 @@ export const metadata: Metadata = {
     // --- HINGLISH / DESI SEARCHES (VERY IMPORTANT) ---
     "Udhaar mobile lock app",
     "Kisht wala phone lock kaise kare",
-    "Mobile finance lock todne ka tarika", // Negative targeting: Hum top pe aayenge
+    "Mobile finance lock todne ka tarika", // Negative targeting
     "Phone ka EMI lock kaise hataye",
     "Finance mobile lock software download",
     "Dukandaar ke liye loan recovery app",
@@ -61,10 +62,10 @@ export const metadata: Metadata = {
 
   // Social Sharing Card
   openGraph: {
-    title: "ZORK DI Shield - India's #1 Finance Security",
-    description: "Retailers aur Financiers ka sabse bharosemand saathi. Customer EMI nahi dega toh phone lock karo 1 click mein.",
-    url: "https://www.zorkdi.in/zorkdi-shield",
-    siteName: "ZORK DI",
+    title: "iShield Lock - India's #1 Finance Security",
+    description: "Retailers aur Financiers ka sabse bharosemand saathi. Customer EMI nahi dega toh phone lock karo 1 click mein. Download iShield App now.",
+    url: "https://www.zorkdi.in/zorkdi-shield", // Agar URL change hua hai toh update karein
+    siteName: "iShield Lock",
     locale: "en_IN",
     type: "website",
     images: [
@@ -72,7 +73,7 @@ export const metadata: Metadata = {
         url: "/shield-banner.png", // Ensure ye image public folder mein ho
         width: 1200,
         height: 630,
-        alt: "ZORK DI Shield Security System",
+        alt: "iShield Lock Security System",
       },
     ],
   },
@@ -106,7 +107,7 @@ export default function ShieldLayout({
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "ZORK DI Shield",
+    "name": "iShield Lock",
     "operatingSystem": "ANDROID",
     "applicationCategory": "BusinessApplication",
     "aggregateRating": {
@@ -125,7 +126,7 @@ export default function ShieldLayout({
     "description": "Enterprise Grade EMI Locking Solution for Mobile Retailers in India.",
     "publisher": {
         "@type": "Organization",
-        "name": "ZORK DI"
+        "name": "iShield Lock Systems"
     }
   };
 
