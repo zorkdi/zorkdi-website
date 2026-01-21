@@ -5,6 +5,9 @@ import type { Metadata } from "next";
 // --- ULTIMATE SEO MASTER KEYWORDS (REBRANDED FOR iSHIELD LOCK) ---
 // Humne yahan har angle cover kiya hai: Retailer, Wholesaler, Defaulter, aur Technical.
 export const metadata: Metadata = {
+  // --- FIX: METADATA BASE ADDED (Important for Google Indexing) ---
+  metadataBase: new URL('https://www.zorkdi.in'), 
+
   title: "iShield Lock | #1 EMI Locker Software & Finance MDM for Retailers",
   description: "India's Best Mobile Finance Lock. Prevent EMI default with Hard Reset Protection. Remote Lock, GPS Tracking, & SIM Alert. Get iShield Lock Retailer Admin Panel ID today.",
   
@@ -94,6 +97,11 @@ export const metadata: Metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
+  },
+  
+  // Verification (Agar Google Search Console verification code hai toh yahan daal sakte ho)
+  verification: {
+    google: "google-site-verification-code-here", // Yahan apna GSC code replace karna
   },
 };
 

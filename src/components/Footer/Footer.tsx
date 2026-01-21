@@ -117,7 +117,8 @@ const Footer = async () => {
                             <h3>Resources</h3>
                             <ul>
                                 <li><Link href="/blog">Tech Insights</Link></li>
-                                <li><Link href="/zorkdi-shield">ZORK DI Shield</Link></li>
+                                {/* UPDATED: Rebranded to iShield Lock with new link */}
+                                <li><Link href="/ishield-lock">iShield Lock</Link></li>
                                 <li><Link href="/case-studies">Case Studies</Link></li>
                                 <li><Link href="/faq">FAQ</Link></li>
                             </ul>

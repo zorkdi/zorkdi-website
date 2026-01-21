@@ -8,7 +8,7 @@ import Image from 'next/image';
 import styles from './page.module.css';
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
 import { 
-    FaShieldAlt, FaLock, FaMapMarkedAlt, FaUserSecret, FaKey, FaUndo, FaServer, FaFingerprint, FaMobileAlt, FaMapMarkerAlt, FaMoneyBillWave, FaCheckCircle, FaPhoneAlt, FaAndroid
+    FaShieldAlt, FaLock, FaMapMarkedAlt, FaUserSecret, FaKey, FaUndo, FaServer, FaFingerprint, FaMobileAlt, FaMapMarkerAlt, FaMoneyBillWave, FaCheckCircle, FaPhoneAlt, FaAndroid, FaBriefcase, FaStore
 } from 'react-icons/fa';
 
 // Firebase
@@ -72,7 +72,7 @@ export default function ShieldPage() {
                                 Get Access Now
                             </Link>
                             
-                            {/* UPDATED DOWNLOAD BUTTON WITH YOUR LINK */}
+                            {/* --- BUTTON 1: RETAILER APP (Original Link) --- */}
                             <a 
                                 href="https://storage.googleapis.com/zork-di-shield.firebasestorage.app/Project_iShield/iShield_Biz1010V1.3.1.apk" 
                                 target="_blank" 
@@ -80,7 +80,18 @@ export default function ShieldPage() {
                                 className={styles.downloadBtn}
                                 download
                             >
-                                <FaAndroid size={20} /> Download App
+                                <FaStore size={20} /> Retailer App
+                            </a>
+
+                            {/* --- BUTTON 2: BUSINESS APP (New Link) --- */}
+                            <a 
+                                href="https://storage.googleapis.com/zork-di-shield.firebasestorage.app/Project_iShield/iShield_Business_V1.0.0.apk" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className={styles.downloadBtn}
+                                download
+                            >
+                                <FaBriefcase size={20} /> Business App
                             </a>
 
                             <Link href="#features" className={styles.secondaryBtn}>

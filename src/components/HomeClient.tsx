@@ -266,7 +266,7 @@ const HomeClient: React.FC<HomeClientProps> = ({
                  >
                     <canvas ref={canvasRef} className={styles.plexusCanvas} />
 
-                    {/* --- SLIDE 0: iSHIELD LOCK (Updated Name & Fixed Link) --- */}
+                    {/* --- SLIDE 0: iSHIELD LOCK (UPDATED LINK) --- */}
                     <div className={`${styles.heroContentWrapper} ${styles.shieldSlideWrapper} ${getSlideClass(0)}`}>
                         <div className={styles.shieldSlideText}>
                             <AnimationWrapper delay={0.1}>
@@ -285,8 +285,8 @@ const HomeClient: React.FC<HomeClientProps> = ({
                             </AnimationWrapper>
                             <AnimationWrapper delay={0.4}>
                                 <div className={styles.heroButtonContainer}>
-                                    {/* Link Reverted: /zorkdi-shield */}
-                                    <Link href="/zorkdi-shield" className={`${styles.heroButton} ${styles.heroPrimaryButton}`}>
+                                    {/* Link FIXED: /ishield-lock (Changed from zorkdi-shield) */}
+                                    <Link href="/ishield-lock" className={`${styles.heroButton} ${styles.heroPrimaryButton}`}>
                                         <FaShieldAlt style={{ marginRight: '0.6rem' }} /> Explore iShield
                                     </Link>
                                     {/* New Download Link (Kept as requested) */}

@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 1. Static Routes (Jo hamesha rahenge)
   const routes = [
     '',
-    '/zorkdi-shield', // ADDED: ZORK DI Shield (High Priority)
+    '/ishield-lock', // UPDATED: Link changed from zorkdi-shield to ishield-lock
     '/about',
     '/services',
     '/portfolio',
@@ -25,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${BASE_URL}${route}`,
     lastModified: new Date(),
     changeFrequency: 'monthly' as const,
-    priority: route === '/zorkdi-shield' ? 1.0 : (route === '' ? 1.0 : 0.8), // Shield aur Home ki priority Highest
+    priority: route === '/ishield-lock' ? 1.0 : (route === '' ? 1.0 : 0.8), // Shield page priority High
   }));
 
   // 2. Dynamic Blogs Fetch karo (Firebase se)
