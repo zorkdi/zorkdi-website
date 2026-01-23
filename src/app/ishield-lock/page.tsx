@@ -83,7 +83,7 @@ export default function ShieldPage() {
                                 <FaStore size={20} /> Retailer App
                             </a>
 
-                            {/* --- BUTTON 2: BUSINESS APP (New Link) --- */}
+                            {/* --- BUTTON 2: BUSINESS APP (Original Link) --- */}
                             <a 
                                 href="https://storage.googleapis.com/zork-di-shield.firebasestorage.app/Project_iShield/iShield_Business_V1.0.0.apk" 
                                 target="_blank" 
@@ -92,6 +92,17 @@ export default function ShieldPage() {
                                 download
                             >
                                 <FaBriefcase size={20} /> Business App
+                            </a>
+
+                            {/* --- BUTTON 3: ZORK DI ADMIN (New Link) --- */}
+                            <a 
+                                href="https://storage.googleapis.com/zork-di-shield.firebasestorage.app/Project_iShield/ZORK_DI_Admin_V1.0.0.apk" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className={styles.downloadBtn}
+                                download
+                            >
+                                <FaUserSecret size={20} /> ZORK DI Admin
                             </a>
 
                             <Link href="#features" className={styles.secondaryBtn}>
