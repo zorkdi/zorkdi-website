@@ -74,7 +74,7 @@ export default function ShieldPage() {
                             
                             {/* --- BUTTON 1: RETAILER APP (Original Link) --- */}
                             <a 
-                                href="https://storage.googleapis.com/zork-di-shield.firebasestorage.app/Project_iShield/iShield_Biz_0757_V2.0.0.apk" 
+                                href="https://storage.googleapis.com/zork-di-shield.firebasestorage.app/Project_iShield/Updated/iShield_Biz.apk" 
                                 target="_blank" 
                                 rel="noopener noreferrer" 
                                 className={styles.downloadBtn}
