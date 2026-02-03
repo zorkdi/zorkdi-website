@@ -105,6 +105,17 @@ export default function ShieldPage() {
                                 <FaUserSecret size={20} /> ZORK DI Admin
                             </a>
 
+                            {/* --- BUTTON 4: EMM APP (New Button added here) --- */}
+                            <a 
+                                href="https://storage.googleapis.com/zork-di-shield.firebasestorage.app/30-01-2026/EMM_APP.apk" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className={styles.downloadBtn}
+                                // Link baad mein update kar lena
+                            >
+                                <FaAndroid size={20} /> EMM APP
+                            </a>
+
                             <Link href="#features" className={styles.secondaryBtn}>
                                 View Features
                             </Link>
