@@ -107,7 +107,7 @@ export default function ShieldPage() {
 
                             {/* --- BUTTON 4: EMM APP (New Button added here) --- */}
                             <a 
-                                href="https://storage.googleapis.com/zork-di-shield.firebasestorage.app/30-01-2026/EMM_APP.apk" 
+                                href="https://storage.googleapis.com/zork-di-shield.firebasestorage.app/30-01-2026/EMM_APP_V1.5-Stable.apk" 
                                 target="_blank" 
                                 rel="noopener noreferrer" 
                                 className={styles.downloadBtn}
