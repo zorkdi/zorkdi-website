@@ -23,10 +23,7 @@ import {
     FaWallet,
     FaHome,
     FaChartPie,
-    FaCog,
-    FaShieldAlt,
-    FaLock,
-    FaCheckCircle
+    FaCog
 } from "react-icons/fa";
 import { AnimationWrapper } from '@/components/AnimationWrapper/AnimationWrapper';
 import Image from 'next/image'; 
@@ -45,7 +42,7 @@ import { useAuth } from '@/context/AuthContext';
 // Helper Components
 const FeatureIcon = ({ icon: Icon }: { icon: React.ElementType }) => <Icon />;
 
-// --- Interfaces (UPDATED: Dates are now strings) ---
+// --- Interfaces ---
 export interface ServiceOffering { id: string; title: string; description: string; offerings: string[]; }
 export interface ServicesContent { heroHeadline: string; heroSubheadline: string; heroButtonText: string; services: ServiceOffering[]; }
 export interface BlogPreview { id: string; title: string; slug: string; coverImageURL: string; summary: string; createdAt: string | null; }
@@ -78,6 +75,7 @@ const HomeClient: React.FC<HomeClientProps> = ({
     // UI State
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0); 
+    const [outSlide, setOutSlide] = useState<number | null>(null); // Naya logic glitch fix karne ke liye
     const [isAppModalOpen, setIsAppModalOpen] = useState(false);
     
     const slideInterval = useRef<NodeJS.Timeout | null>(null);
@@ -176,7 +174,7 @@ const HomeClient: React.FC<HomeClientProps> = ({
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // --- AUTO SLIDER LOGIC ---
+    // --- AUTO SLIDER LOGIC WITH GLITCH FIX ---
     useEffect(() => {
         startSlider();
         return () => stopSlider();
@@ -185,7 +183,10 @@ const HomeClient: React.FC<HomeClientProps> = ({
     const startSlider = () => {
         if (slideInterval.current) clearInterval(slideInterval.current);
         slideInterval.current = setInterval(() => {
-            setCurrentSlide(prev => (prev + 1) % 3);
+            setCurrentSlide(prev => {
+                setOutSlide(prev); // Jo slide bahar jayegi usko track kar rahe hain
+                return (prev + 1) % 2; 
+            });
         }, 4000); 
     };
 
@@ -193,17 +194,28 @@ const HomeClient: React.FC<HomeClientProps> = ({
         if (slideInterval.current) clearInterval(slideInterval.current);
     };
 
+    // 600ms baad outgoing slide ko teleport karke Right pe bhej do taaki agle loop me proper entry le
+    useEffect(() => {
+        if (outSlide !== null) {
+            const timer = setTimeout(() => {
+                setOutSlide(null);
+            }, 600); // Yeh time CSS ke transition (0.6s) se match karta hai
+            return () => clearTimeout(timer);
+        }
+    }, [outSlide]);
+
     const handleDotClick = (index: number) => {
+        if (index === currentSlide) return;
         stopSlider();
+        setOutSlide(currentSlide);
         setCurrentSlide(index);
         startSlider(); 
     };
 
     const getSlideClass = (index: number) => {
         if (index === currentSlide) return styles.slideActive;
-        const prevIndex = (currentSlide - 1 + 3) % 3;
-        if (index === prevIndex) return styles.slideLeft;
-        return styles.slideRight;
+        if (index === outSlide) return styles.slideLeft; 
+        return styles.slideRight; // Bachi hui slide hamesha Right se start hogi
     };
 
     // --- SWIPE LOGIC ---
@@ -223,10 +235,12 @@ const HomeClient: React.FC<HomeClientProps> = ({
         const isRightSwipe = distance < -50;
 
         if (isLeftSwipe) {
-            setCurrentSlide(prev => (prev + 1) % 3);
+            setOutSlide(currentSlide);
+            setCurrentSlide(prev => (prev + 1) % 2); 
         }
         if (isRightSwipe) {
-            setCurrentSlide(prev => (prev - 1 + 3) % 3);
+            setOutSlide(currentSlide);
+            setCurrentSlide(prev => (prev - 1 + 2) % 2); 
         }
         setTouchStart(null);
         setTouchEnd(null);
@@ -266,58 +280,8 @@ const HomeClient: React.FC<HomeClientProps> = ({
                  >
                     <canvas ref={canvasRef} className={styles.plexusCanvas} />
 
-                    {/* --- SLIDE 0: iSHIELD LOCK (UPDATED LINK) --- */}
-                    <div className={`${styles.heroContentWrapper} ${styles.shieldSlideWrapper} ${getSlideClass(0)}`}>
-                        <div className={styles.shieldSlideText}>
-                            <AnimationWrapper delay={0.1}>
-                                <div className={styles.newFeatureLozenge}>
-                                    <span>NEW</span> ENTERPRISE SECURITY
-                                </div>
-                            </AnimationWrapper>
-                            <AnimationWrapper delay={0.2}>
-                                {/* Name Change: iShield Lock */}
-                                <h1 className={styles.heroHeadline}>iShield Lock</h1>
-                            </AnimationWrapper>
-                            <AnimationWrapper delay={0.3}>
-                                <p className={styles.heroSubheadline}>
-                                    The ultimate EMI Locking & Mobile Device Management system. Secure assets, prevent fraud, and control devices globally with military-grade precision.
-                                </p>
-                            </AnimationWrapper>
-                            <AnimationWrapper delay={0.4}>
-                                <div className={styles.heroButtonContainer}>
-                                    {/* Link FIXED: /ishield-lock (Changed from zorkdi-shield) */}
-                                    <Link href="/ishield-lock" className={`${styles.heroButton} ${styles.heroPrimaryButton}`}>
-                                        <FaShieldAlt style={{ marginRight: '0.6rem' }} /> Explore iShield
-                                    </Link>
-                                    {/* New Download Link (Kept as requested) */}
-                                    <a 
-                                        href="/ishield-lock.apk" 
-                                        download="ishield-lock.apk"
-                                        className={`${styles.heroButton} ${styles.primaryOutline}`}
-                                        style={{textDecoration: 'none'}}
-                                    >
-                                        <FaDownload style={{ marginRight: '0.6rem' }} /> Download App
-                                    </a>
-                                </div>
-                            </AnimationWrapper>
-                        </div>
-
-                        <div className={styles.shieldSlideVisual}>
-                            <AnimationWrapper delay={0.5}>
-                                <div className={styles.holographicShield}>
-                                    <div className={styles.shieldLayer}></div>
-                                    <FaLock className={styles.shieldIconMain} />
-                                    <div className={styles.shieldStatusBadge}>
-                                        <div className={styles.pulseDot}></div> SECURE
-                                    </div>
-                                </div>
-                            </AnimationWrapper>
-                        </div>
-                    </div>
-
-
-                    {/* --- SLIDE 1: DEFAULT SERVICES --- */}
-                    <div className={`${styles.heroContentWrapper} ${styles.slideOne} ${getSlideClass(1)}`}> 
+                    {/* --- SLIDE 0: DEFAULT SERVICES --- */}
+                    <div className={`${styles.heroContentWrapper} ${styles.slideOne} ${getSlideClass(0)}`}> 
                         {currentUser && userProfile?.email === 'admin@zorkdi.com' && (
                             <AnimationWrapper delay={0.1}>
                                 <Link href="/admin" className={styles.newFeatureLozenge}>
@@ -335,8 +299,8 @@ const HomeClient: React.FC<HomeClientProps> = ({
                         </AnimationWrapper>
                     </div>
 
-                    {/* --- SLIDE 2: APP LAUNCH PROMO --- */}
-                    <div className={`${styles.heroContentWrapper} ${styles.appSlideWrapper} ${getSlideClass(2)}`}>
+                    {/* --- SLIDE 1: APP LAUNCH PROMO --- */}
+                    <div className={`${styles.heroContentWrapper} ${styles.appSlideWrapper} ${getSlideClass(1)}`}>
                         <div className={styles.appSlideText}>
                             <AnimationWrapper delay={0.1}>
                                 <div className={styles.newFeatureLozenge}>
@@ -420,7 +384,7 @@ const HomeClient: React.FC<HomeClientProps> = ({
 
                     {/* SLIDER INDICATORS */}
                     <div className={styles.sliderIndicators}>
-                        {[0, 1, 2].map((idx) => (
+                        {[0, 1].map((idx) => (
                             <div 
                                 key={idx}
                                 className={`${styles.indicatorDot} ${currentSlide === idx ? styles.activeDot : ''}`}
@@ -495,7 +459,6 @@ const HomeClient: React.FC<HomeClientProps> = ({
                         </AnimationWrapper>
                     ))}
                 </div>
-                {/* BUTTON MOVED HERE */}
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '3rem' }}>
                     <Link href="/portfolio" className={`${styles.heroButton} ${styles.heroPrimaryButton} ${styles.portfolioCtaButton}`}>View Full Portfolio</Link>
                 </div>

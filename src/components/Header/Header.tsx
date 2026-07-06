@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image'; 
 import styles from './Header.module.css';
 import { CgMenuRight, CgClose } from "react-icons/cg";
-import { FaUserCircle, FaShieldAlt, FaEnvelope } from "react-icons/fa"; 
+import { FaUserCircle, FaEnvelope } from "react-icons/fa"; 
 import { useAuth } from '../../context/AuthContext'; 
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
@@ -129,15 +129,7 @@ const Header = ({ globalSettings }: HeaderProps) => {
         {/* --- RIGHT: CONTROLS --- */}
         <div className={styles.rightControls}>
           
-          {/* 1. Shield Button (UPDATED LINK) */}
-          <Link 
-            href="/ishield-lock" 
-            className={`${styles.headerButtonBase} ${styles.shieldCtaButton}`}
-          >
-            <FaShieldAlt /> iShield Lock
-          </Link>
-          
-          {/* 2. Start Project Button */}
+          {/* 1. Start Project Button */}
           <Link 
             href="/new-project" 
             className={`${styles.headerButtonBase} ${styles.primaryCtaButton}`}
@@ -145,7 +137,7 @@ const Header = ({ globalSettings }: HeaderProps) => {
             Start Project
           </Link>
 
-          {/* 3. CONTACT BUTTON */}
+          {/* 2. CONTACT BUTTON */}
           <Link 
             href="/contact" 
             className={`${styles.headerButtonBase} ${styles.contactButton}`}
@@ -153,7 +145,7 @@ const Header = ({ globalSettings }: HeaderProps) => {
             <FaEnvelope style={{marginRight: '8px'}}/> Contact
           </Link>
           
-          {/* 4. PROFILE DROPDOWN */}
+          {/* 3. PROFILE DROPDOWN */}
           <div className={styles.profileMenuContainer} ref={profileMenuRef}>
             {!authLoading && currentUser && userProfile?.photoURL ? (
                 <Image 
@@ -203,8 +195,6 @@ const Header = ({ globalSettings }: HeaderProps) => {
               <li><Link href="/" onClick={closeMenus}>Home</Link></li>
               <li><Link href="/services" onClick={closeMenus}>Services</Link></li>
               <li><Link href="/portfolio" onClick={closeMenus}>Portfolio</Link></li>
-              {/* Mobile Link Fixed */}
-              <li><Link href="/ishield-lock" onClick={closeMenus} style={{color: '#8E2DE2'}}>iShield Lock</Link></li>
               <li><Link href="/blog" onClick={closeMenus}>Blog</Link></li>
               <li><Link href="/contact" onClick={closeMenus}>Contact Us</Link></li>
               <li><Link href="/new-project" className={styles.mobileCta} onClick={closeMenus}>Start a Project</Link></li> 

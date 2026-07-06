@@ -225,83 +225,6 @@
     transform: translateY(-4px);
 }
 
-/* --- SLIDE 0: SHIELD --- */
-.shieldSlideWrapper {
-    flex-direction: row; 
-    align-items: center;
-    justify-content: space-between;
-    gap: 4rem; 
-}
-.shieldSlideText { flex: 1; max-width: 650px; z-index: 2; text-align: left; }
-.shieldSlideVisual {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1;
-    height: 100%;
-    position: relative;
-}
-
-.holographicShield {
-    width: 400px;
-    height: 480px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    animation: shieldFloat 6s ease-in-out infinite;
-}
-.shieldLayer {
-    position: absolute;
-    inset: 0;
-    border: 2px solid rgba(212, 20, 90, 0.3);
-    border-radius: 50% 50% 50% 50% / 15% 15% 85% 85%;
-    box-shadow: 0 0 40px rgba(142, 45, 226, 0.3), inset 0 0 20px rgba(212, 20, 90, 0.1);
-    backdrop-filter: blur(4px);
-    background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
-    z-index: 5;
-}
-.shieldLayer::before {
-    content: '';
-    position: absolute;
-    top: 15px; left: 15px; right: 15px; bottom: 15px;
-    border: 1px dashed rgba(212, 20, 90, 0.5);
-    border-radius: 50% 50% 50% 50% / 15% 15% 85% 85%;
-    animation: spinShield 25s linear infinite;
-}
-.shieldIconMain {
-    font-size: 8rem;
-    color: var(--color-neon-light); 
-    z-index: 10;
-    filter: drop-shadow(0 0 25px var(--color-neon-green));
-    animation: pulseIcon 4s infinite ease-in-out;
-}
-.shieldStatusBadge {
-    position: absolute;
-    bottom: 15%;
-    background: rgba(15, 5, 24, 0.9);
-    border: 1px solid var(--color-neon-green);
-    padding: 0.6rem 2rem;
-    border-radius: 50px;
-    color: var(--color-neon-light);
-    font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    box-shadow: 0 0 20px rgba(212, 20, 90, 0.4);
-    z-index: 12;
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-}
-.pulseDot {
-    width: 10px;
-    height: 10px;
-    background: var(--color-neon-green);
-    border-radius: 50%;
-    box-shadow: 0 0 10px var(--color-neon-green);
-    animation: pulse 2s infinite;
-}
 
 /* --- SLIDE 1: SERVICES --- */
 .slideOne { align-items: center; text-align: center; }
@@ -711,24 +634,6 @@
         justify-content: center;
     } 
     
-    /* SHIELD SLIDE MOBILE - VISUALS HIDDEN */
-    .shieldSlideWrapper { 
-        flex-direction: column; 
-        justify-content: center; 
-    }
-    .shieldSlideText { 
-        order: 1; 
-        text-align: center; 
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem; /* REDUCED gap */
-    }
-    .shieldSlideVisual { display: none !important; }
-    
     /* APP SLIDE MOBILE - VISUALS HIDDEN */
     .appSlideWrapper { 
         flex-direction: column; 
@@ -874,7 +779,4 @@
 @keyframes scrollLogos { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes pulseShadow { 0% { box-shadow: 0 0 30px rgba(142, 45, 226, 0.4); } 50% { box-shadow: 0 0 50px rgba(142, 45, 226, 0.7); } 100% { box-shadow: 0 0 30px rgba(142, 45, 226, 0.4); } }
 @keyframes floatPhone { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
-@keyframes shieldFloat { 0% { transform: translateY(0); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0); } }
-@keyframes spinShield { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes pulseIcon { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.9; } 100% { transform: scale(1); opacity: 1; } }
-@keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 20, 90, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(212, 20, 90, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 20, 90, 0); } }
+@keyframes floatShield { 0% { transform: translateY(0); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0); } } /* Renamed and kept if other elements need float */
